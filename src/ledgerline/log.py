@@ -1,4 +1,5 @@
 import logging
+import resource
 import sys
 
 import structlog
@@ -36,8 +37,8 @@ def configure_logging(settings: Settings) -> None:
 
     formatter = structlog.stdlib.ProcessorFormatter(
         processor=renderer,
-        foreign_pre_chain=shared_processors
-        + [
+        foreign_pre_chain=[
+            *shared_processors,
             structlog.stdlib.PositionalArgumentsFormatter(),
             structlog.processors.StackInfoRenderer(),
             structlog.processors.ExceptionRenderer(),
@@ -55,24 +56,24 @@ def configure_logging(settings: Settings) -> None:
     logging.getLogger("uvicorn.access").handlers.clear()
     logging.getLogger("uvicorn.access").propagate = False
     logging.getLogger("uvicorn.error").propagate = True
-    logging.getLogger("sqlalchemy.engine").setLevel(
-        logging.DEBUG if settings.debug else logging.WARNING
-    )
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG if settings.debug else logging.WARNING)
     logging.getLogger("celery").propagate = True
     logging.getLogger("celery.app.trace").propagate = True
 
 
-def _add_logger_name(logger, method, event_dict):  # noqa: ARG001
+def _add_logger_name(logger, method, event_dict):
     name = getattr(logger, "name", None)
     if name:
         event_dict.setdefault("logger", name)
     return event_dict
 
 
-def _add_app_context(logger, method, event_dict):  # noqa: ARG001
+def _add_app_context(logger, method, event_dict):
     s = get_settings()
     event_dict.setdefault("env", s.environment)
     event_dict.setdefault("ver", s.app_version)
+    # Peak memory of this process (Linux: KiB) on every line, to size the calc worker from real bank files.
+    event_dict["peak_rss_mb"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss // 1024
     return event_dict
 
 
