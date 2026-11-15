@@ -32,7 +32,10 @@ def _prepare_async_url(url: str) -> tuple[str, dict]:
 
 _db_url, _connect_args = _prepare_async_url(settings.database_url)
 # Raw SQL in the ported modules names tables unqualified; engine tables first, then the web app's.
-_connect_args["server_settings"] = {"search_path": f"{ENGINE_SCHEMA},{settings.web_schema}", "application_name": "ledgerline-engine"}
+_connect_args["server_settings"] = {
+    "search_path": f"{ENGINE_SCHEMA},{settings.web_schema}",
+    "application_name": "ledgerline-engine",
+}
 
 engine = create_async_engine(
     _db_url,
@@ -73,5 +76,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 def sync_dsn() -> str:
     """libpq DSN (psycopg / Procrastinate / Alembic) from the same DATABASE_URL."""
-    url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://").replace("postgres://", "postgresql://")
+    url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://").replace(
+        "postgres://", "postgresql://"
+    )
     return url.replace("ssl=require", "sslmode=require")
