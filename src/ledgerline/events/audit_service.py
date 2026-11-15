@@ -5,6 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ledgerline.config import Settings, get_settings
 from ledgerline.events.audit_models import AuditLog
 from ledgerline.kernel.ids import new_ulid
+from ledgerline.log import get_logger
+
+_log = get_logger("audit")
 
 
 async def log_event(
@@ -24,12 +27,8 @@ async def log_event(
     try:
         s = settings or get_settings()
         salt = s.ip_hash_salt
-        ip_hash = (
-            hashlib.sha256(f"{ip}{salt}".encode()).hexdigest() if ip else None
-        )
-        ua_hash = (
-            hashlib.sha256(f"{user_agent}{salt}".encode()).hexdigest() if user_agent else None
-        )
+        ip_hash = hashlib.sha256(f"{ip}{salt}".encode()).hexdigest() if ip else None
+        ua_hash = hashlib.sha256(f"{user_agent}{salt}".encode()).hexdigest() if user_agent else None
         entry = AuditLog(
             id=new_ulid(),
             tenant_id=tenant_id,
@@ -42,5 +41,5 @@ async def log_event(
             error_code=error_code,
         )
         db.add(entry)
-    except Exception:
-        pass
+    except Exception as exc:  # auditing must never break the request it records
+        _log.warning("audit_log_failed", event_type=str(event_type), error=type(exc).__name__)
