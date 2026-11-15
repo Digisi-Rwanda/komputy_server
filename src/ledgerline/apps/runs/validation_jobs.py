@@ -32,8 +32,13 @@ ACTIVE_TTL = timedelta(minutes=30)
 class ValidationJob(Base):
     __tablename__ = "validation_jobs"
     __table_args__ = (
-        Index("uq_validation_jobs_active", "run_id", "scope", unique=True,
-              postgresql_where=text("status IN ('queued','running')")),
+        Index(
+            "uq_validation_jobs_active",
+            "run_id",
+            "scope",
+            unique=True,
+            postgresql_where=text("status IN ('queued','running')"),
+        ),
     )
 
     id: Mapped[str] = mapped_column(String(26), primary_key=True)
@@ -60,13 +65,22 @@ async def create_job(db: AsyncSession, *, tenant_id: str, run_id: str, scope: st
     """Return (job_id, created). Joins the active job for this run and scope if there is one."""
     if scope not in SCOPES:
         raise ECLException("INVALID_SCOPE", "scope must be pd, lgd or ead.", 400)
-    active = (await db.execute(select(ValidationJob).where(
-        ValidationJob.run_id == run_id, ValidationJob.scope == scope, ValidationJob.status.in_(("queued", "running"))
-    ))).scalar_one_or_none()
+    active = (
+        await db.execute(
+            select(ValidationJob).where(
+                ValidationJob.run_id == run_id,
+                ValidationJob.scope == scope,
+                ValidationJob.status.in_(("queued", "running")),
+            )
+        )
+    ).scalar_one_or_none()
     if active and active.updated_at > datetime.now(UTC) - ACTIVE_TTL:
         return active.id, False
     if active:  # abandoned
-        active.status, active.error = "error", {"code": "ABANDONED", "detail": "Validation was interrupted.", "status": 500}
+        active.status, active.error = (
+            "error",
+            {"code": "ABANDONED", "detail": "Validation was interrupted.", "status": 500},
+        )
         await db.flush()
     job = ValidationJob(id=new_ulid(), tenant_id=tenant_id, run_id=run_id, scope=scope, status="queued")
     db.add(job)
@@ -79,9 +93,13 @@ async def create_job(db: AsyncSession, *, tenant_id: str, run_id: str, scope: st
 
 
 async def get_job(db: AsyncSession, *, tenant_id: str, run_id: str, job_id: str) -> dict[str, Any]:
-    j = (await db.execute(select(ValidationJob).where(
-        ValidationJob.id == job_id, ValidationJob.tenant_id == tenant_id, ValidationJob.run_id == run_id
-    ))).scalar_one_or_none()
+    j = (
+        await db.execute(
+            select(ValidationJob).where(
+                ValidationJob.id == job_id, ValidationJob.tenant_id == tenant_id, ValidationJob.run_id == run_id
+            )
+        )
+    ).scalar_one_or_none()
     if not j:
         raise ECLException("JOB_NOT_FOUND", "Validation job not found; validate again.", 404)
     return _out(j)
@@ -89,14 +107,26 @@ async def get_job(db: AsyncSession, *, tenant_id: str, run_id: str, job_id: str)
 
 async def _set(job_id: str, tenant_id: str, run_id: str, scope: str, **values: Any) -> None:
     async with AsyncSessionLocal() as db:
-        await db.execute(update(ValidationJob).where(ValidationJob.id == job_id).values(updated_at=func.now(), **values))
-        await progress(db, tenant_id, {"type": "validation", "runId": run_id, "scope": scope, "jobId": job_id, "status": values.get("status")})
+        await db.execute(
+            update(ValidationJob).where(ValidationJob.id == job_id).values(updated_at=func.now(), **values)
+        )
+        await progress(
+            db,
+            tenant_id,
+            {"type": "validation", "runId": run_id, "scope": scope, "jobId": job_id, "status": values.get("status")},
+        )
         await db.commit()
 
 
 async def run_job(
-    *, job_id: str, tenant_id: str, run_id: str, user_id: str, scope: str,
-    ip: str | None = None, user_agent: str | None = None,
+    *,
+    job_id: str,
+    tenant_id: str,
+    run_id: str,
+    user_id: str,
+    scope: str,
+    ip: str | None = None,
+    user_agent: str | None = None,
 ) -> None:
     """Execute one validation and store its outcome. Never raises."""
     from ledgerline.apps.runs import ecl_validation, pd_validation
@@ -114,11 +144,26 @@ async def run_job(
         await _set(job_id, tenant_id, run_id, scope, status="complete", result=result.model_dump(mode="json"))
         log.info("validation_job_complete", job_id=job_id, run_id=run_id, scope=scope, status=result.status)
     except ECLException as exc:
-        await _set(job_id, tenant_id, run_id, scope, status="error",
-                   error={"code": exc.code, "detail": exc.detail, "status": exc.status_code})
+        await _set(
+            job_id,
+            tenant_id,
+            run_id,
+            scope,
+            status="error",
+            error={"code": exc.code, "detail": exc.detail, "status": exc.status_code},
+        )
         log.info("validation_job_rejected", job_id=job_id, run_id=run_id, scope=scope, code=exc.code)
     except Exception as exc:
-        await _set(job_id, tenant_id, run_id, scope, status="error", error={
-            "code": "VALIDATION_FAILED",
-            "detail": "Validation failed unexpectedly. Try again; if it repeats, contact support.", "status": 500})
+        await _set(
+            job_id,
+            tenant_id,
+            run_id,
+            scope,
+            status="error",
+            error={
+                "code": "VALIDATION_FAILED",
+                "detail": "Validation failed unexpectedly. Try again; if it repeats, contact support.",
+                "status": 500,
+            },
+        )
         log.error("validation_job_failed", job_id=job_id, run_id=run_id, scope=scope, exc_info=exc)
