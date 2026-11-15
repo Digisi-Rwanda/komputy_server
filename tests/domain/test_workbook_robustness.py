@@ -37,9 +37,9 @@ def test_messy_headers_values_and_layout_are_normalised() -> None:
     frame = next(iter(sheets.values()))
     # Title rows skipped, headers canonical, header-less note column dropped.
     assert list(frame.columns) == ["Loan ID", "SEGMENT", "Reporting Month", "Staging", "Loan Amount", "notes"]
-    assert frame["Loan ID"].tolist() == ["1001", "1001", "LN-7"]          # one loan, text IDs
+    assert frame["Loan ID"].tolist() == ["1001", "1001", "LN-7"]  # one loan, text IDs
     assert frame["Staging"].tolist() == ["Stage 1", "Stage 2", "Stage 3"]
-    assert len(frame) == 3                                                # blank row dropped
+    assert len(frame) == 3  # blank row dropped
     assert is_pd_data_sheet(frame)
 
 
@@ -53,7 +53,7 @@ def test_large_pd_file_reads_and_computes_quickly() -> None:
         for m in months:
             stage = min(3, max(1, stage + int(rng.choice([-1, 0, 0, 0, 0, 1]))))
             rows.append([10_000 + loan, seg, m, f"Stage {stage}", float(rng.integers(1_000, 100_000))])
-    content = _xlsx(rows)                                                 # 33,600 rows
+    content = _xlsx(rows)  # 33,600 rows
     start = time.perf_counter()
     frame = frames_from_workbooks([content], keep_sheet=is_pd_data_sheet)
     curve, _, _ = compute_pd(frame)
