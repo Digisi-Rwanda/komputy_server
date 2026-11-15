@@ -31,7 +31,11 @@ New web table/column: add `db/migrations/NNNN_name.sql` (next number), then `npm
 
 - **Code:** Render dashboard → service → Events → pick the last good deploy → *Rollback*. (Auto-deploy keeps running on
   the next push, so also revert the commit on `main`.)
-- **DNS:** Cloudflare → `komputy.com` → DNS: restore the previous record (TTL is 300 s).
+- **DNS:** Cloudflare → `komputy.com` → DNS: restore the previous record (TTL is 300 s). Today `komputy.com` and
+  `www` are DNS-only CNAMEs to `komputy-web-woqc.onrender.com` (switched 2026-11-15). Before that they pointed at
+  Vercel (`9cd10d4a143c0fd3.vercel-dns-017.com`, with `_vercel` TXT records `vc-domain-verify=komputy.com,cfd09411ae9b3ab6a2f8`
+  and `vc-domain-verify=www.komputy.com,4e8294d7071f277f2a3a`); restoring those three brings the old site back.
+  Never touch the Resend records (`send`, `rsend`, `resend._domainkey`, `_dmarc`) or the Google verification TXT.
 - **Data:** see Restore.
 
 ## Restore the database
