@@ -45,6 +45,8 @@ class LoanStage(StrEnum):
     STAGE_1 = "Stage 1"
     STAGE_2 = "Stage 2"
     STAGE_3 = "Stage 3"
+
+
 from enum import StrEnum
 
 
@@ -89,10 +91,38 @@ class InvitationStatus(StrEnum):
 class ReportingCadence(StrEnum):
     MONTHLY = "monthly"
     QUARTERLY = "quarterly"
-SUPPORTED_CURRENCIES = frozenset({
-    "USD", "EUR", "GBP", "CHF", "JPY", "CNY", "INR", "AED", "SAR", "ZAR", "NGN", "GHS",
-    "KES", "UGX", "TZS", "RWF", "BIF", "ETB", "CDF", "XAF", "XOF", "MAD", "EGP", "ZMW", "MWK",
-    "MZN", "BWP", "NAD",
-})
-REPORTING_CADENCES = frozenset({"monthly", "quarterly"})
 
+
+SUPPORTED_CURRENCIES = frozenset(
+    {
+        "USD",
+        "EUR",
+        "GBP",
+        "CHF",
+        "JPY",
+        "CNY",
+        "INR",
+        "AED",
+        "SAR",
+        "ZAR",
+        "NGN",
+        "GHS",
+        "KES",
+        "UGX",
+        "TZS",
+        "RWF",
+        "BIF",
+        "ETB",
+        "CDF",
+        "XAF",
+        "XOF",
+        "MAD",
+        "EGP",
+        "ZMW",
+        "MWK",
+        "MZN",
+        "BWP",
+        "NAD",
+    }
+)
+REPORTING_CADENCES = frozenset({"monthly", "quarterly"})
