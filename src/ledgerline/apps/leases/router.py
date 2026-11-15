@@ -69,22 +69,16 @@ async def state(tenant_id: str, db: DbSession, m: TenantMembership = Member) -> 
     sv = await setup_versions(db, tenant_id)
     leases = list(
         (
-            await db.execute(
-                select(Lease).where(Lease.tenant_id == tenant_id).order_by(Lease.updated_at.desc())
-            )
+            await db.execute(select(Lease).where(Lease.tenant_id == tenant_id).order_by(Lease.updated_at.desc()))
         ).scalars()
     )
     versions: dict[str, list[LeaseVersion]] = {}
-    for v in (
-        await db.execute(select(LeaseVersion).where(LeaseVersion.tenant_id == tenant_id))
-    ).scalars():
+    for v in (await db.execute(select(LeaseVersion).where(LeaseVersion.tenant_id == tenant_id))).scalars():
         versions.setdefault(v.lease_id, []).append(v)
     docs: dict[str, list[LeaseDocument]] = {}
     for d in (
         await db.execute(
-            select(LeaseDocument)
-            .where(LeaseDocument.tenant_id == tenant_id)
-            .order_by(LeaseDocument.uploaded_at)
+            select(LeaseDocument).where(LeaseDocument.tenant_id == tenant_id).order_by(LeaseDocument.uploaded_at)
         )
     ).scalars():
         docs.setdefault(d.lease_id, []).append(d)
@@ -101,9 +95,7 @@ async def state(tenant_id: str, db: DbSession, m: TenantMembership = Member) -> 
     closes = []
     for c in (
         await db.execute(
-            select(LeaseCloseRun)
-            .where(LeaseCloseRun.tenant_id == tenant_id)
-            .order_by(LeaseCloseRun.period)
+            select(LeaseCloseRun).where(LeaseCloseRun.tenant_id == tenant_id).order_by(LeaseCloseRun.period)
         )
     ).scalars():
         sc = await close_svc.ser_close(db, c)
@@ -115,11 +107,7 @@ async def state(tenant_id: str, db: DbSession, m: TenantMembership = Member) -> 
         sb["id"], sb["reversalOf"] = b.code, by_id.get(b.reversal_of) if b.reversal_of else None
         ser_batches.append(sb)
     posted: dict[str, dict[str, str]] = {}
-    for p in (
-        await db.execute(
-            select(LeasePostedBalance).where(LeasePostedBalance.tenant_id == tenant_id)
-        )
-    ).scalars():
+    for p in (await db.execute(select(LeasePostedBalance).where(LeasePostedBalance.tenant_id == tenant_id))).scalars():
         posted.setdefault(p.lease_id, {})[p.account] = f"{p.amount:.2f}"
     notes = (
         await db.execute(
@@ -175,9 +163,7 @@ async def state(tenant_id: str, db: DbSession, m: TenantMembership = Member) -> 
                 }
                 for p in (
                     await db.execute(
-                        select(LeasePeriod)
-                        .where(LeasePeriod.tenant_id == tenant_id)
-                        .order_by(LeasePeriod.key)
+                        select(LeasePeriod).where(LeasePeriod.tenant_id == tenant_id).order_by(LeasePeriod.key)
                     )
                 ).scalars()
             ],
@@ -194,9 +180,7 @@ async def state(tenant_id: str, db: DbSession, m: TenantMembership = Member) -> 
                     )
                 ).scalars()
             ],
-            "leases": [
-                ser_lease(lz, versions.get(lz.id, []), docs.get(lz.id, [])) for lz in leases
-            ],
+            "leases": [ser_lease(lz, versions.get(lz.id, []), docs.get(lz.id, [])) for lz in leases],
             "batches": ser_batches,
             "closes": closes,
             "imports": [
@@ -253,17 +237,13 @@ async def state(tenant_id: str, db: DbSession, m: TenantMembership = Member) -> 
 
 
 @router.put("/entity")
-async def put_entity(
-    tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def put_entity(tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member) -> dict[str, Any]:
     await svc.save_entity(db, m, body)
     return ok()
 
 
 @router.post("/periods", status_code=201)
-async def post_period(
-    tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def post_period(tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member) -> dict[str, Any]:
     await svc.open_first_period(db, m, body.get("key", ""))
     return ok()
 
@@ -297,9 +277,7 @@ async def decide_setup(
 
 
 @router.post("/counterparties", status_code=201)
-async def post_counterparty(
-    tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def post_counterparty(tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member) -> dict[str, Any]:
     cp = await svc.add_counterparty(db, m, body.get("name", ""))
     await db.flush()
     return ok({"id": cp.id, "name": cp.name})
@@ -309,17 +287,13 @@ async def post_counterparty(
 
 
 @router.post("", status_code=201)
-async def create_lease(
-    tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def create_lease(tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member) -> dict[str, Any]:
     lease = await svc.create_draft(db, m, body)
     return ok({"id": lease.id, "rev": lease.rev, "code": lease.code})
 
 
 @router.get("/{lease_id}")
-async def get_lease(
-    tenant_id: str, lease_id: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def get_lease(tenant_id: str, lease_id: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     lease, vs = await svc.load(db, tenant_id, lease_id)
     return ok(await svc.serialize(db, lease, vs))
 
@@ -383,17 +357,13 @@ async def decision(
 
 
 @router.delete("/{lease_id}/draft")
-async def discard(
-    tenant_id: str, lease_id: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def discard(tenant_id: str, lease_id: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     await svc.discard(db, m, lease_id)
     return ok()
 
 
 @router.get("/{lease_id}/duplicates")
-async def duplicates(
-    tenant_id: str, lease_id: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def duplicates(tenant_id: str, lease_id: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     return ok(await svc.duplicates(db, tenant_id, lease_id))
 
 
@@ -449,16 +419,10 @@ async def upload_doc(
             f"This exact file is already attached to {dup.Lease.code}{'' if dup.Lease.id == lease.id else f' ({dup.Lease.name})'}."
         )
     doc_id = new_ulid()
-    safe = "".join(
-        ch if ch.isalnum() or ch in "._-" else "_" for ch in (file.filename or "document")
-    )[:120]
+    safe = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in (file.filename or "document"))[:120]
     key = f"/{tenant_id}/leases/{lease.id}/{doc_id}-{safe}"
     await upload_stream(key, io.BytesIO(raw), file.content_type or "application/octet-stream")
-    has_docs = (
-        await db.execute(
-            select(LeaseDocument.id).where(LeaseDocument.lease_id == lease.id).limit(1)
-        )
-    ).first()
+    has_docs = (await db.execute(select(LeaseDocument.id).where(LeaseDocument.lease_id == lease.id).limit(1))).first()
     db.add(
         LeaseDocument(
             id=doc_id,
@@ -527,9 +491,7 @@ async def delete_doc(
 async def _batch_by_code(db: DbSession, tenant_id: str, code: str) -> LeaseJournalBatch:
     b = (
         await db.execute(
-            select(LeaseJournalBatch).where(
-                LeaseJournalBatch.tenant_id == tenant_id, LeaseJournalBatch.code == code
-            )
+            select(LeaseJournalBatch).where(LeaseJournalBatch.tenant_id == tenant_id, LeaseJournalBatch.code == code)
         )
     ).scalar_one_or_none()
     if b is None:
@@ -538,17 +500,13 @@ async def _batch_by_code(db: DbSession, tenant_id: str, code: str) -> LeaseJourn
 
 
 @router.post("/close/{period}/start")
-async def close_start(
-    tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def close_start(tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     await close_svc.start(db, m, period)
     return ok()
 
 
 @router.get("/close/{period}/issues")
-async def close_issues(
-    tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def close_issues(tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     c = await close_svc._close(db, tenant_id, period)
     if c is None:
         raise not_found("Close not started.")
@@ -577,16 +535,12 @@ async def close_step(
     body: OptJson,
     m: TenantMembership = Member,
 ) -> dict[str, Any]:
-    await close_svc.complete_step(
-        db, m, period, step, body.get("note", ""), bool(body.get("acceptWarning"))
-    )
+    await close_svc.complete_step(db, m, period, step, body.get("note", ""), bool(body.get("acceptWarning")))
     return ok()
 
 
 @router.post("/close/{period}/generate")
-async def close_generate(
-    tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def close_generate(tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     b = await close_svc.generate(db, m, period)
     return ok({"id": b.code})
 
@@ -600,11 +554,7 @@ async def close_payments(
     for col in ("date", "vendor", "amount", "reference"):
         if col not in head:
             raise invalid(f"The payments file needs a '{col}' column.")
-    return ok(
-        await close_svc.upload_payments(
-            db, m, period, [dict(zip(head, r, strict=False)) for r in rows[1:]]
-        )
-    )
+    return ok(await close_svc.upload_payments(db, m, period, [dict(zip(head, r, strict=False)) for r in rows[1:]]))
 
 
 @router.post("/close/{period}/payments/confirm-scheduled")
@@ -634,9 +584,7 @@ async def close_confirm_scheduled(
             body.get("note") or "Confirmed paid as scheduled",
             m.user_id,
         )
-    await svc.audit(
-        db, tenant_id, m.user_id, "close.confirm_scheduled", period, f"{len(rows)} payments"
-    )
+    await svc.audit(db, tenant_id, m.user_id, "close.confirm_scheduled", period, f"{len(rows)} payments")
     return ok({"confirmed": len(rows)})
 
 
@@ -644,16 +592,12 @@ async def close_confirm_scheduled(
 async def close_resolve(
     tenant_id: str, period: str, pid: str, db: DbSession, body: Json, m: TenantMembership = Member
 ) -> dict[str, Any]:
-    await close_svc.resolve_payment(
-        db, m, period, pid, body.get("resolution", ""), body.get("note", "")
-    )
+    await close_svc.resolve_payment(db, m, period, pid, body.get("resolution", ""), body.get("note", ""))
     return ok()
 
 
 @router.post("/periods/{period}/lock")
-async def lock(
-    tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def lock(tenant_id: str, period: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     await close_svc.lock(db, m, period)
     return ok()
 
@@ -667,9 +611,7 @@ async def reopen(
 
 
 @router.get("/batches/{code}/export")
-async def batch_export(
-    tenant_id: str, code: str, db: DbSession, m: TenantMembership = Member
-) -> Response:
+async def batch_export(tenant_id: str, code: str, db: DbSession, m: TenantMembership = Member) -> Response:
     b = await _batch_by_code(db, tenant_id, code)
     text = await close_svc.export_batch(db, m, b.id)
     return Response(
@@ -710,25 +652,19 @@ async def import_template(tenant_id: str, m: TenantMembership = Member) -> Respo
 
 
 @router.post("/imports", status_code=201)
-async def import_upload(
-    tenant_id: str, db: DbSession, file: Upload, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def import_upload(tenant_id: str, db: DbSession, file: Upload, m: TenantMembership = Member) -> dict[str, Any]:
     raw = await file.read(imp_svc.MAX_BYTES + 1)
     b = await imp_svc.create(db, m, file.filename or "upload.csv", raw)
     return ok({"id": b.code})
 
 
 @router.get("/imports/{code}")
-async def import_get(
-    tenant_id: str, code: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def import_get(tenant_id: str, code: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     return ok(await imp_svc.ser(db, await imp_svc.get(db, tenant_id, code)))
 
 
 @router.get("/imports/{code}/errors.csv")
-async def import_errors(
-    tenant_id: str, code: str, db: DbSession, m: TenantMembership = Member
-) -> Response:
+async def import_errors(tenant_id: str, code: str, db: DbSession, m: TenantMembership = Member) -> Response:
     b = await imp_svc.ser(db, await imp_svc.get(db, tenant_id, code))
     return Response(
         "﻿" + imp_svc.error_csv(b),
@@ -773,9 +709,7 @@ async def import_action(
 
 
 @router.post("/views", status_code=201)
-async def save_view(
-    tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def save_view(tenant_id: str, db: DbSession, body: Json, m: TenantMembership = Member) -> dict[str, Any]:
     name = (body.get("name") or "").strip()
     if not name:
         raise invalid("Name the view.", "name")
@@ -792,9 +726,7 @@ async def save_view(
 
 
 @router.delete("/views/{view_id}")
-async def delete_view(
-    tenant_id: str, view_id: str, db: DbSession, m: TenantMembership = Member
-) -> dict[str, Any]:
+async def delete_view(tenant_id: str, view_id: str, db: DbSession, m: TenantMembership = Member) -> dict[str, Any]:
     v = await db.get(LeaseSavedView, view_id)
     if v and v.tenant_id == tenant_id and v.user_id == m.user_id:
         await db.delete(v)
