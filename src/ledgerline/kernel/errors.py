@@ -178,9 +178,7 @@ async def ecl_exception_handler(request: Request, exc: ECLException) -> JSONResp
     )
 
 
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     from ledgerline.log import get_logger
 
     errors = exc.errors()
