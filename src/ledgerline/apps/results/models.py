@@ -21,9 +21,7 @@ from ledgerline.db import Base
 
 class PdResult(Base):
     __tablename__ = "pd_results"
-    __table_args__ = (
-        Index("pd_results_run_segment_idx", "run_id", "segment"),
-    )
+    __table_args__ = (Index("pd_results_run_segment_idx", "run_id", "segment"),)
 
     id: Mapped[str] = mapped_column(String(26), primary_key=True)
     run_id: Mapped[str] = mapped_column(String(26), nullable=False, index=True)
@@ -53,9 +51,7 @@ class PdObservationSnapshot(Base):
     tenant_id: Mapped[str] = mapped_column(String(26), nullable=False, index=True)
     engine_version: Mapped[str] = mapped_column(Text, nullable=False)
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
 class LgdResult(Base):
@@ -110,9 +106,7 @@ class OutputArtifact(Base):
     storage_path: Mapped[str] = mapped_column(Text, nullable=False)
     sha256: Mapped[str] = mapped_column(String(64), nullable=False)
     file_size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
 class EclLoanSummary(Base):
