@@ -151,36 +151,42 @@ services:
   # ── Scheduled jobs (private network → web app) ─────────────────────────────────────────
   - type: cron
     name: komputy-cron-events
-    runtime: image
-    image: { url: docker.io/curlimages/curl:8.11.1 }
+    runtime: docker
+    repo: https://github.com/mugisham37/komputy_server
+    branch: main
+    dockerfilePath: ./ops/cron/Dockerfile
+    dockerContext: ./ops/cron
     region: frankfurt
     plan: starter
     schedule: "* * * * *"
-    dockerCommand: >-
-      sh -c 'curl -fsS -m 50 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/events"'
+    dockerCommand: sh /call.sh events 50
     envVars: &cron_env
       - key: WEB_HOSTPORT
         fromService: { type: web, name: komputy-web, property: hostport }
       - fromGroup: komputy-cron
   - type: cron
     name: komputy-cron-expire
-    runtime: image
-    image: { url: docker.io/curlimages/curl:8.11.1 }
+    runtime: docker
+    repo: https://github.com/mugisham37/komputy_server
+    branch: main
+    dockerfilePath: ./ops/cron/Dockerfile
+    dockerContext: ./ops/cron
     region: frankfurt
     plan: starter
     schedule: "*/5 * * * *"
-    dockerCommand: >-
-      sh -c 'curl -fsS -m 240 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/expire"'
+    dockerCommand: sh /call.sh expire 240
     envVars: *cron_env
   - type: cron
     name: komputy-cron-daily
-    runtime: image
-    image: { url: docker.io/curlimages/curl:8.11.1 }
+    runtime: docker
+    repo: https://github.com/mugisham37/komputy_server
+    branch: main
+    dockerfilePath: ./ops/cron/Dockerfile
+    dockerContext: ./ops/cron
     region: frankfurt
     plan: starter
     schedule: "0 6 * * *"  # 08:00 Africa/Kigali
-    dockerCommand: >-
-      sh -c 'curl -fsS -m 600 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/daily"'
+    dockerCommand: sh /call.sh daily 600
     envVars: *cron_env
   - type: cron
     name: komputy-cron-backup
