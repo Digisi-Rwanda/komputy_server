@@ -200,7 +200,7 @@ services:
     branch: main
     region: frankfurt
     plan: starter
-    schedule: "*/5 * * * *"  # TEMPORARY: verifying the backup on production
+    schedule: "0 1 * * *"  # 03:00 Kigali; verified on production 2026-11-15 (all 96 tables)
     dockerfilePath: ./ops/backup/Dockerfile
     dockerContext: ./ops/backup
     envVars:
