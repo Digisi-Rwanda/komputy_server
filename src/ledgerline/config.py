@@ -25,6 +25,8 @@ class Settings(BaseSettings):
 
     # Auth: the web app (Next.js) mints RS256 tokens; we verify against its JWKS.
     web_jwks_url: str = "http://localhost:3300/api/auth/jwks"
+    # Render private network: host:port of the web service (fromService hostport); overrides web_jwks_url when set.
+    web_hostport: str | None = None
     web_jwt_issuer: str = "ledgerline-web"
     web_jwt_audience: str = "ecl-engine"
     # Shared secret for service calls from the web app's scheduler (ops endpoints only).
