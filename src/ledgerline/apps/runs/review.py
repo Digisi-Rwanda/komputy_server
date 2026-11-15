@@ -41,7 +41,11 @@ def assert_mutable(run: Run) -> None:
 
 
 async def _run(db: AsyncSession, tenant_id: str, run_id: str) -> Run:
-    run = (await db.execute(select(Run).where(Run.id == run_id, Run.tenant_id == tenant_id, Run.deleted_at.is_(None)).with_for_update())).scalar_one_or_none()
+    run = (
+        await db.execute(
+            select(Run).where(Run.id == run_id, Run.tenant_id == tenant_id, Run.deleted_at.is_(None)).with_for_update()
+        )
+    ).scalar_one_or_none()
     if not run:
         raise ECLException("RUN_NOT_FOUND", "Run not found.", 404)
     return run
@@ -55,9 +59,19 @@ def _require_reviewer(m: Membership, run: Run, user_id: str) -> None:
 
 
 async def _event(db: AsyncSession, run: Run, user_id: str, action: str, comment: str | None) -> None:
-    db.add(RunReviewEvent(id=new_ulid(), run_id=run.id, tenant_id=run.tenant_id, user_id=user_id, action=action, comment=comment))
+    db.add(
+        RunReviewEvent(
+            id=new_ulid(), run_id=run.id, tenant_id=run.tenant_id, user_id=user_id, action=action, comment=comment
+        )
+    )
     await db.flush()
-    await log_event(db, f"run.{action}", user_id=user_id, tenant_id=run.tenant_id, details={"run_id": run.id, "description": run.name, "comment": comment})
+    await log_event(
+        db,
+        f"run.{action}",
+        user_id=user_id,
+        tenant_id=run.tenant_id,
+        details={"run_id": run.id, "description": run.name, "comment": comment},
+    )
 
 
 class Decision(BaseModel):
@@ -69,15 +83,32 @@ class ReturnDecision(BaseModel):
 
 
 async def _history(db: AsyncSession, run: Run) -> dict[str, Any]:
-    rows = (await db.execute(
-        select(RunReviewEvent, User.name).outerjoin(User, User.id == RunReviewEvent.user_id)
-        .where(RunReviewEvent.run_id == run.id).order_by(RunReviewEvent.created_at)
-    )).all()
+    rows = (
+        await db.execute(
+            select(RunReviewEvent, User.name)
+            .outerjoin(User, User.id == RunReviewEvent.user_id)
+            .where(RunReviewEvent.run_id == run.id)
+            .order_by(RunReviewEvent.created_at)
+        )
+    ).all()
     return {
-        "runId": run.id, "state": review_state(run), "lockedAt": run.locked_at.isoformat() if run.locked_at else None,
-        "signedOffAt": run.signed_off_at.isoformat() if run.signed_off_at else None, "reviewedBy": run.reviewed_by_user_id,
+        "runId": run.id,
+        "state": review_state(run),
+        "lockedAt": run.locked_at.isoformat() if run.locked_at else None,
+        "signedOffAt": run.signed_off_at.isoformat() if run.signed_off_at else None,
+        "reviewedBy": run.reviewed_by_user_id,
         "preparedBy": run.created_by_user_id,
-        "events": [{"id": e.id, "action": e.action, "comment": e.comment, "by": name or e.user_id, "byId": e.user_id, "at": e.created_at.isoformat()} for e, name in rows],
+        "events": [
+            {
+                "id": e.id,
+                "action": e.action,
+                "comment": e.comment,
+                "by": name or e.user_id,
+                "byId": e.user_id,
+                "at": e.created_at.isoformat(),
+            }
+            for e, name in rows
+        ],
     }
 
 
@@ -90,7 +121,9 @@ async def get_review(tenant_id: str, run_id: str, db: DbSession, _m: Member) -> 
 
 
 @router.post("/{tenant_id}/runs/{run_id}/review/comment")
-async def comment(tenant_id: str, run_id: str, body: ReturnDecision, db: DbSession, user: CurrentUser, m: Member) -> dict[str, Any]:
+async def comment(
+    tenant_id: str, run_id: str, body: ReturnDecision, db: DbSession, user: CurrentUser, m: Member
+) -> dict[str, Any]:
     run = await _run(db, tenant_id, run_id)
     if m.role == "viewer":
         raise ECLException("INSUFFICIENT_ROLE", "Viewers can't comment.", 403)
@@ -99,20 +132,34 @@ async def comment(tenant_id: str, run_id: str, body: ReturnDecision, db: DbSessi
 
 
 @router.post("/{tenant_id}/runs/{run_id}/review/return")
-async def return_run(tenant_id: str, run_id: str, body: ReturnDecision, db: DbSession, user: CurrentUser, m: Member) -> dict[str, Any]:
+async def return_run(
+    tenant_id: str, run_id: str, body: ReturnDecision, db: DbSession, user: CurrentUser, m: Member
+) -> dict[str, Any]:
     run = await _run(db, tenant_id, run_id)
     _require_reviewer(m, run, user.id)
     if review_state(run) != "needs_review":
         raise ECLException("INVALID_STATE", "Only runs awaiting review can be returned.", 409)
     run.review_status, run.reviewed_by_user_id = "returned", user.id
     await _event(db, run, user.id, "returned", body.comment)
-    await notify(db, tenant_id=tenant_id, user_ids=[run.created_by_user_id], event="signoff", kind="runs",
-                 title=f"{run.name} was returned", body=f"{user.name}: “{body.comment}”", href=f"/ecl/runs/{run.id}/summary", action="Open", runId=run.id)
+    await notify(
+        db,
+        tenant_id=tenant_id,
+        user_ids=[run.created_by_user_id],
+        event="signoff",
+        kind="runs",
+        title=f"{run.name} was returned",
+        body=f"{user.name}: “{body.comment}”",
+        href=f"/ecl/runs/{run.id}/summary",
+        action="Open",
+        runId=run.id,
+    )
     return {"data": await _history(db, run)}
 
 
 @router.post("/{tenant_id}/runs/{run_id}/review/resubmit")
-async def resubmit(tenant_id: str, run_id: str, body: Decision, db: DbSession, user: CurrentUser, m: Member) -> dict[str, Any]:
+async def resubmit(
+    tenant_id: str, run_id: str, body: Decision, db: DbSession, user: CurrentUser, m: Member
+) -> dict[str, Any]:
     run = await _run(db, tenant_id, run_id)
     if m.role not in ("analyst", "reviewer", "administrator"):
         raise ECLException("INSUFFICIENT_ROLE", "Only preparers can resubmit.", 403)
@@ -120,13 +167,25 @@ async def resubmit(tenant_id: str, run_id: str, body: Decision, db: DbSession, u
         raise ECLException("INVALID_STATE", "Only returned runs can be resubmitted.", 409)
     run.review_status = "needs_review"
     await _event(db, run, user.id, "submitted", body.comment)
-    await notify(db, tenant_id=tenant_id, user_ids="*reviewers", event="signoff", kind="runs", title=f"{run.name} is ready for sign-off",
-                 body=f"Resubmitted by {user.name}", href=f"/ecl/runs/{run.id}/summary", action="Review", runId=run.id)
+    await notify(
+        db,
+        tenant_id=tenant_id,
+        user_ids="*reviewers",
+        event="signoff",
+        kind="runs",
+        title=f"{run.name} is ready for sign-off",
+        body=f"Resubmitted by {user.name}",
+        href=f"/ecl/runs/{run.id}/summary",
+        action="Review",
+        runId=run.id,
+    )
     return {"data": await _history(db, run)}
 
 
 @router.post("/{tenant_id}/runs/{run_id}/review/sign-off")
-async def sign_off(tenant_id: str, run_id: str, body: Decision, db: DbSession, user: CurrentUser, m: Member) -> dict[str, Any]:
+async def sign_off(
+    tenant_id: str, run_id: str, body: Decision, db: DbSession, user: CurrentUser, m: Member
+) -> dict[str, Any]:
     run = await _run(db, tenant_id, run_id)
     _require_reviewer(m, run, user.id)
     if review_state(run) != "needs_review":
@@ -135,10 +194,22 @@ async def sign_off(tenant_id: str, run_id: str, body: Decision, db: DbSession, u
     run.review_status, run.reviewed_by_user_id, run.signed_off_at, run.locked_at = "signed_off", user.id, now, now
     await _event(db, run, user.id, "signed_off", body.comment)
     if run.supersedes_run_id:  # the rerun replaces the earlier statutory figure
-        prev = (await db.execute(select(Run).where(Run.id == run.supersedes_run_id, Run.tenant_id == tenant_id))).scalar_one_or_none()
+        prev = (
+            await db.execute(select(Run).where(Run.id == run.supersedes_run_id, Run.tenant_id == tenant_id))
+        ).scalar_one_or_none()
         if prev and prev.review_status == "signed_off":
             prev.review_status = "archived"
             await _event(db, prev, user.id, "archived", f"Superseded by {run.name}")
-    await notify(db, tenant_id=tenant_id, user_ids=[run.created_by_user_id], event="signoff", kind="runs", title=f"{run.name} was signed off",
-                 body=f"Signed off by {user.name}. Figures are locked.", href=f"/ecl/runs/{run.id}/summary", action="Open", runId=run.id)
+    await notify(
+        db,
+        tenant_id=tenant_id,
+        user_ids=[run.created_by_user_id],
+        event="signoff",
+        kind="runs",
+        title=f"{run.name} was signed off",
+        body=f"Signed off by {user.name}. Figures are locked.",
+        href=f"/ecl/runs/{run.id}/summary",
+        action="Open",
+        runId=run.id,
+    )
     return {"data": await _history(db, run)}
