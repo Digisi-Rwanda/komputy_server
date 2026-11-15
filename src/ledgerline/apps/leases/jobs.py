@@ -27,9 +27,7 @@ async def daily_alerts(db: AsyncSession, today: date | None = None) -> int:
     sent = 0
     seen = {(a.lease_id, a.key) for a in (await db.execute(select(LeaseAlertSent))).scalars()}
 
-    async def once(
-        tenant_id: str, lease_id: str, key: str, to: str, title: str, body: str, href: str
-    ) -> None:
+    async def once(tenant_id: str, lease_id: str, key: str, to: str, title: str, body: str, href: str) -> None:
         nonlocal sent
         if (lease_id, key) in seen:
             return
@@ -41,9 +39,7 @@ async def daily_alerts(db: AsyncSession, today: date | None = None) -> int:
     leases = {lz.id: lz for lz in (await db.execute(select(Lease))).scalars()}
     latest: dict[str, LeaseVersion] = {}
     for v in (
-        await db.execute(
-            select(LeaseVersion).where(LeaseVersion.status == "approved").order_by(LeaseVersion.n)
-        )
+        await db.execute(select(LeaseVersion).where(LeaseVersion.status == "approved").order_by(LeaseVersion.n))
     ).scalars():
         latest[v.lease_id] = v
     for lid, v in latest.items():
@@ -99,17 +95,13 @@ async def verify_books(db: AsyncSession) -> int:
             (
                 await db.execute(
                     select(LeaseVersion)
-                    .where(
-                        LeaseVersion.lease_id == books.lease_id, LeaseVersion.status == "approved"
-                    )
+                    .where(LeaseVersion.lease_id == books.lease_id, LeaseVersion.status == "approved")
                     .order_by(LeaseVersion.n)
                 )
             ).scalars()
         )
         dc = await day_count(db, books.tenant_id)
-        expected = checksum(
-            {"inputs": segment_inputs(chain), "dayCount": dc, "engine": ENGINE_VERSION}
-        )
+        expected = checksum({"inputs": segment_inputs(chain), "dayCount": dc, "engine": ENGINE_VERSION})
         lz = await db.get(Lease, books.lease_id)
         bad = expected != books.chain_checksum
         if lz and lz.verification_failed != bad:
