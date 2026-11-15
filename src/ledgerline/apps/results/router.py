@@ -81,9 +81,7 @@ async def get_loan_endpoint(
     membership: TenantMembership = Depends(require_tenant_member),
     run_id: str | None = Query(default=None),
 ) -> LoanResponse:
-    data = await service.get_loan(
-        db, tenant_id, loan_id, run_id=run_id, user=user, membership=membership
-    )
+    data = await service.get_loan(db, tenant_id, loan_id, run_id=run_id, user=user, membership=membership)
     return LoanResponse(data=data)
 
 
@@ -111,7 +109,13 @@ async def list_run_exceptions_endpoint(
     per_page: int = Query(default=50, ge=1, le=200),
 ) -> ExceptionsPageResponse:
     data = await service.list_run_exceptions(
-        db, tenant_id, run_id, category=category, page=page, per_page=per_page,
-        user=user, membership=membership,
+        db,
+        tenant_id,
+        run_id,
+        category=category,
+        page=page,
+        per_page=per_page,
+        user=user,
+        membership=membership,
     )
     return ExceptionsPageResponse(data=data)
