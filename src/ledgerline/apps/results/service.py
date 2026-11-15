@@ -95,9 +95,7 @@ def _pct_delta(current: float, previous: float | None) -> float | None:
 
 
 async def _get_tenant(db: AsyncSession, tenant_id: str) -> Tenant:
-    result = await db.execute(
-        select(Tenant).where(Tenant.id == tenant_id, Tenant.deleted_at.is_(None))
-    )
+    result = await db.execute(select(Tenant).where(Tenant.id == tenant_id, Tenant.deleted_at.is_(None)))
     tenant = result.scalar_one_or_none()
     if not tenant:
         raise ECLException("RESOURCE_NOT_FOUND", "Workspace not found.", 404)
@@ -144,10 +142,7 @@ async def _latest_completed_run(
         )
 
     result = await db.execute(
-        select(Run)
-        .where(*where_clause)
-        .order_by(Run.finished_at.desc().nullslast(), Run.created_at.desc())
-        .limit(1)
+        select(Run).where(*where_clause).order_by(Run.finished_at.desc().nullslast(), Run.created_at.desc()).limit(1)
     )
     run = result.scalar_one_or_none()
     if not run:
@@ -179,12 +174,7 @@ async def _previous_completed_run(
             Run.deleted_at.is_(None),
             Run.finished_at < before,
         )
-    result = await db.execute(
-        select(Run)
-        .where(*where_clause)
-        .order_by(Run.finished_at.desc())
-        .limit(1)
-    )
+    result = await db.execute(select(Run).where(*where_clause).order_by(Run.finished_at.desc()).limit(1))
     return result.scalar_one_or_none()
 
 
@@ -216,10 +206,12 @@ def _summary_filter(
         base.append(EclLoanSummary.total_ecl >= min_ecl)
     if q and q.strip():
         pattern = "%" + q.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
-        base.append(or_(
-            EclLoanSummary.loan_id.ilike(pattern, escape="\\"),
-            EclLoanSummary.customer_id.ilike(pattern, escape="\\"),
-        ))
+        base.append(
+            or_(
+                EclLoanSummary.loan_id.ilike(pattern, escape="\\"),
+                EclLoanSummary.customer_id.ilike(pattern, escape="\\"),
+            )
+        )
     return base
 
 
@@ -424,26 +416,15 @@ async def get_dashboard(
     except ECLException:
         return DashboardOut(kpis=[], segments=[], stages=[], trend=[], runs=[])
 
-    previous = await _previous_completed_run(
-        db, tenant_id, latest.finished_at, user=user, membership=membership
-    )
+    previous = await _previous_completed_run(db, tenant_id, latest.finished_at, user=user, membership=membership)
     loan_count = await _loan_count(db, latest.id, tenant_id)
-    prev_loans = (
-        await _loan_count(db, previous.id, tenant_id) if previous else None
-    )
+    prev_loans = await _loan_count(db, previous.id, tenant_id) if previous else None
 
     total_ecl = float(latest.total_ecl or 0)
     prev_ecl = float(previous.total_ecl) if previous and previous.total_ecl else None
     outstanding = float(latest.total_outstanding or 0)
-    prev_outstanding = (
-        float(previous.total_outstanding)
-        if previous and previous.total_outstanding
-        else None
-    )
     coverage = float(latest.coverage_ratio or 0)
-    prev_coverage = (
-        float(previous.coverage_ratio) if previous and previous.coverage_ratio else None
-    )
+    prev_coverage = float(previous.coverage_ratio) if previous and previous.coverage_ratio else None
 
     kpis = [
         KpiDashboardOut(
@@ -461,9 +442,7 @@ async def get_dashboard(
             helpText="ECL ÷ total outstanding",
             value=format_coverage(coverage),
             delta=_pct_delta(coverage * 100, prev_coverage * 100 if prev_coverage else None),
-            deltaDir=_delta_dir(
-                _pct_delta(coverage * 100, prev_coverage * 100 if prev_coverage else None)
-            ),
+            deltaDir=_delta_dir(_pct_delta(coverage * 100, prev_coverage * 100 if prev_coverage else None)),
             subNote="vs previous run",
         ),
         KpiDashboardOut(
@@ -479,17 +458,13 @@ async def get_dashboard(
             label="Loans analysed",
             value=f"{loan_count:,}",
             delta=_pct_delta(float(loan_count), float(prev_loans) if prev_loans else None),
-            deltaDir=_delta_dir(
-                _pct_delta(float(loan_count), float(prev_loans) if prev_loans else None)
-            ),
+            deltaDir=_delta_dir(_pct_delta(float(loan_count), float(prev_loans) if prev_loans else None)),
             subNote="vs previous run",
         ),
     ]
 
     segment_data = await _segment_aggregates(db, latest.id, tenant_id)
-    segments = [
-        SegmentBarDashboardOut(name=s.name, value=s.ecl) for s in segment_data[:6]
-    ]
+    segments = [SegmentBarDashboardOut(name=s.name, value=s.ecl) for s in segment_data[:6]]
 
     stage_result = await db.execute(
         select(EclLoanSummary.stage, func.count())
@@ -609,6 +584,7 @@ def _validate_stages(stages: list[str] | None) -> list[str] | None:
     bad = [s for s in stages if s not in _VALID_STAGES]
     if bad:
         from ledgerline.kernel.errors import ECLException
+
         raise ECLException(
             "INVALID_STAGE",
             f"stage must be one of: {', '.join(sorted(_VALID_STAGES))}.",
@@ -630,9 +606,7 @@ async def get_portfolio(
     stages = _validate_stages(stages)
     tenant = await _get_tenant(db, tenant_id)
     run = await _latest_completed_run(db, tenant_id, run_id, user=user, membership=membership)
-    previous = await _previous_completed_run(
-        db, tenant_id, run.finished_at, user=user, membership=membership
-    )
+    previous = await _previous_completed_run(db, tenant_id, run.finished_at, user=user, membership=membership)
     segments = await _segment_aggregates(
         db,
         run.id,
@@ -680,11 +654,9 @@ async def get_segment(
     membership: TenantMembership | None = None,
 ) -> SegmentViewOut:
     stages = _validate_stages(stages)
-    tenant = await _get_tenant(db, tenant_id)
+    await _get_tenant(db, tenant_id)
     run = await _latest_completed_run(db, tenant_id, run_id, user=user, membership=membership)
-    previous = await _previous_completed_run(
-        db, tenant_id, run.finished_at, user=user, membership=membership
-    )
+    previous = await _previous_completed_run(db, tenant_id, run.finished_at, user=user, membership=membership)
     segments = await _segment_aggregates(
         db,
         run.id,
@@ -698,15 +670,18 @@ async def get_segment(
     if not segment:
         # Filters can exclude every loan of a real segment: show it empty, not 404.
         exists = await db.scalar(
-            select(func.count()).where(
-                *_summary_filter(run.id, tenant_id), EclLoanSummary.segment == segment_name
-            )
+            select(func.count()).where(*_summary_filter(run.id, tenant_id), EclLoanSummary.segment == segment_name)
         )
         if not exists:
             raise ECLException("RESOURCE_NOT_FOUND", f"Segment '{segment_name}' not found.", 404)
         segment = SegmentDataOut(
-            name=segment_name, mix=(0.0, 0.0, 0.0), ecl=0.0, outstanding=0.0,
-            coverage="0.00%", loans=0, delta=0.0,
+            name=segment_name,
+            mix=(0.0, 0.0, 0.0),
+            ecl=0.0,
+            outstanding=0.0,
+            coverage="0.00%",
+            loans=0,
+            delta=0.0,
         )
 
     loans, total = await _loan_rows_for_segment(
@@ -742,9 +717,7 @@ async def get_segment(
                 )
             except ProgrammingError:
                 await db.rollback()
-    observation, pd_loans = (
-        segment_from_preview(preview, segment_name) if preview is not None else (None, [])
-    )
+    observation, pd_loans = segment_from_preview(preview, segment_name) if preview is not None else (None, [])
     avg_lgd, avg_pd = await _segment_rate_avgs(db, run.id, tenant_id, segment_name)
     cure_rate = observation.stats.cure_rate if observation is not None else 0.0
 
@@ -779,14 +752,12 @@ async def get_loan(
     user: User | None = None,
     membership: TenantMembership | None = None,
 ) -> LoanViewOut:
-    tenant = await _get_tenant(db, tenant_id)
+    await _get_tenant(db, tenant_id)
     run = await _latest_completed_run(db, tenant_id, run_id, user=user, membership=membership)
 
     summary = (
         await db.execute(
-            select(EclLoanSummary).where(
-                *_summary_filter(run.id, tenant_id), EclLoanSummary.loan_id == loan_id
-            )
+            select(EclLoanSummary).where(*_summary_filter(run.id, tenant_id), EclLoanSummary.loan_id == loan_id)
         )
     ).scalar_one_or_none()
     if summary is None:
@@ -952,12 +923,16 @@ async def build_workbooks_bundle(
 
     await _get_run_or_404(db, tenant_id, run_id)
     artifacts = (
-        await db.execute(
-            select(OutputArtifact)
-            .where(OutputArtifact.run_id == run_id, OutputArtifact.tenant_id == tenant_id)
-            .order_by(OutputArtifact.created_at)
+        (
+            await db.execute(
+                select(OutputArtifact)
+                .where(OutputArtifact.run_id == run_id, OutputArtifact.tenant_id == tenant_id)
+                .order_by(OutputArtifact.created_at)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     if not artifacts:
         raise ECLException("ARTIFACT_NOT_FOUND", "This run has no output workbooks.", 404)
     buffer = io.BytesIO()
@@ -996,7 +971,11 @@ async def get_ecl_report(
         )
     ).one()
     outstanding, ecl, before_cap, loans, capped = (
-        float(totals[0]), float(totals[1]), float(totals[2]), int(totals[3]), int(totals[4])
+        float(totals[0]),
+        float(totals[1]),
+        float(totals[2]),
+        int(totals[3]),
+        int(totals[4]),
     )
 
     async def _group(column) -> dict[str, tuple[float, float]]:
@@ -1015,7 +994,9 @@ async def get_ecl_report(
         ]
         out.append(
             SummaryRowOut(
-                key="Total", outstanding=outstanding, ecl=ecl,
+                key="Total",
+                outstanding=outstanding,
+                ecl=ecl,
                 coverage=ecl / outstanding if outstanding else 0.0,
             )
         )
@@ -1070,19 +1051,29 @@ async def list_run_exceptions(
         where.append(RunException.category == category)
     total = (await db.execute(select(func.count()).where(*where))).scalar_one()
     rows = (
-        await db.execute(
-            select(RunException)
-            .where(*where)
-            .order_by(RunException.seq)
-            .offset((page - 1) * per_page)
-            .limit(per_page)
+        (
+            await db.execute(
+                select(RunException)
+                .where(*where)
+                .order_by(RunException.seq)
+                .offset((page - 1) * per_page)
+                .limit(per_page)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return ExceptionsPageOut(
         items=[
             ExceptionOut(
-                category=r.category, dataset=r.dataset, loanId=r.loan_id, customerId=r.customer_id,
-                field=r.field, value=r.value, issue=r.issue, action=r.action,
+                category=r.category,
+                dataset=r.dataset,
+                loanId=r.loan_id,
+                customerId=r.customer_id,
+                field=r.field,
+                value=r.value,
+                issue=r.issue,
+                action=r.action,
             )
             for r in rows
         ],
