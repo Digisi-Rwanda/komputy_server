@@ -24,9 +24,7 @@ def _to_out(c: CollateralType) -> CollateralTypeOut:
     )
 
 
-async def _check_name_unique(
-    db: AsyncSession, tenant_id: str, name: str, exclude_id: str | None = None
-) -> None:
+async def _check_name_unique(db: AsyncSession, tenant_id: str, name: str, exclude_id: str | None = None) -> None:
     q = select(CollateralType).where(
         CollateralType.tenant_id == tenant_id,
         CollateralType.name == name.strip(),
@@ -133,9 +131,7 @@ async def update_collateral_type(
     return _to_out(c)
 
 
-async def delete_collateral_type(
-    db: AsyncSession, tenant_id: str, collateral_id: str
-) -> None:
+async def delete_collateral_type(db: AsyncSession, tenant_id: str, collateral_id: str) -> None:
     result = await db.execute(
         select(CollateralType).where(
             CollateralType.id == collateral_id,
