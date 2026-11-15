@@ -162,7 +162,8 @@ services:
     region: frankfurt
     plan: starter
     schedule: "* * * * *"
-    dockerCommand: sh -c 'curl -fsS -m 50 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/events"'
+    dockerCommand: >-
+      sh -c 'curl -fsS -m 50 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/events"'
     envVars: &cron_env
       - key: WEB_HOSTPORT
         fromService: { type: web, name: komputy-web, property: hostport }
@@ -174,7 +175,8 @@ services:
     region: frankfurt
     plan: starter
     schedule: "*/5 * * * *"
-    dockerCommand: sh -c 'curl -fsS -m 240 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/expire"'
+    dockerCommand: >-
+      sh -c 'curl -fsS -m 240 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/expire"'
     envVars: *cron_env
   - type: cron
     name: komputy-cron-daily
@@ -183,7 +185,8 @@ services:
     region: frankfurt
     plan: starter
     schedule: "0 6 * * *"  # 08:00 Africa/Kigali
-    dockerCommand: sh -c 'curl -fsS -m 600 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/daily"'
+    dockerCommand: >-
+      sh -c 'curl -fsS -m 600 -X POST -H "Authorization: Bearer $CRON_SECRET" "http://$WEB_HOSTPORT/api/cron/daily"'
     envVars: *cron_env
   - type: cron
     name: komputy-cron-backup
