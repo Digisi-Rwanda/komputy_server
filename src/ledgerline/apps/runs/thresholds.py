@@ -18,7 +18,15 @@ from ledgerline.kernel.errors import ECLException
 
 router = APIRouter(prefix="/tenants", tags=["setup"])
 Member = Annotated[Membership, Depends(require_tenant_member)]
-FIELDS = ("max_month_gap", "min_transitions", "stage3_share_min", "stage3_share_max", "cure_rate_min", "cure_rate_max", "offbooks_abs_band")
+FIELDS = (
+    "max_month_gap",
+    "min_transitions",
+    "stage3_share_min",
+    "stage3_share_max",
+    "cure_rate_min",
+    "cure_rate_max",
+    "offbooks_abs_band",
+)
 
 
 def _out(row: Any) -> dict[str, Any]:
@@ -48,7 +56,9 @@ async def get_thresholds(tenant_id: str, db: DbSession, _m: Member) -> dict[str,
 
 
 @router.put("/{tenant_id}/ecl/thresholds")
-async def put_thresholds(tenant_id: str, body: ThresholdsIn, db: DbSession, user: CurrentUser, m: Member) -> dict[str, Any]:
+async def put_thresholds(
+    tenant_id: str, body: ThresholdsIn, db: DbSession, user: CurrentUser, m: Member
+) -> dict[str, Any]:
     if m.role not in ("administrator", "reviewer"):
         raise ECLException("INSUFFICIENT_ROLE", "Only reviewers and administrators can change thresholds.", 403)
     _, row = await resolve_pd_thresholds(db, tenant_id)
@@ -58,5 +68,11 @@ async def put_thresholds(tenant_id: str, body: ThresholdsIn, db: DbSession, user
         setattr(row, f, Decimal(str(v)) if isinstance(v, float) else v)
     db.add(row)
     await db.flush()
-    await log_event(db, "ecl.thresholds_changed", user_id=user.id, tenant_id=tenant_id, details={"before": before, "after": body.model_dump()})
+    await log_event(
+        db,
+        "ecl.thresholds_changed",
+        user_id=user.id,
+        tenant_id=tenant_id,
+        details={"before": before, "after": body.model_dump()},
+    )
     return {"data": _out(row)}
