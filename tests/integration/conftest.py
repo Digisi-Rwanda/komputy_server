@@ -37,14 +37,31 @@ def _prepare_db() -> None:
         has_queue = c.execute("SELECT to_regclass('public.procrastinate_jobs')").fetchone()[0]
     subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], cwd=ROOT, check=True, capture_output=True)
     if not has_queue:
-        subprocess.run([sys.executable, "-m", "procrastinate", "--app=ledgerline.queue.app", "schema", "--apply"], cwd=ROOT, check=True, capture_output=True)
+        subprocess.run(
+            [sys.executable, "-m", "procrastinate", "--app=ledgerline.queue.app", "schema", "--apply"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        )
     _prepared = True
 
 
-def token(sub: str, tid: str, wr: str, av: int = 1, ecl: str = "none", leases: str = "none", **extra: Any) -> dict[str, str]:
+def token(
+    sub: str, tid: str, wr: str, av: int = 1, ecl: str = "none", leases: str = "none", **extra: Any
+) -> dict[str, str]:
     s, now = get_settings(), int(time.time())
-    claims = {"sub": sub, "tid": tid, "wr": wr, "av": av, "iss": s.web_jwt_issuer, "aud": s.web_jwt_audience, "iat": now, "exp": now + 300,
-              "svc": {"ecl": {"role": ecl, "state": "active"}, "leases": {"role": leases, "state": "active"}}, **extra}
+    claims = {
+        "sub": sub,
+        "tid": tid,
+        "wr": wr,
+        "av": av,
+        "iss": s.web_jwt_issuer,
+        "aud": s.web_jwt_audience,
+        "iat": now,
+        "exp": now + 300,
+        "svc": {"ecl": {"role": ecl, "state": "active"}, "leases": {"role": leases, "state": "active"}},
+        **extra,
+    }
     return {"Authorization": f"Bearer {jwt.encode(claims, KEY, algorithm='RS256', headers={'kid': KID})}"}
 
 
@@ -55,8 +72,12 @@ class Workspace:
         self.tid, self.users = tid, users
 
     def h(self, who: str) -> dict[str, str]:
-        roles = {"admin": ("owner", "reviewer", "reviewer"), "prep": ("member", "analyst", "preparer"),
-                 "rev": ("member", "reviewer", "reviewer"), "viewer": ("member", "viewer", "viewer")}[who]
+        roles = {
+            "admin": ("owner", "reviewer", "reviewer"),
+            "prep": ("member", "analyst", "preparer"),
+            "rev": ("member", "reviewer", "reviewer"),
+            "viewer": ("member", "viewer", "viewer"),
+        }[who]
         return token(self.users[who], self.tid, roles[0], ecl=roles[1], leases=roles[2])
 
 
@@ -65,17 +86,33 @@ async def make_workspace(name: str, viewer: bool = True) -> Workspace:
 
     tid = new_ulid()
     users = {k: new_ulid() for k in ("admin", "prep", "rev", *(("viewer",) if viewer else ()))}
-    roles = {"admin": ("owner", None), "prep": ("member", "preparer"), "rev": ("member", "reviewer"), "viewer": ("member", "viewer")}
+    roles = {
+        "admin": ("owner", None),
+        "prep": ("member", "preparer"),
+        "rev": ("member", "reviewer"),
+        "viewer": ("member", "viewer"),
+    }
     async with AsyncSessionLocal() as db:
         await db.execute(text("INSERT INTO public.tenants (id, name) VALUES (:i, :n)"), {"i": tid, "n": name})
         for k, uid in users.items():
             mid = new_ulid()
-            await db.execute(text("INSERT INTO public.users (id, email, name) VALUES (:i, :e, :n)"), {"i": uid, "e": f"{k}.{tid[-6:]}@x.test", "n": f"{k.title()} {name}"})
-            await db.execute(text("INSERT INTO public.tenant_memberships (id, user_id, tenant_id, workspace_role) VALUES (:m, :u, :t, :w)"),
-                             {"m": mid, "u": uid, "t": tid, "w": roles[k][0]})
+            await db.execute(
+                text("INSERT INTO public.users (id, email, name) VALUES (:i, :e, :n)"),
+                {"i": uid, "e": f"{k}.{tid[-6:]}@x.test", "n": f"{k.title()} {name}"},
+            )
+            await db.execute(
+                text(
+                    "INSERT INTO public.tenant_memberships (id, user_id, tenant_id, workspace_role) VALUES (:m, :u, :t, :w)"
+                ),
+                {"m": mid, "u": uid, "t": tid, "w": roles[k][0]},
+            )
             if roles[k][1]:
-                await db.execute(text("INSERT INTO public.member_service_roles (id, membership_id, service, role) VALUES (:i, :m, 'leases', :r)"),
-                                 {"i": new_ulid(), "m": mid, "r": roles[k][1]})
+                await db.execute(
+                    text(
+                        "INSERT INTO public.member_service_roles (id, membership_id, service, role) VALUES (:i, :m, 'leases', :r)"
+                    ),
+                    {"i": new_ulid(), "m": mid, "r": roles[k][1]},
+                )
         await db.commit()
     return Workspace(tid, users)
 
