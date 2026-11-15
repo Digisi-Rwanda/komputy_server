@@ -69,9 +69,7 @@ async def persist_pd_observation_payload(
 
 async def load_pd_observation(db: AsyncSession, run_id: str) -> PdPreviewOut | None:
     try:
-        result = await db.execute(
-            select(PdObservationSnapshot).where(PdObservationSnapshot.run_id == run_id)
-        )
+        result = await db.execute(select(PdObservationSnapshot).where(PdObservationSnapshot.run_id == run_id))
         row = result.scalar_one_or_none()
     except ProgrammingError:
         await db.rollback()
@@ -104,9 +102,7 @@ async def rebuild_pd_observation(
     from ledgerline.kernel.enums import UploadKind
 
     result = await db.execute(
-        select(Upload)
-        .where(Upload.run_id == run_id, Upload.kind == UploadKind.PD.value)
-        .order_by(Upload.created_at)
+        select(Upload).where(Upload.run_id == run_id, Upload.kind == UploadKind.PD.value).order_by(Upload.created_at)
     )
     uploads = list(result.scalars().all())
     if not uploads:
