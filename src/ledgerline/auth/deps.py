@@ -43,7 +43,9 @@ class Membership:
 
 
 async def get_current_user(
-    request: Request, db: DbSession, creds: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
+    request: Request,
+    db: DbSession,
+    creds: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
 ) -> User:
     if not creds or not creds.credentials:
         raise ECLException("TOKEN_INVALID", "Authentication required.", 401)
@@ -76,7 +78,9 @@ async def require_tenant_member(tenant_id: str, user: CurrentUser, db: DbSession
     if claims.get("tid") != tenant_id:
         raise ECLException("NOT_TENANT_MEMBER", "Not a member of this workspace.", 403)
     tenant = (
-        await db.execute(select(Tenant.status, Tenant.authz_version).where(Tenant.id == tenant_id, Tenant.deleted_at.is_(None)))
+        await db.execute(
+            select(Tenant.status, Tenant.authz_version).where(Tenant.id == tenant_id, Tenant.deleted_at.is_(None))
+        )
     ).one_or_none()
     if tenant is None:
         raise ECLException("NOT_TENANT_MEMBER", "Not a member of this workspace.", 403)
@@ -86,7 +90,11 @@ async def require_tenant_member(tenant_id: str, user: CurrentUser, db: DbSession
         raise ECLException("TENANT_SUSPENDED", "This workspace is read-only.", 403)
     service = _service_of(request)
     svc = (claims.get("svc") or {}).get(service, {})
-    if svc.get("state") in (None, "locked", "requested") and not claims.get("sup") and claims.get("wr") not in ("owner", "admin"):
+    if (
+        svc.get("state") in (None, "locked", "requested")
+        and not claims.get("sup")
+        and claims.get("wr") not in ("owner", "admin")
+    ):
         raise ECLException("SERVICE_NOT_ENABLED", "This service isn't enabled for your workspace.", 403)
     if svc.get("state") in ("expired", "trial-expired", "suspended") and request.method not in ("GET", "HEAD"):
         raise ECLException("SERVICE_READ_ONLY", "This service is read-only for your workspace.", 403)
@@ -94,8 +102,12 @@ async def require_tenant_member(tenant_id: str, user: CurrentUser, db: DbSession
     await db.execute(text("SELECT set_config('app.tenant_id', :t, true)"), {"t": tenant_id})
     sup = claims.get("sup") or None
     return Membership(
-        user_id=user.id, tenant_id=tenant_id, role="viewer" if sup else legacy_role(claims, service),
-        workspace_role=claims.get("wr"), services=claims.get("svc") or {}, support_session=(sup or {}).get("id"),
+        user_id=user.id,
+        tenant_id=tenant_id,
+        role="viewer" if sup else legacy_role(claims, service),
+        workspace_role=claims.get("wr"),
+        services=claims.get("svc") or {},
+        support_session=(sup or {}).get("id"),
     )
 
 
