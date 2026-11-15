@@ -255,7 +255,7 @@ These are real gaps, found by reading the code. Every one of them gets committed
 
 ### Phase 7: CI/CD
 1. Render auto-deploy is set to **"after CI checks pass"** on `main` (`autoDeployTrigger: checksPass`).
-   - This needs **Render's GitHub app to have access to `mugisham37/komputy_*`**. Today Render is connected to the *Digisi-Rwanda* GitHub org.
+   - Both repos live in the **Digisi-Rwanda** GitHub org (moved there 2026-11-15), where Render's GitHub app is installed.
    - If it isn't connected, I use the fallback: GitHub Actions calls **Render deploy hooks**, stored as repo secrets, after CI passes. That needs nothing from you.
 2. Protect the `main` branch: CI must pass and force-pushes are blocked.
 3. The order on each deploy is enforced by pre-deploy: **migrations run before new code takes traffic**. Migrations must stay backward compatible (expand, then contract).
@@ -329,5 +329,5 @@ These are real gaps, found by reading the code. Every one of them gets committed
 
 1. **Approve D1–D6**, or just say "defaults".
 2. **Rotate the leaked secrets** at the end (Phase 10): the Resend key and the GitHub token. Put the new values in `~/.komputy-secrets`.
-3. *Optional:* give Render's GitHub app access to `mugisham37` for native auto-deploy (otherwise I use the deploy-hook fallback). Optional: a Sentry DSN.
+3. *Optional:* a Sentry DSN.
 4. Final sign-off at the Phase 10 gate.

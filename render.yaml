@@ -1,5 +1,5 @@
 # Komputy production on Render (Frankfurt). Infrastructure as code: see docs/DEPLOYMENT_PLAN.md.
-# Web app: github.com/mugisham37/komputy_web · Engine: this repo. Everything talks over Render's private network;
+# Web app: github.com/Digisi-Rwanda/komputy_web · Engine: this repo. Everything talks over Render's private network;
 # only komputy-web is public. Secrets marked `sync: false` are set once at approval and never live in git.
 
 projects:
@@ -53,7 +53,7 @@ projects:
           - type: web
             name: komputy-web
             runtime: node
-            repo: https://github.com/mugisham37/komputy_web
+            repo: https://github.com/Digisi-Rwanda/komputy_web
             branch: main
             region: frankfurt
             plan: standard
@@ -96,7 +96,7 @@ projects:
           - type: pserv
             name: komputy-engine-api
             runtime: docker
-            repo: https://github.com/mugisham37/komputy_server
+            repo: https://github.com/Digisi-Rwanda/komputy_server
             branch: main
             region: frankfurt
             plan: standard
@@ -131,7 +131,7 @@ projects:
           - type: worker
             name: komputy-worker-io
             runtime: docker
-            repo: https://github.com/mugisham37/komputy_server
+            repo: https://github.com/Digisi-Rwanda/komputy_server
             branch: main
             region: frankfurt
             plan: standard
@@ -146,7 +146,7 @@ projects:
           - type: worker
             name: komputy-worker-calc
             runtime: docker
-            repo: https://github.com/mugisham37/komputy_server
+            repo: https://github.com/Digisi-Rwanda/komputy_server
             branch: main
             region: frankfurt
             plan: pro
@@ -161,7 +161,7 @@ projects:
           - type: cron
             name: komputy-cron-events
             runtime: docker
-            repo: https://github.com/mugisham37/komputy_server
+            repo: https://github.com/Digisi-Rwanda/komputy_server
             branch: main
             dockerfilePath: ./ops/cron/Dockerfile
             dockerContext: ./ops/cron
@@ -176,7 +176,7 @@ projects:
           - type: cron
             name: komputy-cron-expire
             runtime: docker
-            repo: https://github.com/mugisham37/komputy_server
+            repo: https://github.com/Digisi-Rwanda/komputy_server
             branch: main
             dockerfilePath: ./ops/cron/Dockerfile
             dockerContext: ./ops/cron
@@ -188,7 +188,7 @@ projects:
           - type: cron
             name: komputy-cron-daily
             runtime: docker
-            repo: https://github.com/mugisham37/komputy_server
+            repo: https://github.com/Digisi-Rwanda/komputy_server
             branch: main
             dockerfilePath: ./ops/cron/Dockerfile
             dockerContext: ./ops/cron
@@ -200,7 +200,7 @@ projects:
           - type: cron
             name: komputy-cron-backup
             runtime: docker
-            repo: https://github.com/mugisham37/komputy_server
+            repo: https://github.com/Digisi-Rwanda/komputy_server
             branch: main
             region: frankfurt
             plan: starter
