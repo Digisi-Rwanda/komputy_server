@@ -59,6 +59,9 @@ services:
     startCommand: npm start
     healthCheckPath: /api/healthz
     autoDeployTrigger: checksPass
+    domains:  # Cloudflare DNS (DNS-only) → this service; Render issues the certificates. www redirects to the apex.
+      - komputy.com
+      - www.komputy.com
     envVars:
       - key: NODE_VERSION
         value: "22"
