@@ -82,27 +82,27 @@ _ACTIVE_RUN_STATUSES = frozenset(
 )
 
 _COLLATERAL_DEFAULTS: dict[str, dict] = {
-    "real estate":          {"haircut": 15.0, "time_to_realize": 18},
+    "real estate": {"haircut": 15.0, "time_to_realize": 18},
     "residential property": {"haircut": 15.0, "time_to_realize": 18},
-    "commercial property":  {"haircut": 20.0, "time_to_realize": 24},
-    "land":                 {"haircut": 20.0, "time_to_realize": 24},
-    "motor vehicle":        {"haircut": 25.0, "time_to_realize": 6},
-    "vehicle":              {"haircut": 25.0, "time_to_realize": 6},
-    "cash deposit":         {"haircut": 0.0,  "time_to_realize": 0},
-    "cash":                 {"haircut": 0.0,  "time_to_realize": 0},
-    "deposit":              {"haircut": 0.0,  "time_to_realize": 1},
-    "corporate guarantee":  {"haircut": 20.0, "time_to_realize": 12},
-    "personal guarantee":   {"haircut": 30.0, "time_to_realize": 12},
-    "guarantee":            {"haircut": 25.0, "time_to_realize": 12},
-    "equipment":            {"haircut": 30.0, "time_to_realize": 12},
-    "machinery":            {"haircut": 35.0, "time_to_realize": 12},
-    "government bond":      {"haircut": 5.0,  "time_to_realize": 1},
-    "bond":                 {"haircut": 10.0, "time_to_realize": 3},
-    "stock":                {"haircut": 30.0, "time_to_realize": 5},
-    "shares":               {"haircut": 30.0, "time_to_realize": 5},
-    "insurance":            {"haircut": 20.0, "time_to_realize": 6},
-    "inventory":            {"haircut": 50.0, "time_to_realize": 6},
-    "receivables":          {"haircut": 40.0, "time_to_realize": 3},
+    "commercial property": {"haircut": 20.0, "time_to_realize": 24},
+    "land": {"haircut": 20.0, "time_to_realize": 24},
+    "motor vehicle": {"haircut": 25.0, "time_to_realize": 6},
+    "vehicle": {"haircut": 25.0, "time_to_realize": 6},
+    "cash deposit": {"haircut": 0.0, "time_to_realize": 0},
+    "cash": {"haircut": 0.0, "time_to_realize": 0},
+    "deposit": {"haircut": 0.0, "time_to_realize": 1},
+    "corporate guarantee": {"haircut": 20.0, "time_to_realize": 12},
+    "personal guarantee": {"haircut": 30.0, "time_to_realize": 12},
+    "guarantee": {"haircut": 25.0, "time_to_realize": 12},
+    "equipment": {"haircut": 30.0, "time_to_realize": 12},
+    "machinery": {"haircut": 35.0, "time_to_realize": 12},
+    "government bond": {"haircut": 5.0, "time_to_realize": 1},
+    "bond": {"haircut": 10.0, "time_to_realize": 3},
+    "stock": {"haircut": 30.0, "time_to_realize": 5},
+    "shares": {"haircut": 30.0, "time_to_realize": 5},
+    "insurance": {"haircut": 20.0, "time_to_realize": 6},
+    "inventory": {"haircut": 50.0, "time_to_realize": 6},
+    "receivables": {"haircut": 40.0, "time_to_realize": 3},
 }
 _COLLATERAL_FALLBACK: dict = {"haircut": 50.0, "time_to_realize": 24}
 
@@ -115,9 +115,7 @@ def _segment_code(name: str) -> str:
     return _re.sub(r"[^A-Z0-9_]", "_", name.strip().upper())[:20]
 
 
-async def _auto_provision_segments(
-    db: AsyncSession, tenant_id: str, user_id: str, names: set[str]
-) -> None:
+async def _auto_provision_segments(db: AsyncSession, tenant_id: str, user_id: str, names: set[str]) -> None:
     from ledgerline.apps.segments.models import Segment
     from ledgerline.apps.segments.schemas import BatchCreateSegmentsRequest, CreateSegmentRequest
     from ledgerline.apps.segments.service import batch_create_segments
@@ -134,9 +132,9 @@ async def _auto_provision_segments(
     if not truly_new:
         return
 
-    req = BatchCreateSegmentsRequest(segments=[
-        CreateSegmentRequest(name=n, code=_segment_code(n)) for n in sorted(truly_new)
-    ])
+    req = BatchCreateSegmentsRequest(
+        segments=[CreateSegmentRequest(name=n, code=_segment_code(n)) for n in sorted(truly_new)]
+    )
     # A concurrent validation of the same files may insert these first. A
     # savepoint keeps that unique-violation from aborting this request's session;
     # either way the segments exist afterwards.
@@ -172,9 +170,7 @@ async def assert_run_visible(
     membership: TenantMembership | None,
     run_id: str,
 ) -> Run:
-    result = await db.execute(
-        select(Run).where(Run.id == run_id, Run.tenant_id == tenant_id, Run.deleted_at.is_(None))
-    )
+    result = await db.execute(select(Run).where(Run.id == run_id, Run.tenant_id == tenant_id, Run.deleted_at.is_(None)))
     run = result.scalar_one_or_none()
     if not run:
         raise ECLException("RUN_NOT_FOUND", "Run not found.", 404)
@@ -187,6 +183,8 @@ async def assert_run_visible(
                 raise ECLException("RUN_NOT_FOUND", "Run not found.", 404)
 
     return run
+
+
 from ledgerline.apps.runs.schemas import (
     CreateRunRequest,
     EngineInfoOut,
@@ -198,6 +196,7 @@ from ledgerline.apps.runs.schemas import (
     RerunRequest,
     RunAuditEventOut,
     RunDetailOut,
+    RunInputFileOut,
     RunListItemOut,
     SegmentBarOut,
     UpdateRunRequest,
@@ -307,9 +306,7 @@ def _engine_progress_out(progress: dict[str, Any] | None) -> EngineProgressOut |
 
 
 async def _get_tenant(db: AsyncSession, tenant_id: str) -> Tenant:
-    result = await db.execute(
-        select(Tenant).where(Tenant.id == tenant_id, Tenant.deleted_at.is_(None))
-    )
+    result = await db.execute(select(Tenant).where(Tenant.id == tenant_id, Tenant.deleted_at.is_(None)))
     tenant = result.scalar_one_or_none()
     if not tenant:
         raise ECLException("RESOURCE_NOT_FOUND", "Workspace not found.", 404)
@@ -363,12 +360,8 @@ async def _clear_run_results(db: AsyncSession, run_id: str, tenant_id: str) -> N
             PdObservationSnapshot.tenant_id == tenant_id,
         )
     )
-    await db.execute(
-        delete(PdResult).where(PdResult.run_id == run_id, PdResult.tenant_id == tenant_id)
-    )
-    await db.execute(
-        delete(LgdResult).where(LgdResult.run_id == run_id, LgdResult.tenant_id == tenant_id)
-    )
+    await db.execute(delete(PdResult).where(PdResult.run_id == run_id, PdResult.tenant_id == tenant_id))
+    await db.execute(delete(LgdResult).where(LgdResult.run_id == run_id, LgdResult.tenant_id == tenant_id))
     for model in (EadResult, EclLoanSummary, RunException):
         await db.execute(delete(model).where(model.run_id == run_id, model.tenant_id == tenant_id))
     await db.execute(
@@ -409,8 +402,7 @@ def _assert_upload_safe(content: bytes, content_type: str) -> None:
     if content_type not in _ALLOWED_CONTENT_TYPES:
         raise ECLException(
             "UNSUPPORTED_MEDIA_TYPE",
-            f"Uploaded file has unsupported content type '{content_type}'. "
-            "Only .xlsx workbooks are accepted.",
+            f"Uploaded file has unsupported content type '{content_type}'. Only .xlsx workbooks are accepted.",
             415,
         )
     try:
@@ -421,12 +413,12 @@ def _assert_upload_safe(content: bytes, content_type: str) -> None:
                     "Uploaded file contains VBA macros, which are not permitted.",
                     415,
                 )
-    except zipfile.BadZipFile:
+    except zipfile.BadZipFile as exc:
         raise ECLException(
             "INVALID_FILE",
             "Uploaded file is not a valid .xlsx workbook.",
             415,
-        )
+        ) from exc
 
 
 def _parse_excel(content: bytes) -> tuple[dict[str, pd.DataFrame], int, int]:
@@ -444,9 +436,7 @@ def _combine_sheets(sheets: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 
 async def _load_uploads(db: AsyncSession, run_id: str) -> list[Upload]:
-    result = await db.execute(
-        select(Upload).where(Upload.run_id == run_id).order_by(Upload.created_at)
-    )
+    result = await db.execute(select(Upload).where(Upload.run_id == run_id).order_by(Upload.created_at))
     return list(result.scalars().all())
 
 
@@ -465,9 +455,7 @@ async def _audit_events_for_run(
     )
     events: list[RunAuditEventOut] = []
     for log, user in result.all():
-        kind, icon, title = _AUDIT_DISPLAY.get(
-            log.event_type, ("default", "Clock", log.event_type)
-        )
+        kind, icon, title = _AUDIT_DISPLAY.get(log.event_type, ("default", "Clock", log.event_type))
         details = log.details or {}
         description = str(details.get("description", details.get("message", "")))
         who = user.name if user else "system"
@@ -536,9 +524,7 @@ async def _segment_bars(db: AsyncSession, run_id: str, tenant_id: str) -> list[S
         .order_by(func.sum(S.total_ecl).desc())
         .limit(6)
     )
-    return [
-        SegmentBarOut(name=row.segment, value=float(row.ecl or 0)) for row in result.all()
-    ]
+    return [SegmentBarOut(name=row.segment, value=float(row.ecl or 0)) for row in result.all()]
 
 
 def _engine_info(run: Run) -> EngineInfoOut:
@@ -553,9 +539,7 @@ def _engine_info(run: Run) -> EngineInfoOut:
     )
 
 
-async def _input_files(
-    db: AsyncSession, run_id: str, uploads: list[Upload] | None = None
-) -> list[RunInputFileOut]:
+async def _input_files(db: AsyncSession, run_id: str, uploads: list[Upload] | None = None) -> list[RunInputFileOut]:
     uploads = uploads or await _load_uploads(db, run_id)
     files: list[RunInputFileOut] = []
     for upload in uploads:
@@ -580,9 +564,7 @@ async def _input_files(
 
 async def _latest_uploads_by_kind(db: AsyncSession, tenant_id: str, run_id: str) -> dict[str, Upload]:
     run = (
-        await db.execute(
-            select(Run.id).where(Run.id == run_id, Run.tenant_id == tenant_id, Run.deleted_at.is_(None))
-        )
+        await db.execute(select(Run.id).where(Run.id == run_id, Run.tenant_id == tenant_id, Run.deleted_at.is_(None)))
     ).scalar_one_or_none()
     if not run:
         raise ECLException("RESOURCE_NOT_FOUND", "Run not found.", 404)
@@ -590,9 +572,7 @@ async def _latest_uploads_by_kind(db: AsyncSession, tenant_id: str, run_id: str)
     return {u.kind.upper(): u for u in await _load_uploads(db, run_id)}
 
 
-async def get_input_file_bytes(
-    db: AsyncSession, tenant_id: str, run_id: str, kind: str
-) -> tuple[bytes, str]:
+async def get_input_file_bytes(db: AsyncSession, tenant_id: str, run_id: str, kind: str) -> tuple[bytes, str]:
     upload = (await _latest_uploads_by_kind(db, tenant_id, run_id)).get(kind.upper())
     if upload is None:
         raise ECLException("RESOURCE_NOT_FOUND", f"No {kind.upper()} input for this run.", 404)
@@ -646,9 +626,11 @@ async def create_run(
     ip: str | None = None,
     user_agent: str | None = None,
 ) -> RunDetailOut:
-    log.info("run_create_started", tenant_id=tenant_id, user_id=user_id, name=req.name.strip(), engine_version=ENGINE_VERSION)
+    log.info(
+        "run_create_started", tenant_id=tenant_id, user_id=user_id, name=req.name.strip(), engine_version=ENGINE_VERSION
+    )
     tenant = await _get_tenant(db, tenant_id)
-    user = await _get_user(db, user_id)
+    await _get_user(db, user_id)
     run = Run(
         currency=tenant.currency,
         id=new_ulid(),
@@ -715,7 +697,7 @@ async def reset_validation_from(db: AsyncSession, run_id: str, kind: str) -> Non
     EAD validation reads the PD curve and the collateral file, and LGD reads PD
     loan IDs, so a new PD file must send LGD and EAD back through validation.
     """
-    later = _VALIDATION_ORDER[_VALIDATION_ORDER.index(kind):]
+    later = _VALIDATION_ORDER[_VALIDATION_ORDER.index(kind) :]
     result = await db.execute(select(Upload).where(Upload.run_id == run_id, Upload.kind.in_(later)))
     for upload in result.scalars().all():
         upload.validation_status = None
@@ -751,8 +733,21 @@ async def upload_file(
     log.info("upload_streaming_to_storage", run_id=run_id, kind=kind, storage_path=storage_path)
     sha256, size = await upload_stream(storage_path, file_obj, content_type)
     file_obj.seek(0)
-    return await _register_upload(db, run, tenant_id, user_id, kind=kind, filename=filename, storage_path=storage_path,
-                                  sha256=sha256, size=size, content=file_obj.read(), content_type=content_type, ip=ip, user_agent=user_agent)
+    return await _register_upload(
+        db,
+        run,
+        tenant_id,
+        user_id,
+        kind=kind,
+        filename=filename,
+        storage_path=storage_path,
+        sha256=sha256,
+        size=size,
+        content=file_obj.read(),
+        content_type=content_type,
+        ip=ip,
+        user_agent=user_agent,
+    )
 
 
 async def _check_uploadable(db: AsyncSession, tenant_id: str, run_id: str, kind: str) -> Run:
@@ -765,13 +760,22 @@ async def _check_uploadable(db: AsyncSession, tenant_id: str, run_id: str, kind:
 
 
 async def start_direct_upload(
-    db: AsyncSession, tenant_id: str, run_id: str, *, kind: str, filename: str, size: int, content_type: str,
+    db: AsyncSession,
+    tenant_id: str,
+    run_id: str,
+    *,
+    kind: str,
+    filename: str,
+    size: int,
+    content_type: str,
 ) -> dict[str, Any]:
     """Step 1 of a browser → storage upload: a multipart upload with one presigned URL per part."""
     await _check_uploadable(db, tenant_id, run_id, kind)
     s = get_settings()
     if size <= 0 or size > s.max_upload_bytes:
-        raise ECLException("FILE_TOO_LARGE", f"File exceeds the maximum upload size of {s.max_upload_bytes // (1024 * 1024)} MB.", 413)
+        raise ECLException(
+            "FILE_TOO_LARGE", f"File exceeds the maximum upload size of {s.max_upload_bytes // (1024 * 1024)} MB.", 413
+        )
     if not filename.lower().endswith(".xlsx"):
         raise ECLException("INVALID_FILE", "Upload an Excel workbook (.xlsx).", 415)
     safe_name = filename.replace("/", "_").replace("\\", "_")
@@ -783,8 +787,19 @@ async def start_direct_upload(
 
 
 async def complete_direct_upload(
-    db: AsyncSession, tenant_id: str, run_id: str, user_id: str, *, kind: str, filename: str, key: str,
-    upload_id: str, parts: list[dict[str, Any]], content_type: str, ip: str | None = None, user_agent: str | None = None,
+    db: AsyncSession,
+    tenant_id: str,
+    run_id: str,
+    user_id: str,
+    *,
+    kind: str,
+    filename: str,
+    key: str,
+    upload_id: str,
+    parts: list[dict[str, Any]],
+    content_type: str,
+    ip: str | None = None,
+    user_agent: str | None = None,
 ) -> UploadOut:
     """Step 2: finish the multipart upload, then register it exactly like a direct upload."""
     run = await _check_uploadable(db, tenant_id, run_id, kind)
@@ -794,13 +809,38 @@ async def complete_direct_upload(
     # shortcut: the workbook is read whole for parsing (same as the engine needs it); stream to Parquet in the ingest job when files exceed worker RAM.
     content = await download_bytes(key)
     sha256 = hashlib.sha256(content).hexdigest()
-    return await _register_upload(db, run, tenant_id, user_id, kind=kind, filename=filename, storage_path=key, sha256=sha256,
-                                  size=len(content), content=content, content_type=content_type, ip=ip, user_agent=user_agent)
+    return await _register_upload(
+        db,
+        run,
+        tenant_id,
+        user_id,
+        kind=kind,
+        filename=filename,
+        storage_path=key,
+        sha256=sha256,
+        size=len(content),
+        content=content,
+        content_type=content_type,
+        ip=ip,
+        user_agent=user_agent,
+    )
 
 
 async def _register_upload(
-    db: AsyncSession, run: Run, tenant_id: str, user_id: str, *, kind: str, filename: str, storage_path: str, sha256: str,
-    size: int, content: bytes, content_type: str, ip: str | None, user_agent: str | None,
+    db: AsyncSession,
+    run: Run,
+    tenant_id: str,
+    user_id: str,
+    *,
+    kind: str,
+    filename: str,
+    storage_path: str,
+    sha256: str,
+    size: int,
+    content: bytes,
+    content_type: str,
+    ip: str | None,
+    user_agent: str | None,
 ) -> UploadOut:
     run_id = run.id
     existing = await db.execute(select(Upload).where(Upload.run_id == run_id, Upload.kind == kind))
@@ -826,18 +866,17 @@ async def _register_upload(
         sheets, sheet_count, row_count = await asyncio.to_thread(_parse_excel, content)
     except Exception as exc:
         await delete_object(storage_path)
-        raise ECLException(
-            "INVALID_FILE", f"'{filename}' could not be read as an Excel workbook.", 422
-        ) from exc
+        raise ECLException("INVALID_FILE", f"'{filename}' could not be read as an Excel workbook.", 422) from exc
     del sheets
     log.info("upload_parsed", run_id=run_id, kind=kind, sheets=sheet_count, rows=row_count)
 
     if row_count is not None and row_count > 1_000_000:
         existing_warnings = run.run_warnings or []
-        run.run_warnings = existing_warnings + [
+        run.run_warnings = [
+            *existing_warnings,
             f"EC-12: Upload '{kind}' contains {row_count:,} rows. "
             "Compute time may exceed the 30-minute budget. "
-            "Consider splitting the dataset into batches before running."
+            "Consider splitting the dataset into batches before running.",
         ]
 
     upload = Upload(
@@ -893,9 +932,7 @@ async def delete_upload(
             "Files can only be modified on draft or failed runs.",
             409,
         )
-    result = await db.execute(
-        select(Upload).where(Upload.id == upload_id, Upload.run_id == run_id)
-    )
+    result = await db.execute(select(Upload).where(Upload.id == upload_id, Upload.run_id == run_id))
     upload = result.scalar_one_or_none()
     if upload is None:
         raise ECLException("RESOURCE_NOT_FOUND", "Upload not found.", 404)
@@ -1022,9 +1059,7 @@ async def get_run(
     if user is not None:
         run = await assert_run_visible(db, user, tenant_id, membership, run_id)
     else:
-        result = await db.execute(
-            select(Run).where(Run.id == run_id, Run.tenant_id == tenant_id)
-        )
+        result = await db.execute(select(Run).where(Run.id == run_id, Run.tenant_id == tenant_id))
         run = result.scalar_one_or_none()
         if not run:
             raise ECLException("RESOURCE_NOT_FOUND", "Run not found.", 404)
@@ -1084,9 +1119,7 @@ async def get_run(
         workbooksStatus=((run.engine_progress or {}).get("workbooks") or {}).get("status"),
         elapsed=_format_elapsed(run.started_at, run.finished_at),
         kpis=_build_kpis(run, loan_count),
-        segments=await _segment_bars(db, run_id, tenant_id)
-        if run.status == RunStatus.COMPLETE.value
-        else [],
+        segments=await _segment_bars(db, run_id, tenant_id) if run.status == RunStatus.COMPLETE.value else [],
         inputFiles=await _input_files(db, run_id),
         auditEvents=await _audit_events_for_run(db, run_id, tenant.timezone),
         engineInfo=_engine_info(run),
@@ -1112,11 +1145,7 @@ async def list_runs(
     tenant = await _get_tenant(db, tenant_id)
     if user is not None:
         scope = get_run_scope_filter(user, tenant_id, membership)
-        base = (
-            select(Run, User)
-            .join(User, User.id == Run.created_by_user_id)
-            .where(scope, Run.deleted_at.is_(None))
-        )
+        base = select(Run, User).join(User, User.id == Run.created_by_user_id).where(scope, Run.deleted_at.is_(None))
     else:
         base = (
             select(Run, User)
@@ -1154,18 +1183,12 @@ async def list_runs(
 
     if search:
         pattern = f"%{search.strip()}%"
-        base = base.where(
-            or_(Run.name.ilike(pattern), Run.reporting_period.ilike(pattern))
-        )
+        base = base.where(or_(Run.name.ilike(pattern), Run.reporting_period.ilike(pattern)))
 
-    count_q = select(func.count()).select_from(
-        base.with_only_columns(Run.id).subquery()
-    )
+    count_q = select(func.count()).select_from(base.with_only_columns(Run.id).subquery())
     total = (await db.execute(count_q)).scalar_one()
     offset = (page - 1) * per_page
-    result = await db.execute(
-        base.order_by(Run.created_at.desc()).offset(offset).limit(per_page)
-    )
+    result = await db.execute(base.order_by(Run.created_at.desc()).offset(offset).limit(per_page))
     pages = max(1, (total + per_page - 1) // per_page)
     meta = PageMeta(
         total=total,
@@ -1175,9 +1198,7 @@ async def list_runs(
         has_next=page < pages,
         has_prev=page > 1,
     )
-    items = [
-        await _run_list_item(run, user, tenant) for run, user in result.all()
-    ]
+    items = [await _run_list_item(run, user, tenant) for run, user in result.all()]
     return items, meta
 
 
@@ -1227,7 +1248,7 @@ async def rerun_run(
             409,
         )
 
-    tenant = await _get_tenant(db, tenant_id)
+    await _get_tenant(db, tenant_id)
     new_name = req.name.strip() if req.name else f"{original.name} (rerun)"
 
     new_run = Run(
