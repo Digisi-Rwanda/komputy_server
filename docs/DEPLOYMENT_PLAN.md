@@ -6,6 +6,11 @@ We work in phases. Each phase has an exit gate, and the next phase starts only o
 
 Status of access, checked on 2026-11-15: Render MCP, Cloudflare MCP (DNS, R2, account API tokens), Resend API key, and the GitHub token are all available.
 
+**Progress (2026-11-15):** Phases 0–7 done and verified. Live at https://komputy.com (Render, Frankfurt):
+web, engine API, io + calc workers, 3 HTTP crons, nightly backup (verified complete on production), R2 storage,
+CI-gated auto-deploy. Open: Phase 4 human sign-in check, Phase 8 external uptime check, Phase 9 bank-scale load
+test, Phase 10 secret rotation (GitHub token, Resend key, R2 token: all pasted in chat).
+
 ---
 
 ## 1. Target architecture
