@@ -38,14 +38,36 @@ async def reconcile_runs(timestamp: int) -> int:
     from ledgerline.apps.runs.jobs import compute_run
     from ledgerline.apps.runs.models import Run
 
+    # A worker killed mid-job (deploy past the shutdown delay, OOM) leaves its job `doing` forever: give it back to the
+    # queue once its worker has sent no heartbeat for 5 min (heartbeats run every 10 s, also during threaded compute).
+    for job in await queue_app.job_manager.get_stalled_jobs(seconds_since_heartbeat=300):
+        await queue_app.job_manager.retry_job(job)
+        log.warning("stalled_job_retried", job_id=job.id, task=job.task_name)
     cutoff = datetime.now(UTC) - timedelta(minutes=10)
     requeued = 0
     async with AsyncSessionLocal() as db:
-        stuck = (await db.execute(select(Run.id).where(Run.status.in_(("queued", "pd_running", "lgd_running", "ead_running")), Run.updated_at < cutoff))).scalars().all()
+        stuck = (
+            (
+                await db.execute(
+                    select(Run.id).where(
+                        Run.status.in_(("queued", "pd_running", "lgd_running", "ead_running")), Run.updated_at < cutoff
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
         for run_id in stuck:
-            live = await db.scalar(text("SELECT count(*) FROM procrastinate_jobs WHERE task_name = 'ecl.compute' AND status IN ('todo','doing') AND args->>'run_id' = :r"), {"r": run_id})
+            live = await db.scalar(
+                text(
+                    "SELECT count(*) FROM procrastinate_jobs WHERE task_name = 'ecl.compute' AND status IN ('todo','doing') AND args->>'run_id' = :r"
+                ),
+                {"r": run_id},
+            )
             if not live:
-                await db.execute(update(Run).where(Run.id == run_id).values(status="queued", updated_at=datetime.now(UTC)))
+                await db.execute(
+                    update(Run).where(Run.id == run_id).values(status="queued", updated_at=datetime.now(UTC))
+                )
                 await db.commit()
                 await compute_run.configure(queueing_lock=run_id).defer_async(run_id=run_id)
                 requeued += 1
@@ -60,7 +82,15 @@ async def outbox_retention(timestamp: int) -> int:
     from ledgerline.events.notify import OutboxEvent
 
     async with AsyncSessionLocal() as db:
-        n = (await db.execute(delete(OutboxEvent).where(OutboxEvent.consumed_at < datetime.now(UTC) - timedelta(days=30)))).rowcount or 0
-        await db.execute(text("DELETE FROM procrastinate_jobs WHERE status IN ('succeeded','failed','cancelled','aborted') AND id IN (SELECT job_id FROM procrastinate_events WHERE type IN ('succeeded','failed','cancelled','aborted') AND at < now() - interval '14 days')"))
+        n = (
+            await db.execute(
+                delete(OutboxEvent).where(OutboxEvent.consumed_at < datetime.now(UTC) - timedelta(days=30))
+            )
+        ).rowcount or 0
+        await db.execute(
+            text(
+                "DELETE FROM procrastinate_jobs WHERE status IN ('succeeded','failed','cancelled','aborted') AND id IN (SELECT job_id FROM procrastinate_events WHERE type IN ('succeeded','failed','cancelled','aborted') AND at < now() - interval '14 days')"
+            )
+        )
         await db.commit()
     return n
