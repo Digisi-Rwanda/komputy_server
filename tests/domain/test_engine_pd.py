@@ -33,9 +33,7 @@ def test_compute_pd_basic() -> None:
     df = pd.DataFrame(
         {
             "Loan ID": ["L1", "L1", "L2", "L2"],
-            "Reporting Month": pd.to_datetime(
-                ["2024-01-31", "2024-02-29", "2024-01-31", "2024-02-29"]
-            ),
+            "Reporting Month": pd.to_datetime(["2024-01-31", "2024-02-29", "2024-01-31", "2024-02-29"]),
             "Staging": ["Stage 1", "Stage 1", "Stage 2", "Stage 3"],
             "Loan Amount": [100_000.0, 95_000.0, 50_000.0, 48_000.0],
             "SEGMENT": ["Retail", "Retail", "Retail", "Retail"],
@@ -68,9 +66,7 @@ def test_month_end_join_survives_short_months() -> None:
         ]
     )
     joined = derive_next_month_staging(prepare_pd_frame(df))
-    by_month = dict(
-        zip(joined["Reporting Month"], joined["Next Month Staging"], strict=True)
-    )
+    by_month = dict(zip(joined["Reporting Month"], joined["Next Month Staging"], strict=True))
     assert by_month[pd.Timestamp("2024-01-31")] == "Stage 1"
     assert by_month[pd.Timestamp("2024-02-29")] == "Stage 1"
     assert by_month[pd.Timestamp("2024-03-31")] == "Stage 1"
@@ -108,9 +104,7 @@ def test_cure_rate_uses_pre_absorbing_proportions() -> None:
 
     Normalizing Stage 3 to [0, 0, 1] first would make every cure rate zero.
     """
-    aggregate = np.array(
-        [[80.0, 20.0, 0.0], [10.0, 70.0, 20.0], [15.0, 5.0, 80.0]], dtype=np.float64
-    )
+    aggregate = np.array([[80.0, 20.0, 0.0], [10.0, 70.0, 20.0], [15.0, 5.0, 80.0]], dtype=np.float64)
     proportions = row_proportions(aggregate)
     assert cure_rate_from_proportions(proportions) == 0.20
 
