@@ -13,8 +13,8 @@ from datetime import date
 import pandas as pd
 import pytest
 
-from ledgerline.ecl.domain.ecl_pipeline import ECL_BEFORE_CAP, ECL_CAPPED, TOTAL_ECL, run_ecl
-from ledgerline.ecl.domain.ecl_rules import prepare_inputs
+from komputy.ecl.domain.ecl_pipeline import ECL_BEFORE_CAP, ECL_CAPPED, TOTAL_ECL, run_ecl
+from komputy.ecl.domain.ecl_rules import prepare_inputs
 
 REP = date(2025, 1, 31)
 CONFIG = [
@@ -392,7 +392,7 @@ def test_workbooks_follow_step_11(result) -> None:
 
     import openpyxl
 
-    from ledgerline.ecl.domain.ecl_workbooks import build_loan_detail_workbook, build_portfolio_workbook
+    from komputy.ecl.domain.ecl_workbooks import build_loan_detail_workbook, build_portfolio_workbook
 
     wb = openpyxl.load_workbook(BytesIO(build_loan_detail_workbook(result, _meta())))
     assert wb.sheetnames == ["Run Details", "Row Detail", "Loan Summary", "Exception Report"]
@@ -429,7 +429,7 @@ def test_row_detail_splits_loan_by_loan(result) -> None:
 
     import openpyxl
 
-    from ledgerline.ecl.domain.ecl_workbooks import build_loan_detail_workbook
+    from komputy.ecl.domain.ecl_workbooks import build_loan_detail_workbook
 
     wb = openpyxl.load_workbook(BytesIO(build_loan_detail_workbook(result, _meta(), max_rows=40)))
     tabs = [n for n in wb.sheetnames if n.startswith("Row Detail")]
@@ -450,7 +450,7 @@ def test_exception_report_says_no_exceptions_when_clean() -> None:
 
     import openpyxl
 
-    from ledgerline.ecl.domain.ecl_workbooks import build_loan_detail_workbook
+    from komputy.ecl.domain.ecl_workbooks import build_loan_detail_workbook
 
     exposure = _exposure().iloc[[0]]
     collateral = _collateral().iloc[[0]].drop(columns=["Gold", "Cash"])

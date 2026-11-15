@@ -1,6 +1,6 @@
 {
  "version": 1,
- "note": "Shared by ECL-Server pytest and ECL-Web tsx. Illustrative until signed off by the accounting lead.",
+ "note": "Shared by the engine (pytest) and the web app (tsx). Illustrative until signed off by the accounting lead.",
  "cases": [
   {
    "name": "T01 3-year annual arrears @10%",

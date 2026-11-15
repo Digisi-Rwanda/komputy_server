@@ -1,4 +1,4 @@
--- Minimal copies of the web app's tables the engine reads (columns the engine maps in ledgerline/web.py).
+-- Minimal copies of the web app's tables the engine reads (columns the engine maps in komputy/web.py).
 CREATE TABLE IF NOT EXISTS public.users (id varchar(26) PRIMARY KEY, email text NOT NULL, name text NOT NULL, is_active boolean NOT NULL DEFAULT true, platform_role varchar(16));
 CREATE TABLE IF NOT EXISTS public.tenants (id varchar(26) PRIMARY KEY, name text NOT NULL, status varchar(32) NOT NULL DEFAULT 'active', currency varchar(8) NOT NULL DEFAULT 'USD',
   timezone varchar(64) NOT NULL DEFAULT 'Africa/Kigali', reporting_cadence varchar(16) NOT NULL DEFAULT 'monthly', fiscal_year_end varchar(5) NOT NULL DEFAULT '12-31',

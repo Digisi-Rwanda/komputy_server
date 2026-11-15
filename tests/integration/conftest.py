@@ -13,9 +13,9 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from jwt.algorithms import RSAAlgorithm
 from sqlalchemy import text
 
-from ledgerline.auth.tokens import set_jwks_for_tests
-from ledgerline.config import get_settings
-from ledgerline.kernel.ids import new_ulid
+from komputy.auth.tokens import set_jwks_for_tests
+from komputy.config import get_settings
+from komputy.kernel.ids import new_ulid
 
 ROOT = Path(__file__).parents[2]
 KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -30,7 +30,7 @@ def _prepare_db() -> None:
         return
     import psycopg
 
-    from ledgerline.db import sync_dsn
+    from komputy.db import sync_dsn
 
     with psycopg.connect(sync_dsn(), autocommit=True) as c:
         c.execute((ROOT / "tests" / "web_tables.sql").read_text())
@@ -38,7 +38,7 @@ def _prepare_db() -> None:
     subprocess.run([sys.executable, "-m", "alembic", "upgrade", "head"], cwd=ROOT, check=True, capture_output=True)
     if not has_queue:
         subprocess.run(
-            [sys.executable, "-m", "procrastinate", "--app=ledgerline.queue.app", "schema", "--apply"],
+            [sys.executable, "-m", "procrastinate", "--app=komputy.queue.app", "schema", "--apply"],
             cwd=ROOT,
             check=True,
             capture_output=True,
@@ -82,7 +82,7 @@ class Workspace:
 
 
 async def make_workspace(name: str, viewer: bool = True) -> Workspace:
-    from ledgerline.db import AsyncSessionLocal
+    from komputy.db import AsyncSessionLocal
 
     tid = new_ulid()
     users = {k: new_ulid() for k in ("admin", "prep", "rev", *(("viewer",) if viewer else ()))}
@@ -122,8 +122,8 @@ async def client() -> Any:
     _prepare_db()
     jwk: dict[str, Any] = RSAAlgorithm.to_jwk(KEY.public_key(), as_dict=True)
     set_jwks_for_tests({"keys": [{**jwk, "kid": KID, "alg": "RS256", "use": "sig"}]})
-    from ledgerline.app import create_app
-    from ledgerline.storage import ensure_bucket
+    from komputy.app import create_app
+    from komputy.storage import ensure_bucket
 
     app = create_app()
     async with app.router.lifespan_context(app):
@@ -133,6 +133,6 @@ async def client() -> Any:
 
 
 async def drain(queues: list[str]) -> None:
-    from ledgerline.queue import app as queue_app
+    from komputy.queue import app as queue_app
 
     await queue_app.run_worker_async(queues=queues, wait=False, install_signal_handlers=False)

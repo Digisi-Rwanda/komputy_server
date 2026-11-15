@@ -1,16 +1,16 @@
 """End-to-end ECL arithmetic: PD × LGD × EAD on a small IFRS 9-shaped book.
 
 This is the formula the compute worker runs. It does not need Celery or the
-API — if this passes, the engines still produce a finite discounted ECL.
+API: if this passes, the engines still produce a finite discounted ECL.
 """
 
 from __future__ import annotations
 
 import pandas as pd
 
-from ledgerline.ecl.domain.ecl_pipeline import run_ecl
-from ledgerline.ecl.domain.ecl_rules import prepare_inputs
-from ledgerline.ecl.domain.pd_engine import compute_pd
+from komputy.ecl.domain.ecl_pipeline import run_ecl
+from komputy.ecl.domain.ecl_rules import prepare_inputs
+from komputy.ecl.domain.pd_engine import compute_pd
 
 
 def _pd_book() -> pd.DataFrame:

@@ -84,7 +84,7 @@ projects:
               - key: RESEND_API_KEY
                 sync: false
               - key: EMAIL_FROM
-                value: Ledgerline <no-reply@komputy.com>
+                value: Komputy <no-reply@komputy.com>
               - key: DB_POOL_MAX
                 value: "10"
               - key: BOOTSTRAP_ADMIN_EMAIL  # first platform admin; sets a password via "Forgot password"
@@ -137,7 +137,7 @@ projects:
             plan: standard
             dockerfilePath: ./Dockerfile
             dockerContext: .
-            dockerCommand: procrastinate --app=ledgerline.queue.app worker --queues=io --concurrency=4
+            dockerCommand: procrastinate --app=komputy.queue.app worker --queues=io --concurrency=4
             maxShutdownDelaySeconds: 300  # let in-flight jobs finish on deploys
             autoDeployTrigger: checksPass
             envVars: *engine_env
@@ -152,7 +152,7 @@ projects:
             plan: pro
             dockerfilePath: ./Dockerfile
             dockerContext: .
-            dockerCommand: procrastinate --app=ledgerline.queue.app worker --queues=calc --concurrency=1
+            dockerCommand: procrastinate --app=komputy.queue.app worker --queues=calc --concurrency=1
             maxShutdownDelaySeconds: 300
             autoDeployTrigger: checksPass
             envVars: *engine_env

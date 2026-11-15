@@ -8,7 +8,7 @@ preview and the computed ECL at once.
 import numpy as np
 import pandas as pd
 
-from ledgerline.ecl.domain.pd_engine import (
+from komputy.ecl.domain.pd_engine import (
     MAX_PD_MONTH,
     _compute_marginal_pd,
     build_monthly_matrix,

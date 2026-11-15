@@ -1,7 +1,7 @@
 {
  "openapi": "3.1.0",
  "info": {
-  "title": "Ledgerline Engine",
+  "title": "Komputy Engine",
   "version": "1.0.0"
  },
  "paths": {
@@ -2852,7 +2852,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ledgerline__apps__results__schemas__SegmentResponse"
+         "$ref": "#/components/schemas/komputy__apps__results__schemas__SegmentResponse"
         }
        }
       }
@@ -3177,7 +3177,7 @@
       "content": {
        "application/json": {
         "schema": {
-         "$ref": "#/components/schemas/ledgerline__apps__segments__schemas__SegmentResponse"
+         "$ref": "#/components/schemas/komputy__apps__segments__schemas__SegmentResponse"
         }
        }
       }
@@ -9450,7 +9450,7 @@
     ],
     "title": "ValidationError"
    },
-   "ledgerline__apps__results__schemas__SegmentResponse": {
+   "komputy__apps__results__schemas__SegmentResponse": {
     "properties": {
      "data": {
       "$ref": "#/components/schemas/SegmentViewOut"
@@ -9462,7 +9462,7 @@
     ],
     "title": "SegmentResponse"
    },
-   "ledgerline__apps__segments__schemas__SegmentResponse": {
+   "komputy__apps__segments__schemas__SegmentResponse": {
     "properties": {
      "data": {
       "$ref": "#/components/schemas/SegmentOut"

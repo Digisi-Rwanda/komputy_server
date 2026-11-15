@@ -14,11 +14,16 @@ jobs:
     services:
       postgres:
         image: postgres:17-alpine
-        env: { POSTGRES_USER: ledgerline, POSTGRES_PASSWORD: ledgerline, POSTGRES_DB: ledgerline_engine_test }
+        env: { POSTGRES_USER: komputy, POSTGRES_PASSWORD: komputy, POSTGRES_DB: komputy_engine_test }
         ports: ["5440:5432"]
-        options: --health-cmd "pg_isready -U ledgerline" --health-interval 5s --health-retries 10
+        options: --health-cmd "pg_isready -U komputy" --health-interval 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
+      - name: "Naming and punctuation guard: no em/en dashes, no pre-rebrand names"
+        run: |
+          if git grep -nI -e $'\u2014' -e $'\u2013' -e 'Ledgerline' -e 'ECL Platform' -- . ':!*.lock' ':!package-lock.json' ':!uv.lock' ':!design/**' ':!docs/REBRAND_PLAN.md' | grep -v '_LEGACY_'; then
+            echo "Found em/en dashes or old product names (see docs/REBRAND_PLAN.md in komputy_server)"; exit 1
+          fi
       - uses: astral-sh/setup-uv@v5
         with: { enable-cache: true, prune-cache: false }  # moto (uv tool) keeps the cache locked until the job ends
       - name: S3 stand-in for R2 (moto; the MinIO image is no longer on Docker Hub)

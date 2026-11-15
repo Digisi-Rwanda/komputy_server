@@ -4,14 +4,14 @@ services:
   minio:  # S3 API stand-in for Cloudflare R2
     image: minio/minio:latest  # shortcut: unpinned for local dev only; R2 in prod
     command: server /data --console-address ":9011"
-    environment: { MINIO_ROOT_USER: ledgerline, MINIO_ROOT_PASSWORD: ledgerline-secret, MINIO_API_CORS_ALLOW_ORIGIN: "*" }
+    environment: { MINIO_ROOT_USER: komputy, MINIO_ROOT_PASSWORD: komputy-secret, MINIO_API_CORS_ALLOW_ORIGIN: "*" }
     ports: ["9010:9000", "9011:9011"]
     volumes: [minio:/data]
     healthcheck: { test: ["CMD", "mc", "ready", "local"], interval: 5s, retries: 10 }
   postgres:
     profiles: [postgres]
     image: postgres:17-alpine
-    environment: { POSTGRES_USER: ledgerline, POSTGRES_PASSWORD: ledgerline, POSTGRES_DB: ecl_db }
+    environment: { POSTGRES_USER: komputy, POSTGRES_PASSWORD: komputy, POSTGRES_DB: komputy }
     ports: ["5440:5432"]
     volumes: [pg:/var/lib/postgresql/data]
   mailpit:

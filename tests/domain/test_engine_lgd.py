@@ -3,8 +3,8 @@
 import pandas as pd
 import pytest
 
-from ledgerline.ecl.domain.ecl_rules import prepare_inputs
-from ledgerline.ecl.domain.lgd_engine import compute_lgd
+from komputy.ecl.domain.ecl_rules import prepare_inputs
+from komputy.ecl.domain.lgd_engine import compute_lgd
 
 
 def test_shared_customer_collateral_is_split_by_exposure_share() -> None:

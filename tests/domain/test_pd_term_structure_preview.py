@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from ledgerline.ecl.domain.pd_engine import (
+from komputy.ecl.domain.pd_engine import (
     MAX_PD_MONTH,
     STAGES,
     compute_pd,
@@ -14,7 +14,7 @@ from ledgerline.ecl.domain.pd_engine import (
     project_term_structure,
     row_proportions,
 )
-from ledgerline.ecl.domain.pd_preview import build_pd_preview, prepare_preview_frame
+from komputy.ecl.domain.pd_preview import build_pd_preview, prepare_preview_frame
 
 
 def _frame() -> pd.DataFrame:

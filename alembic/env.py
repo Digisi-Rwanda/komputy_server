@@ -5,8 +5,8 @@ from __future__ import annotations
 from alembic import context
 from sqlalchemy import create_engine, text
 
-from ledgerline.db import ENGINE_SCHEMA, Base, sync_dsn
-from ledgerline.models import load_all
+from komputy.db import ENGINE_SCHEMA, Base, sync_dsn
+from komputy.models import load_all
 
 load_all()
 target_metadata = Base.metadata

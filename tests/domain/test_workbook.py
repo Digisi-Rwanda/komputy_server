@@ -1,11 +1,11 @@
-"""Shared workbook reader — validation and compute must parse Excel the same way."""
+"""Shared workbook reader: validation and compute must parse Excel the same way."""
 
 from io import BytesIO
 
 import pandas as pd
 
-from ledgerline.ecl.domain.pd_engine import is_pd_data_sheet
-from ledgerline.ecl.domain.workbook import concat_sheets, frames_from_workbooks, read_workbook_sheets
+from komputy.ecl.domain.pd_engine import is_pd_data_sheet
+from komputy.ecl.domain.workbook import concat_sheets, frames_from_workbooks, read_workbook_sheets
 
 
 def _xlsx(sheets: dict[str, pd.DataFrame]) -> bytes:

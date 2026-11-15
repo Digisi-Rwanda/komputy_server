@@ -9,15 +9,15 @@ import numpy as np
 import openpyxl
 import pandas as pd
 
-from ledgerline.ecl.domain.pd_engine import compute_pd, is_pd_data_sheet
-from ledgerline.ecl.domain.workbook import frames_from_workbooks, read_workbook_sheets
+from komputy.ecl.domain.pd_engine import compute_pd, is_pd_data_sheet
+from komputy.ecl.domain.workbook import frames_from_workbooks, read_workbook_sheets
 
 
 def _xlsx(rows: list[list], title_rows: int = 0) -> bytes:
     wb = openpyxl.Workbook()
     ws = wb.active
     for i in range(title_rows):
-        ws.append([f"Bank PD extract — note {i}"])
+        ws.append([f"Bank PD extract: note {i}"])
     for r in rows:
         ws.append(r)
     buf = io.BytesIO()

@@ -66,7 +66,7 @@ Change the value in `render.yaml` and push (Blueprint applies it), so the file s
 
 - Runs stuck in `queued`/`*_running` > 10 min are re-queued automatically by `reconcile_runs` (every 10 min); jobs of a
   dead worker (no heartbeat for 5 min) are retried by the same job.
-- Inspect: Render shell on `komputy-engine-api` → `procrastinate --app=ledgerline.queue.app shell` → `list_jobs`,
+- Inspect: Render shell on `komputy-engine-api` → `procrastinate --app=komputy.queue.app shell` → `list_jobs`,
   `retry <id>`, `cancel <id>`.
 - Logs: Render → service → Logs (JSON; filter by `run_id`, `stage`, `peak_rss_mb`).
 

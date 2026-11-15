@@ -1,6 +1,6 @@
 """End-to-end API tests for the leases module (real Postgres; object storage stubbed in memory).
 
-Ported from ECL-Server: setup → wizard → review → events → close → lock/reopen → imports, plus the guards:
+Ported from the previous engine: setup → wizard → review → events → close → lock/reopen → imports, plus the guards:
 optimistic lock, maker-checker, tenant isolation, idempotent posting. Auth is the web app's token (per-service roles).
 """
 
@@ -34,9 +34,9 @@ def _storage(monkeypatch: pytest.MonkeyPatch):
     async def rm(key):
         _FILES.pop(key, None)
 
-    monkeypatch.setattr("ledgerline.apps.leases.router.upload_stream", up)
-    monkeypatch.setattr("ledgerline.apps.leases.router.presign_download", presign)
-    monkeypatch.setattr("ledgerline.apps.leases.router.delete_object", rm)
+    monkeypatch.setattr("komputy.apps.leases.router.upload_stream", up)
+    monkeypatch.setattr("komputy.apps.leases.router.presign_download", presign)
+    monkeypatch.setattr("komputy.apps.leases.router.delete_object", rm)
     yield
     _FILES.clear()
 
@@ -419,7 +419,7 @@ async def test_lease_lifecycle_and_guards(client: AsyncClient, t: T) -> None:
     # Notices go to the web app through the outbox (it applies people's preferences and delivers them).
     from sqlalchemy import text
 
-    from ledgerline.db import AsyncSessionLocal
+    from komputy.db import AsyncSessionLocal
 
     async with AsyncSessionLocal() as db:
         titles = (
@@ -667,9 +667,9 @@ async def test_scheduled_jobs(client: AsyncClient, t: T) -> None:
 
     from sqlalchemy import update
 
-    from ledgerline.apps.leases.jobs import daily_alerts, verify_books
-    from ledgerline.apps.leases.models import Lease, LeaseBooks
-    from ledgerline.db import AsyncSessionLocal as TestSessionLocal
+    from komputy.apps.leases.jobs import daily_alerts, verify_books
+    from komputy.apps.leases.models import Lease, LeaseBooks
+    from komputy.db import AsyncSessionLocal as TestSessionLocal
 
     await setup(client, t, period="2026-01")
     lease = await approved_lease(client, t)

@@ -17,7 +17,7 @@ import httpx
 import pytest
 from sqlalchemy import text
 
-from ledgerline.db import AsyncSessionLocal
+from komputy.db import AsyncSessionLocal
 from tests.integration.conftest import drain, make_workspace
 
 pytestmark = pytest.mark.integration

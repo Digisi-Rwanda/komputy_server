@@ -5,9 +5,9 @@ from __future__ import annotations
 import psycopg
 import pytest
 
-from ledgerline.db import sync_dsn
-from ledgerline.platform.jobs import reconcile_runs
-from ledgerline.queue import app as queue_app
+from komputy.db import sync_dsn
+from komputy.platform.jobs import reconcile_runs
+from komputy.queue import app as queue_app
 from tests.integration.conftest import _prepare_db
 
 

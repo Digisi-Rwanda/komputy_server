@@ -1,7 +1,7 @@
 # One image, four roles (set the command per Render service):
 #   api:         default CMD (uvicorn; process count from WEB_CONCURRENCY)
-#   worker-io:   procrastinate --app=ledgerline.queue.app worker --queues=io --concurrency=4
-#   worker-calc: procrastinate --app=ledgerline.queue.app worker --queues=calc --concurrency=1
+#   worker-io:   procrastinate --app=komputy.queue.app worker --queues=io --concurrency=4
+#   worker-calc: procrastinate --app=komputy.queue.app worker --queues=calc --concurrency=1
 #   (periodic jobs run inside the workers; no separate scheduler process)
 # Pre-deploy (api): sh scripts/predeploy.sh (Alembic + queue schema, idempotent). Workers exit cleanly on SIGTERM.
 FROM python:3.12-slim AS build
@@ -25,4 +25,4 @@ ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 POR
 USER app
 EXPOSE 8000
 # exec: uvicorn becomes PID 1 so Render's SIGTERM reaches it (graceful shutdown). Health: Render checks /healthz.
-CMD ["sh", "-c", "exec uvicorn ledgerline.app:app --host 0.0.0.0 --port ${PORT} --proxy-headers --forwarded-allow-ips='*' --timeout-graceful-shutdown 25"]
+CMD ["sh", "-c", "exec uvicorn komputy.app:app --host 0.0.0.0 --port ${PORT} --proxy-headers --forwarded-allow-ips='*' --timeout-graceful-shutdown 25"]

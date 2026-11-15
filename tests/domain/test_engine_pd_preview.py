@@ -7,8 +7,8 @@ agree with the engine exactly and has to be reproducible run over run.
 import numpy as np
 import pandas as pd
 
-from ledgerline.ecl.domain.pd_engine import compute_pd
-from ledgerline.ecl.domain.pd_preview import (
+from komputy.ecl.domain.pd_engine import compute_pd
+from komputy.ecl.domain.pd_preview import (
     DEST_LABELS,
     build_pd_preview,
     month_key,
@@ -155,7 +155,7 @@ def test_compute_pd_projection_reuses_preview_aggregates() -> None:
 
 def test_compute_pd_preview_matches_standalone_builder() -> None:
     """Validation and compute must emit the same observed matrix and loan rows."""
-    from ledgerline.ecl.domain import ENGINE_VERSION
+    from komputy.ecl.domain import ENGINE_VERSION
 
     standalone = build_pd_preview(prepare_preview_frame(_portfolio()), engine_version=ENGINE_VERSION)
     _output, _cure_rates, intermediates = compute_pd(_portfolio())

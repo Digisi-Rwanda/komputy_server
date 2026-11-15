@@ -1,7 +1,7 @@
 [project]
-name = "ledgerline-engine"
+name = "komputy-server"
 version = "1.0.0"
-description = "Ledgerline calculation & accounting engine (IFRS 9 ECL, IFRS 16 leases)"
+description = "Komputy calculation and accounting engine (IFRS 9 ECL, IFRS 16 leases)"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.115",
@@ -46,15 +46,12 @@ dev = [
   "httpx>=0.28",
 ]
 
-[project.scripts]
-ledgerline = "ledgerline.cli:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/ledgerline"]
+packages = ["src/komputy"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -71,7 +68,7 @@ src = ["src", "tests"]
 
 [tool.ruff.format]
 # Approved calculation code stays byte-for-byte as carried over.
-exclude = ["src/ledgerline/ecl/domain/**", "src/ledgerline/leases/domain/**"]
+exclude = ["src/komputy/ecl/domain/**", "src/komputy/leases/domain/**"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "S", "ASYNC", "RUF"]
@@ -82,14 +79,14 @@ ignore = ["S101", "RUF001", "RUF002", "RUF003", "E501", "B008", "UP046", "UP047"
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S", "B", "ASYNC240"]
 # Approved calculation code: carried over unchanged, so style rules don't apply (S106: `pass_rationale=` is not a password).
-"src/ledgerline/ecl/domain/**" = ["E501", "RUF005", "B905", "UP", "I001", "S106", "RUF007", "RUF059"]
+"src/komputy/ecl/domain/**" = ["E501", "RUF005", "B905", "UP", "I001", "S106", "RUF007", "RUF059"]
 # Ported service modules import their schemas after helper definitions (circular-import order).
-"src/ledgerline/apps/runs/jobs.py" = ["E402"]
-"src/ledgerline/kernel/enums.py" = ["E402"]
+"src/komputy/apps/runs/jobs.py" = ["E402"]
+"src/komputy/kernel/enums.py" = ["E402"]
 # Audit event names and UI labels such as "PASSWORD_CHANGED" / token="Upload" are not secrets.
-"src/ledgerline/events/audit_models.py" = ["S105"]
-"src/ledgerline/apps/runs/service.py" = ["E402", "S105"]
-"src/ledgerline/leases/domain/**" = ["E501", "B905", "UP"]
+"src/komputy/events/audit_models.py" = ["S105"]
+"src/komputy/apps/runs/service.py" = ["E402", "S105"]
+"src/komputy/leases/domain/**" = ["E501", "B905", "UP"]
 
 [tool.pyright]
 include = ["src"]

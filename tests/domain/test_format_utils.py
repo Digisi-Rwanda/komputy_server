@@ -1,6 +1,6 @@
 """Format utility tests."""
 
-from ledgerline.ecl.domain.format_utils import (
+from komputy.ecl.domain.format_utils import (
     format_coverage,
     format_file_size,
     map_run_status_to_api,

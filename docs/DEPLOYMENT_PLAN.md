@@ -1,12 +1,12 @@
 # Komputy production deployment plan
 
-Deploy everything from scratch: `komputy_web` (Next.js) and `komputy_server` (Ledgerline engine) on Render (Frankfurt),
+Deploy everything from scratch: `komputy_web` (Next.js) and `komputy_server` (Komputy engine) on Render (Frankfurt),
 files on Cloudflare R2, DNS on Cloudflare, email through Resend, code and CI on GitHub.
 We work in phases. Each phase has an exit gate, and the next phase starts only once that gate passes.
 
 Status of access, checked on 2026-11-15: Render MCP, Cloudflare MCP (DNS, R2, account API tokens), Resend API key, and the GitHub token are all available.
 
-**Progress (2026-11-15):** Phases 0–7 done and verified. Live at https://komputy.com (Render, Frankfurt):
+**Progress (2026-11-15):** Phases 0-7 done and verified. Live at https://komputy.com (Render, Frankfurt):
 web, engine API, io + calc workers, 3 HTTP crons, nightly backup (verified complete on production), R2 storage,
 CI-gated auto-deploy. Open: Phase 4 human sign-in check, Phase 8 external uptime check, Phase 9 bank-scale load
 test, Phase 10 secret rotation (GitHub token, Resend key, R2 token: all pasted in chat).
@@ -35,7 +35,7 @@ test, Phase 10 secret rotation (GitHub token, Resend key, R2 token: all pasted i
   Resend ◀── web app sends email (komputy.com is already verified)
 ```
 
-**Why this fixes "the server is not on".** The old ECL-Server ran as a single 512 MB web service, with no worker split. It would sleep, run out of memory, or get stuck on long requests. In the new setup:
+**Why this fixes "the server is not on".** The previous engine ran as a single 512 MB web service, with no worker split. It would sleep, run out of memory, or get stuck on long requests. In the new setup:
 
 - Every service is on a **paid instance type, so nothing sleeps**.
 - Heavy work never runs inside a web request. It goes onto a **Postgres-backed queue**, and dedicated workers pick it up.
@@ -55,19 +55,19 @@ test, Phase 10 secret rotation (GitHub token, Resend key, R2 token: all pasted i
 |---|---|---|---|---|
 | `komputy-db` | Render Postgres 17 | **Basic-4gb**, 50 GB disk, Frankfurt | Pro tiers, read replica | PITR on; internal URL only; IP allow-list empty |
 | `komputy-kv` | Render Key Value (Valkey) | Starter | Standard | Better Auth secondary storage + rate limits. `maxmemoryPolicy: noeviction` |
-| `komputy-web` | Web service, Node | **Standard (1 CPU / 2 GB)** | +instances (manual or autoscale 2–4) | `npm ci && npm run build` / `npm start`; health `/api/healthz` |
+| `komputy-web` | Web service, Node | **Standard (1 CPU / 2 GB)** | +instances (manual or autoscale 2-4) | `npm ci && npm run build` / `npm start`; health `/api/healthz` |
 | `komputy-engine-api` | Private service, Docker | **Standard** | +instances | `uvicorn … --workers 2`; health `/healthz`; pre-deploy migrations |
 | `komputy-worker-io` | Background worker, Docker | **Standard** | +instances | `--queues=io --concurrency=4` |
 | `komputy-worker-calc` | Background worker, Docker | **Pro (2 CPU / 4 GB)** | Pro Plus 8 GB → Pro Max 16 GB; +instances | `--queues=calc --concurrency=1`; `maxShutdownDelaySeconds: 300` |
-| `komputy-cron-events` | Cron (image `curlimages/curl`) | Starter | — | `* * * * *` → `POST /api/cron/events` |
-| `komputy-cron-expire` | Cron | Starter | — | `*/5 * * * *` → `/api/cron/expire` |
-| `komputy-cron-daily` | Cron | Starter | — | `0 6 * * *` (08:00 Kigali) → `/api/cron/daily` |
-| `komputy-cron-backup` | Cron (image `postgres:17`) | Starter | — | `0 1 * * *` `pg_dump -Fc` → R2 `komputy-backups` |
-| Env group `komputy-shared` | Render env group | — | — | Shared secrets (below) |
-| R2 `komputy-prod` | Bucket, EU jurisdiction | — | — | Private, CORS for the web origin, lifecycle rule |
-| R2 `komputy-backups` | Bucket | — | — | 30-day lifecycle expiry |
-| CF API token `komputy-engine-r2` | Account token | — | — | Object read and write on these 2 buckets only → S3 keys |
-| DNS `komputy.com`, `www` | Cloudflare | — | — | Vercel → Render (see Phase 6) |
+| `komputy-cron-events` | Cron (image `curlimages/curl`) | Starter |: | `* * * * *` → `POST /api/cron/events` |
+| `komputy-cron-expire` | Cron | Starter |: | `*/5 * * * *` → `/api/cron/expire` |
+| `komputy-cron-daily` | Cron | Starter |: | `0 6 * * *` (08:00 Kigali) → `/api/cron/daily` |
+| `komputy-cron-backup` | Cron (image `postgres:17`) | Starter |: | `0 1 * * *` `pg_dump -Fc` → R2 `komputy-backups` |
+| Env group `komputy-shared` | Render env group |: |: | Shared secrets (below) |
+| R2 `komputy-prod` | Bucket, EU jurisdiction |: |: | Private, CORS for the web origin, lifecycle rule |
+| R2 `komputy-backups` | Bucket |: |: | 30-day lifecycle expiry |
+| CF API token `komputy-engine-r2` | Account token |: |: | Object read and write on these 2 buckets only → S3 keys |
+| DNS `komputy.com`, `www` | Cloudflare |: |: | Vercel → Render (see Phase 6) |
 
 **Estimated monthly cost (USD).** Render prices change, so the exact figure is confirmed as each resource is created.
 
@@ -80,10 +80,10 @@ test, Phase 10 secret rotation (GitHub token, Resend key, R2 token: all pasted i
 | Postgres | Basic-1gb ~19 + disk | **Basic-4gb ~75 + disk** | Pro-8gb ~185 + disk |
 | Key Value | Starter 10 | Starter 10 | Standard 32 |
 | Crons (4) | ~2 | ~2 | ~2 |
-| R2 | ~0 (10 GB free) | ~0–5 | ~15 |
+| R2 | ~0 (10 GB free) | ~0-5 | ~15 |
 | **Total** | **≈ $95** | **≈ $250** | **≈ $535** |
 
-> This corrects the "$40–70" I gave earlier. That figure did not include a large calc worker and database, and those are exactly what large bank files need.
+> This corrects the "$40-70" I gave earlier. That figure did not include a large calc worker and database, and those are exactly what large bank files need.
 > We start on **Recommended**. We move to Bank-scale only when the Phase 9 measurements show it is needed. Every resize is a one-click change with no downtime.
 
 ---
@@ -124,7 +124,7 @@ The secrets listed below are generated during deployment with `openssl rand`, an
 | `DATABASE_URL` | `fromDatabase komputy-db connectionString` |
 | `DATABASE_POOL_SIZE` / `DATABASE_MAX_OVERFLOW` | API: `5` / `5` per uvicorn worker. Workers: `3` / `2`. |
 | `WEB_JWKS_URL` | `http://komputy-web:10000/api/auth/jwks` (private network) |
-| `WEB_JWT_ISSUER` / `WEB_JWT_AUDIENCE` | `ledgerline-web` / `ecl-engine` (the defaults, must match the web app) |
+| `WEB_JWT_ISSUER` / `WEB_JWT_AUDIENCE` | `komputy-web` / `komputy-engine` (the defaults, must match the web app) |
 | `STORAGE_ENDPOINT_URL` | `https://<account_id>.eu.r2.cloudflarestorage.com` |
 | `STORAGE_PUBLIC_ENDPOINT_URL` | Same as above. The browser uses this host for presigned URLs. |
 | `STORAGE_ACCESS_KEY` / `STORAGE_SECRET_KEY` | Derived from the scoped Cloudflare token: the key ID is the token id, and the secret is the sha256 of the token value |
@@ -141,7 +141,7 @@ The secrets listed below are generated during deployment with `openssl rand`, an
 - crons: 2;
 - SSE `LISTEN`: 1 per web instance.
 
-That leaves room for 3–4× scale-out before we would need PgBouncer.
+That leaves room for 3-4× scale-out before we would need PgBouncer.
 
 ---
 
@@ -151,12 +151,12 @@ These are real gaps, found by reading the code. Every one of them gets committed
 
 | # | Repo | Change | Why |
 |---|---|---|---|
-| C1 | web | **Baseline database schema for the web tables.** Dump the 58 `public` tables from dev with `pg_dump --schema-only` and keep only the tables in `schema.ts`. Save the result as a `drizzle/0000_baseline.sql` migration. Add `drizzle-kit migrate` (`db:migrate`) and run it as the web service's **pre-deploy** step. | These tables were created by the **old ECL-Server Alembic** migrations, which we are no longer using. Without this step the new production database would have no `users` or `tenants` tables, and both apps would crash. From here on, the web app owns its own schema. |
+| C1 | web | **Baseline database schema for the web tables.** Dump the 58 `public` tables from dev with `pg_dump --schema-only` and keep only the tables in `schema.ts`. Save the result as a `drizzle/0000_baseline.sql` migration. Add `drizzle-kit migrate` (`db:migrate`) and run it as the web service's **pre-deploy** step. | These tables were created by the **previous engine's Alembic** migrations, which we are no longer using. Without this step the new production database would have no `users` or `tenants` tables, and both apps would crash. From here on, the web app owns its own schema. |
 | C2 | web | Add a `/api/healthz` route (fast, checks the database with `select 1`). Fix `health.ts` so it calls engine `/readyz` and reads the field names the new engine actually returns, instead of the old `celery_worker` / `/health`. | Render health checks, and a correct admin status page |
 | C3 | web | `next.config.ts`: `serverActions.bodySizeLimit: "25mb"`, `poweredByHeader: false`, security headers (HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `frame-ancestors 'none'`) | Lease imports upload files of up to 20 MB through a server action, but the default limit is 1 MB |
 | C4 | web | Default `EMAIL_FROM` → `Komputy <no-reply@komputy.com>`; `start` script respects `$PORT` (`next start -p ${PORT:-3000}`) | The sending domain is verified in Resend; Render injects `PORT` |
 | C5 | web | First-admin bootstrap: make `scripts/seed.mts` (or a new `scripts/bootstrap-admin.mts`) idempotent and driven by environment variables, and run it once through a one-off Render job | A fresh production database has no users |
-| C6 | server | `scripts/predeploy.sh`: `alembic upgrade head && procrastinate --app=ledgerline.queue.app schema --apply` **only if** `procrastinate_jobs` does not exist yet; on later deploys run procrastinate's own migrations | `schema --apply` is not idempotent |
+| C6 | server | `scripts/predeploy.sh`: `alembic upgrade head && procrastinate --app=komputy.queue.app schema --apply` **only if** `procrastinate_jobs` does not exist yet; on later deploys run procrastinate's own migrations | `schema --apply` is not idempotent |
 | C7 | server | `Dockerfile`: run the CMD through `exec` so SIGTERM reaches uvicorn and procrastinate for graceful shutdown; set the uvicorn worker count from `WEB_CONCURRENCY`; pin `uv` | Clean deploys with no killed jobs |
 | C8 | server | Make sure workers handle SIGTERM by finishing the current job, or releasing it so it is retried. Add a test that a calc job interrupted halfway is safe to re-run. | Deploys and restarts happen while a bank calculation is running |
 | C9 | server | **Memory guard for very large workbooks.** Parse ingest with `python-calamine`/`polars` and stream it in chunks instead of loading the whole sheet (this is the `shortcut:` already noted). Record peak RSS per job in the logs. | One 500k-row file must not crash the calc worker |
@@ -181,8 +181,8 @@ These are real gaps, found by reading the code. Every one of them gets committed
 
 ## 6. Phases, each ending in an exit gate
 
-### Phase 0: Prepare the code (C1–C12)
-1. Make changes C1–C9. Run both test suites locally and the 3 live e2e scripts against a **fresh empty database**, so the C1 baseline is proven to work.
+### Phase 0: Prepare the code (C1-C12)
+1. Make changes C1-C9. Run both test suites locally and the 3 live e2e scripts against a **fresh empty database**, so the C1 baseline is proven to work.
 2. Commit each change individually and push to `main` on both repos.
 3. Write the `render.yaml` and the GitHub Actions workflows (C10, C11), then push them.
 
@@ -280,7 +280,7 @@ These are real gaps, found by reading the code. Every one of them gets committed
    - io concurrency;
    - database plan;
    - web instance count;
-   - turn on autoscaling (2–4) if the workspace plan allows it.
+   - turn on autoscaling (2-4) if the workspace plan allows it.
 5. Write the measured limits into the runbook: for example, "500k loans needs Pro Plus and takes N minutes".
 
 **Gate:** the biggest realistic file finishes with no OOM and no time-outs, and the API p95 stays under 500 ms while compute runs.
@@ -327,7 +327,7 @@ These are real gaps, found by reading the code. Every one of them gets committed
 
 ## 8. Things only you can do (everything else is automated)
 
-1. **Approve D1–D6**, or just say "defaults".
+1. **Approve D1-D6**, or just say "defaults".
 2. **Rotate the leaked secrets** at the end (Phase 10): the Resend key and the GitHub token. Put the new values in `~/.komputy-secrets`.
 3. *Optional:* a Sentry DSN.
 4. Final sign-off at the Phase 10 gate.

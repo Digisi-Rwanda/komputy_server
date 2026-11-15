@@ -2,7 +2,7 @@
 
 1. Independent check: for regular annuities the engine's per-flow discounting must equal the
    closed-form annuity formula (different maths, same answer) to the cent.
-2. Property test: hundreds of random leases with random events — every chain must pass every
+2. Property test: hundreds of random leases with random events: every chain must pass every
    integrity check, run off to exactly 0.00, and balance its journals month by month.
 """
 
@@ -12,8 +12,8 @@ from decimal import Decimal, localcontext
 
 import pytest
 
-from ledgerline.leases.domain.dates import add_days, add_months
-from ledgerline.leases.domain.engine import CTX, compute
+from komputy.leases.domain.dates import add_days, add_months
+from komputy.leases.domain.engine import CTX, compute
 
 FREQ = {"monthly": 1, "quarterly": 3, "semiannual": 6, "annual": 12}
 

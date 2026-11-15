@@ -1129,7 +1129,7 @@ wheels = [
 ]
 
 [[package]]
-name = "ledgerline-engine"
+name = "komputy-server"
 version = "1.0.0"
 source = { editable = "." }
 dependencies = [

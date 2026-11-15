@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from ledgerline.leases.domain.dates import add_months, months_between
-from ledgerline.leases.domain.engine import compute, current_split, maturity
+from komputy.leases.domain.dates import add_months, months_between
+from komputy.leases.domain.engine import compute, current_split, maturity
 
 CASES = json.loads((Path(__file__).parent.parent.parent / "fixtures" / "leases_golden.json").read_text())["cases"]
 
