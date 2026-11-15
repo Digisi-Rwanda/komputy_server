@@ -61,9 +61,7 @@ _STATUS_TO_UPLOAD_STATUS = {
 }
 
 
-async def resolve_pd_thresholds(
-    db: AsyncSession, tenant_id: str
-) -> tuple[PdThresholds, PdValidationThresholds]:
+async def resolve_pd_thresholds(db: AsyncSession, tenant_id: str) -> tuple[PdThresholds, PdValidationThresholds]:
     """Load this tenant's thresholds, provisioning platform defaults on first use.
 
     Mirrors `_auto_provision_segments`: a workspace should not have to configure
@@ -150,11 +148,7 @@ async def _load_pd_sources(uploads: list[Upload]) -> list[PdSourceSheet]:
                 422,
             ) from exc
         for sheet_name, frame in sheets.items():
-            sources.append(
-                PdSourceSheet(
-                    filename=upload.original_filename, sheet_name=sheet_name, frame=frame
-                )
-            )
+            sources.append(PdSourceSheet(filename=upload.original_filename, sheet_name=sheet_name, frame=frame))
     return sources
 
 
@@ -263,9 +257,7 @@ async def validate_pd_files(
     run = await _get_run(db, tenant_id, run_id)
 
     result = await db.execute(
-        select(Upload)
-        .where(Upload.run_id == run_id, Upload.kind == UploadKind.PD.value)
-        .order_by(Upload.created_at)
+        select(Upload).where(Upload.run_id == run_id, Upload.kind == UploadKind.PD.value).order_by(Upload.created_at)
     )
     pd_uploads = list(result.scalars().all())
     if not pd_uploads:
@@ -331,10 +323,7 @@ async def validate_pd_files(
     for upload in pd_uploads:
         upload.validation_status = upload_status
 
-    counts = {
-        key: sum(1 for c in outcome.criteria if c.outcome == key)
-        for key in ("pass", "review", "block", "info")
-    }
+    counts = {key: sum(1 for c in outcome.criteria if c.outcome == key) for key in ("pass", "review", "block", "info")}
     log.info(
         "pd_validate_complete",
         run_id=run_id,
@@ -390,9 +379,7 @@ async def build_pd_export(db: AsyncSession, tenant_id: str, run_id: str) -> tupl
 
     run = await _get_run(db, tenant_id, run_id)
     result = await db.execute(
-        select(Upload)
-        .where(Upload.run_id == run_id, Upload.kind == UploadKind.PD.value)
-        .order_by(Upload.created_at)
+        select(Upload).where(Upload.run_id == run_id, Upload.kind == UploadKind.PD.value).order_by(Upload.created_at)
     )
     uploads = list(result.scalars().all())
     if not uploads:
