@@ -19,15 +19,16 @@ jobs:
         options: --health-cmd "pg_isready -U ledgerline" --health-interval 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
-      - name: MinIO (S3 stand-in for R2)
-        run: |
-          docker run -d -p 9010:9000 -e MINIO_ROOT_USER=ledgerline -e MINIO_ROOT_PASSWORD=ledgerline-secret minio/minio:RELEASE.2025-04-22T22-12-26Z server /data
-          for i in $(seq 30); do curl -sf localhost:9010/minio/health/live && break; sleep 1; done
       - uses: astral-sh/setup-uv@v5
         with: { enable-cache: true }
+      - name: S3 stand-in for R2 (moto; the MinIO image is no longer on Docker Hub)
+        run: |
+          uv tool run --from 'moto[server]==5.1.4' moto_server -H 127.0.0.1 -p 9010 > moto.log 2>&1 &
+          for _ in $(seq 30); do curl -sf localhost:9010/ > /dev/null && break; sleep 1; done
       - run: uv sync --frozen
       - run: uv run ruff check src tests
       - run: uv run ruff format --check src tests
       - run: uv run pytest -q
+        env: { STORAGE_REGION: us-east-1 }  # moto rejects R2's "auto"
       - name: Production image builds
         run: docker build -t komputy-engine:ci . && docker build -t komputy-backup:ci ops/backup
