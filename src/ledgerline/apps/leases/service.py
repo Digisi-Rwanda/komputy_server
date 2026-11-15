@@ -80,9 +80,7 @@ async def save_entity(db: AsyncSession, m: TenantMembership, body: dict[str, Any
     if not 1 <= fy <= 12:
         raise invalid("Financial year must start in month 1–12.")
     e = await entity_of(db, m.tenant_id)
-    has_leases = (
-        await db.execute(select(Lease.id).where(Lease.tenant_id == m.tenant_id).limit(1))
-    ).first() is not None
+    has_leases = (await db.execute(select(Lease.id).where(Lease.tenant_id == m.tenant_id).limit(1))).first() is not None
     if e is None:
         e = LeaseEntity(id=new_ulid(), tenant_id=m.tenant_id, currency=currency, fy_start_month=fy)
         db.add(e)
@@ -101,11 +99,7 @@ async def save_entity(db: AsyncSession, m: TenantMembership, body: dict[str, Any
 
 async def open_first_period(db: AsyncSession, m: TenantMembership, key: str) -> LeasePeriod:
     require(m, ADMIN)
-    if (
-        await db.execute(
-            select(LeasePeriod.id).where(LeasePeriod.tenant_id == m.tenant_id).limit(1)
-        )
-    ).first():
+    if (await db.execute(select(LeasePeriod.id).where(LeasePeriod.tenant_id == m.tenant_id).limit(1))).first():
         raise invalid("Periods already exist.")
     if not (isinstance(key, str) and len(key) == 7 and is_iso_date(key + "-01")):
         raise invalid("Pick a valid month.")
@@ -256,20 +250,14 @@ async def decide_setup(
 # ─── Leases: load / create / autosave ──────────────────────────────────────
 
 
-async def load(
-    db: AsyncSession, tenant_id: str, lease_id: str, lock: bool = False
-) -> tuple[Lease, list[LeaseVersion]]:
+async def load(db: AsyncSession, tenant_id: str, lease_id: str, lock: bool = False) -> tuple[Lease, list[LeaseVersion]]:
     q = select(Lease).where(Lease.tenant_id == tenant_id, Lease.id == lease_id)
     lease = (await db.execute(q.with_for_update() if lock else q)).scalar_one_or_none()
     if lease is None:
         raise not_found("Lease not found.")
     vs = list(
         (
-            await db.execute(
-                select(LeaseVersion)
-                .where(LeaseVersion.lease_id == lease.id)
-                .order_by(LeaseVersion.n)
-            )
+            await db.execute(select(LeaseVersion).where(LeaseVersion.lease_id == lease.id).order_by(LeaseVersion.n))
         ).scalars()
     )
     return lease, vs
@@ -285,28 +273,18 @@ def pending_of(vs: list[LeaseVersion]) -> LeaseVersion | None:
 
 def touch(lease: Lease, rev: int | None) -> None:
     if rev is not None and rev != lease.rev:
-        raise conflict(
-            "Someone else changed this lease while you were editing. Reload to see their changes."
-        )
+        raise conflict("Someone else changed this lease while you were editing. Reload to see their changes.")
     lease.rev += 1
     lease.updated_at = now()
 
 
-async def serialize(
-    db: AsyncSession, lease: Lease, vs: list[LeaseVersion] | None = None
-) -> dict[str, Any]:
+async def serialize(db: AsyncSession, lease: Lease, vs: list[LeaseVersion] | None = None) -> dict[str, Any]:
     if vs is None:
-        vs = list(
-            (
-                await db.execute(select(LeaseVersion).where(LeaseVersion.lease_id == lease.id))
-            ).scalars()
-        )
+        vs = list((await db.execute(select(LeaseVersion).where(LeaseVersion.lease_id == lease.id))).scalars())
     docs = list(
         (
             await db.execute(
-                select(LeaseDocument)
-                .where(LeaseDocument.lease_id == lease.id)
-                .order_by(LeaseDocument.uploaded_at)
+                select(LeaseDocument).where(LeaseDocument.lease_id == lease.id).order_by(LeaseDocument.uploaded_at)
             )
         ).scalars()
     )
@@ -350,9 +328,7 @@ async def create_draft(db: AsyncSession, m: TenantMembership, body: dict[str, An
     require(m, ADMIN, PREP)
     await require_setup(db, m.tenant_id)
     e = (
-        await db.execute(
-            select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update()
-        )
+        await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update())
     ).scalar_one()
     if body.get("assetClass", "property") not in ASSET_CLASSES:
         raise invalid("Unknown asset class.", "assetClass")
@@ -439,15 +415,11 @@ def _version_value(v: LeaseVersion, key: str) -> Any:
         "rate": v.rate,
         "effectiveDate": v.effective_date.isoformat() if v.effective_date else "",
         "scopeDecrease": str(v.scope_decrease) if v.scope_decrease is not None else None,
-        "terminationPenalty": str(v.termination_penalty)
-        if v.termination_penalty is not None
-        else None,
+        "terminationPenalty": str(v.termination_penalty) if v.termination_penalty is not None else None,
     }[key]
 
 
-async def update_draft(
-    db: AsyncSession, m: TenantMembership, lease_id: str, rev: int, patch: dict[str, Any]
-) -> int:
+async def update_draft(db: AsyncSession, m: TenantMembership, lease_id: str, rev: int, patch: dict[str, Any]) -> int:
     lease, vs = await load(db, m.tenant_id, lease_id, lock=True)
     v = pending_of(vs)
     if v is None or v.status == "in_review":
@@ -469,15 +441,11 @@ async def update_draft(
     if "reason" in pv:
         v.reason = pv["reason"] or ""
     if "effectiveDate" in pv and v.event != "initial":
-        v.effective_date = (
-            date.fromisoformat(pv["effectiveDate"]) if is_iso_date(pv["effectiveDate"]) else None
-        )
+        v.effective_date = date.fromisoformat(pv["effectiveDate"]) if is_iso_date(pv["effectiveDate"]) else None
     if "scopeDecrease" in pv:
         v.scope_decrease = D(pv["scopeDecrease"]) if pv["scopeDecrease"] not in (None, "") else None
     if "terminationPenalty" in pv:
-        v.termination_penalty = (
-            D(pv["terminationPenalty"]) if pv["terminationPenalty"] not in (None, "") else None
-        )
+        v.termination_penalty = D(pv["terminationPenalty"]) if pv["terminationPenalty"] not in (None, "") else None
     if changed:  # unchanged autosaves keep the calculation (fixes the "submit after autosave" bug)
         v.calc_at = v.calc_liability = v.calc_rou = v.calc_checks_ok = v.input_checksum = None
     if v.event == "initial" and is_iso_date(v.terms.get("commencementDate")):
@@ -490,9 +458,7 @@ async def update_draft(
 # ─── Validation (same keys/messages as the web wizard) ─────────────────────
 
 
-async def validate_version(
-    db: AsyncSession, lease: Lease, v: LeaseVersion, vs: list[LeaseVersion]
-) -> dict[str, str]:
+async def validate_version(db: AsyncSession, lease: Lease, v: LeaseVersion, vs: list[LeaseVersion]) -> dict[str, str]:
     e: dict[str, str] = {}
     t = v.terms or {}
     ent = await entity_of(db, lease.tenant_id)
@@ -533,10 +499,7 @@ async def validate_version(
             e["rate"] = "Discount rate is required."
         elif D(rate["value"]) <= 0 or D(rate["value"]) > Decimal("0.4"):
             e["rate"] = "Rate must be between 0% and 40%."
-        if (
-            rate.get("source") in ("override", "implicit")
-            and not (rate.get("reason") or "").strip()
-        ):
+        if rate.get("source") in ("override", "implicit") and not (rate.get("reason") or "").strip():
             e["rateReason"] = "Explain why the curve rate isn't used."
     a = v.assessment or {}
     if v.event == "initial":
@@ -545,9 +508,7 @@ async def validate_version(
         if a.get("rightToControl") is None:
             e["rightToControl"] = "Answer this question."
         if a.get("identifiedAsset") is False or a.get("rightToControl") is False:
-            e["notLease"] = (
-                "This contract doesn't contain a lease. Discard the draft or change the answers."
-            )
+            e["notLease"] = "This contract doesn't contain a lease. Discard the draft or change the answers."
         if a.get("exemption") is None:
             e["exemption"] = "Answer this question."
         if exempt and not (a.get("exemptionRationale") or "").strip():
@@ -567,9 +528,7 @@ async def validate_version(
         if not eff:
             e["effectiveDate"] = "Effective date is required."
         elif prev:
-            prev_start = (
-                prev.effective_date.isoformat() if len(ch) > 1 else prev.terms["commencementDate"]
-            )
+            prev_start = prev.effective_date.isoformat() if len(ch) > 1 else prev.terms["commencementDate"]
             if eff <= prev_start:
                 e["effectiveDate"] = "Must be after the previous version's effective date."
             if eff > prev.terms["endDate"]:
@@ -591,9 +550,7 @@ def _computation(versions: list[LeaseVersion], dc: str):
     return compute(segment_inputs(versions), dc)
 
 
-async def calculate(
-    db: AsyncSession, m: TenantMembership, lease_id: str, rev: int
-) -> dict[str, Any]:
+async def calculate(db: AsyncSession, m: TenantMembership, lease_id: str, rev: int) -> dict[str, Any]:
     lease, vs = await load(db, m.tenant_id, lease_id, lock=True)
     v = pending_of(vs)
     if v is None:
@@ -774,9 +731,7 @@ async def discard(db: AsyncSession, m: TenantMembership, lease_id: str) -> None:
 # ─── Events ────────────────────────────────────────────────────────────────
 
 
-def _event_version(
-    lease: Lease, vs: list[LeaseVersion], ev: dict[str, Any], user_id: str
-) -> LeaseVersion:
+def _event_version(lease: Lease, vs: list[LeaseVersion], ev: dict[str, Any], user_id: str) -> LeaseVersion:
     ch = chain_of(vs)
     last = ch[-1]
     terms = copy.deepcopy(last.terms)
@@ -797,9 +752,7 @@ def _event_version(
         raise invalid("Unknown event type.")
     rate = ev.get("rate") or {}
     if ev["event"] in ("index", "termination"):
-        rate = (
-            last.rate
-        )  # index changes keep the original rate (IFRS 16.42(b)); termination needs none
+        rate = last.rate  # index changes keep the original rate (IFRS 16.42(b)); termination needs none
     return LeaseVersion(
         id=new_ulid(),
         tenant_id=lease.tenant_id,
@@ -813,17 +766,13 @@ def _event_version(
         assessment=copy.deepcopy(last.assessment),
         rate=rate,
         scope_decrease=D(ev["scopeDecrease"]) if ev.get("scopeDecrease") else None,
-        termination_penalty=D(ev.get("terminationPenalty"))
-        if ev["event"] == "termination"
-        else None,
+        termination_penalty=D(ev.get("terminationPenalty")) if ev["event"] == "termination" else None,
         comments=[],
         created_by=user_id,
     )
 
 
-async def preview_event(
-    db: AsyncSession, m: TenantMembership, lease_id: str, ev: dict[str, Any]
-) -> dict[str, Any]:
+async def preview_event(db: AsyncSession, m: TenantMembership, lease_id: str, ev: dict[str, Any]) -> dict[str, Any]:
     lease, vs = await load(db, m.tenant_id, lease_id)
     ch = chain_of(vs)
     if not ch or is_exempt(ch[0]):
@@ -835,17 +784,11 @@ async def preview_event(
     return {
         "segment": c.segments[-1].to_json(),
         "ok": c.ok,
-        "journals": [
-            j
-            for j in c.journals
-            if j["month"] == month and j["kind"] in ("remeasurement", "derecognition")
-        ],
+        "journals": [j for j in c.journals if j["month"] == month and j["kind"] in ("remeasurement", "derecognition")],
     }
 
 
-async def start_event(
-    db: AsyncSession, m: TenantMembership, lease_id: str, rev: int, ev: dict[str, Any]
-) -> int:
+async def start_event(db: AsyncSession, m: TenantMembership, lease_id: str, rev: int, ev: dict[str, Any]) -> int:
     require(m, ADMIN, PREP)
     lease, vs = await load(db, m.tenant_id, lease_id, lock=True)
     if pending_of(vs):
@@ -933,9 +876,7 @@ async def lessor_names(db: AsyncSession, tenant_id: str) -> dict[str, str]:
     return dict(
         (
             await db.execute(
-                select(LeaseCounterparty.id, LeaseCounterparty.name).where(
-                    LeaseCounterparty.tenant_id == tenant_id
-                )
+                select(LeaseCounterparty.id, LeaseCounterparty.name).where(LeaseCounterparty.tenant_id == tenant_id)
             )
         ).all()
     )
@@ -945,9 +886,7 @@ async def is_locked_date(db: AsyncSession, tenant_id: str, d: str) -> bool:
     return d[:7] in await locked_keys(db, tenant_id)
 
 
-async def curve_rate_for(
-    db: AsyncSession, tenant_id: str, currency: str, start: str, end: str
-) -> dict[str, Any]:
+async def curve_rate_for(db: AsyncSession, tenant_id: str, currency: str, start: str, end: str) -> dict[str, Any]:
     curve = in_force(await setup_versions(db, tenant_id, "curves"), start)
     yrs = term_years(start, end)
     return {
