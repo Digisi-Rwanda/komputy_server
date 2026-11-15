@@ -75,6 +75,8 @@ services:
         fromService: { type: pserv, name: komputy-engine-api, property: hostport }
       - key: BETTER_AUTH_SECRET
         generateValue: true
+      - key: BETTER_AUTH_URL  # canonical origin: auth cookies, links in emails, redirects
+        value: https://komputy.com
       - key: RESEND_API_KEY
         sync: false
       - key: EMAIL_FROM
