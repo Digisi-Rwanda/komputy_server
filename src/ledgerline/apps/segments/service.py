@@ -44,9 +44,7 @@ def _to_out(s: Segment, runs_count: int = 0) -> SegmentOut:
     )
 
 
-async def _check_name_unique(
-    db: AsyncSession, tenant_id: str, name: str, exclude_id: str | None = None
-) -> None:
+async def _check_name_unique(db: AsyncSession, tenant_id: str, name: str, exclude_id: str | None = None) -> None:
     q = select(Segment).where(
         Segment.tenant_id == tenant_id,
         Segment.name == name.strip(),
@@ -74,9 +72,7 @@ async def list_segments(db: AsyncSession, tenant_id: str) -> list[SegmentOut]:
     return [_to_out(s, runs_count or 0) for s, runs_count in result.all()]
 
 
-async def create_segment(
-    db: AsyncSession, tenant_id: str, user_id: str, req: CreateSegmentRequest
-) -> SegmentOut:
+async def create_segment(db: AsyncSession, tenant_id: str, user_id: str, req: CreateSegmentRequest) -> SegmentOut:
     await _check_name_unique(db, tenant_id, req.name)
     s = Segment(
         id=new_ulid(),
@@ -159,7 +155,7 @@ async def update_segment(
                 AuditEvent.SEGMENT_UPDATED,
                 user_id=user_id,
                 tenant_id=tenant_id,
-                details={"segment_id": segment.id, "is_active": req.is_active},
+                details={"segment_id": s.id, "is_active": req.is_active},
             )
     return _to_out(s)
 
