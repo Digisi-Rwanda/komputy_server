@@ -78,18 +78,14 @@ services:
         fromService: { type: pserv, name: komputy-engine-api, property: hostport }
       - key: BETTER_AUTH_SECRET
         generateValue: true
-      - key: TOTP_ENCRYPTION_KEY
-        sync: false  # Fernet key (urlsafe base64, 32 bytes)
       - key: RESEND_API_KEY
         sync: false
       - key: EMAIL_FROM
         value: Ledgerline <no-reply@komputy.com>
       - key: DB_POOL_MAX
         value: "10"
-      - key: BOOTSTRAP_ADMIN_EMAIL
-        sync: false
-      - key: BOOTSTRAP_ADMIN_PASSWORD
-        sync: false
+      - key: BOOTSTRAP_ADMIN_EMAIL  # first platform admin; sets a password via "Forgot password"
+        value: mugisham333@gmail.com
       - fromGroup: komputy-shared
       - fromGroup: komputy-cron
 
