@@ -81,9 +81,7 @@ async def collateral_parameters(db: AsyncSession, tenant_id: str) -> list[dict[s
     from ledgerline.apps.collateral.models import CollateralType
 
     result = await db.execute(
-        select(CollateralType).where(
-            CollateralType.tenant_id == tenant_id, CollateralType.deleted_at.is_(None)
-        )
+        select(CollateralType).where(CollateralType.tenant_id == tenant_id, CollateralType.deleted_at.is_(None))
     )
     return [
         # Stored as a percentage and in months (the admin form's units).
@@ -106,9 +104,7 @@ async def _frame(uploads: list[Upload], keep) -> pd.DataFrame:
         files = [await download_bytes(u.storage_path) for u in uploads]
         return await asyncio.to_thread(frames_from_workbooks, files, keep)
     except Exception as exc:
-        raise ECLException(
-            "UNREADABLE_WORKBOOK", f"Could not read {uploads[0].original_filename}: {exc}", 400
-        ) from exc
+        raise ECLException("UNREADABLE_WORKBOOK", f"Could not read {uploads[0].original_filename}: {exc}", 400) from exc
 
 
 async def _pd_inputs(db: AsyncSession, run, *, curve: bool) -> tuple[pd.DataFrame, pd.DataFrame | None]:
@@ -124,8 +120,14 @@ async def _pd_inputs(db: AsyncSession, run, *, curve: bool) -> tuple[pd.DataFram
 
 def _exception_out(e: ExceptionLine) -> ExceptionOut:
     return ExceptionOut(
-        category=e.category, dataset=e.dataset, loanId=e.loan_id, customerId=e.customer_id,
-        field=e.field, value=e.value, issue=e.issue, action=e.action,
+        category=e.category,
+        dataset=e.dataset,
+        loanId=e.loan_id,
+        customerId=e.customer_id,
+        field=e.field,
+        value=e.value,
+        issue=e.issue,
+        action=e.action,
     )
 
 
@@ -134,8 +136,16 @@ def _f(v: Any) -> float:
 
 
 async def _record(
-    db: AsyncSession, uploads: list[Upload], status: str, *, run_id: str, user_id: str,
-    scope: str, criteria: list, ip: str | None, user_agent: str | None,
+    db: AsyncSession,
+    uploads: list[Upload],
+    status: str,
+    *,
+    run_id: str,
+    user_id: str,
+    scope: str,
+    criteria: list,
+    ip: str | None,
+    user_agent: str | None,
 ) -> None:
     for upload in uploads:
         new_status = _STATUS_TO_UPLOAD_STATUS[status]
@@ -181,8 +191,13 @@ async def _started(db, *, run_id, user_id, scope, ip, user_agent) -> None:
 
 
 async def validate_lgd_files(
-    db: AsyncSession, tenant_id: str, run_id: str, user_id: str,
-    *, ip: str | None = None, user_agent: str | None = None,
+    db: AsyncSession,
+    tenant_id: str,
+    run_id: str,
+    user_id: str,
+    *,
+    ip: str | None = None,
+    user_agent: str | None = None,
 ) -> LgdValidationResultOut:
     from ledgerline.apps.runs.service import _get_run
 
@@ -201,9 +216,11 @@ async def validate_lgd_files(
 
     outcome = await asyncio.to_thread(
         evaluate_lgd,
-        collateral, config,
+        collateral,
+        config,
         exposure=exposure if exposure is not None and not exposure.empty else None,
-        pd_loan_ids=pd_ids, engine_version=ENGINE_VERSION,
+        pd_loan_ids=pd_ids,
+        engine_version=ENGINE_VERSION,
     )
     preview = None
     if outcome.status != "blocking" or not outcome.lgd.empty:
@@ -227,8 +244,7 @@ async def validate_lgd_files(
                 proportion=_f(r[LOAN_PROPORTION]),
                 collateralEir=_f(r[COLLATERAL_EIR]),
                 collateral={
-                    t: [_f(r[t]), _f(r[allocated_col(t)]), _f(r[discounted_col(t)])]
-                    for t in prepared.collateral_types
+                    t: [_f(r[t]), _f(r[allocated_col(t)]), _f(r[discounted_col(t)])] for t in prepared.collateral_types
                 },
                 discountedCollateral=_f(r[DISCOUNTED_COLLATERAL]),
             )
@@ -244,8 +260,17 @@ async def validate_lgd_files(
             exceptionCount=len(exceptions),
         )
 
-    await _record(db, lgd_uploads, outcome.status, run_id=run_id, user_id=user_id, scope="lgd",
-                  criteria=outcome.criteria, ip=ip, user_agent=user_agent)
+    await _record(
+        db,
+        lgd_uploads,
+        outcome.status,
+        run_id=run_id,
+        user_id=user_id,
+        scope="lgd",
+        criteria=outcome.criteria,
+        ip=ip,
+        user_agent=user_agent,
+    )
     log.info("lgd_validate_complete", run_id=run_id, status=outcome.status, provisional=outcome.provisional)
     return LgdValidationResultOut(
         status=outcome.status,  # type: ignore[arg-type]
@@ -283,8 +308,12 @@ def _cell(v: Any) -> float | int | str | None:
 
 def summary_rows(table: pd.DataFrame, key: str) -> list[SummaryRowOut]:
     return [
-        SummaryRowOut(key=str(r[key]), outstanding=_f(r["Outstanding Amount"]), ecl=_f(r["ECL"]),
-                      coverage=_f(r["ECL Coverage Ratio"]))
+        SummaryRowOut(
+            key=str(r[key]),
+            outstanding=_f(r["Outstanding Amount"]),
+            ecl=_f(r["ECL"]),
+            coverage=_f(r["ECL Coverage Ratio"]),
+        )
         for _, r in table.iterrows()
     ]
 
@@ -296,11 +325,17 @@ def ead_preview(run: EclRun, reporting_date_source: str) -> EadPreviewOut:
     counts = rows.groupby("Loan ID").size()
     loans = [
         EadLoanOut(
-            loanId=str(r["Loan ID"]), customerId=str(r[CUSTOMER_ID]), segment=str(r["SEGMENT"]),
-            stage=str(r["Stage"]), treatment=str(first.at[r["Loan ID"], "Treatment"]),
-            outstanding=_f(r["Outstanding Amount"]), discountedCollateral=_f(r[DISCOUNTED_COLLATERAL]),
-            rows=int(counts.get(r["Loan ID"], 0)), eclBeforeCap=_f(r[ECL_BEFORE_CAP]),
-            totalEcl=_f(r[TOTAL_ECL]), capped=r[ECL_CAPPED] == "Yes",
+            loanId=str(r["Loan ID"]),
+            customerId=str(r[CUSTOMER_ID]),
+            segment=str(r["SEGMENT"]),
+            stage=str(r["Stage"]),
+            treatment=str(first.at[r["Loan ID"], "Treatment"]),
+            outstanding=_f(r["Outstanding Amount"]),
+            discountedCollateral=_f(r[DISCOUNTED_COLLATERAL]),
+            rows=int(counts.get(r["Loan ID"], 0)),
+            eclBeforeCap=_f(r[ECL_BEFORE_CAP]),
+            totalEcl=_f(r[TOTAL_ECL]),
+            capped=r[ECL_CAPPED] == "Yes",
         )
         for _, r in summary.head(MAX_PREVIEW_LOANS).iterrows()
     ]
@@ -333,8 +368,14 @@ def ead_preview(run: EclRun, reporting_date_source: str) -> EadPreviewOut:
         stageSummary=summary_rows(run.stage_summary, "Stage"),
         segmentSummary=summary_rows(run.segment_summary, "SEGMENT"),
         reconciliation=[
-            ReconciliationOut(name=c.name, expected=c.expected, actual=c.actual,
-                              difference=c.difference, passed=c.passed, detail=c.detail)
+            ReconciliationOut(
+                name=c.name,
+                expected=c.expected,
+                actual=c.actual,
+                difference=c.difference,
+                passed=c.passed,
+                detail=c.detail,
+            )
             for c in run.reconciliation
         ],
         exceptions=[_exception_out(e) for e in run.exceptions[:MAX_PREVIEW_EXCEPTIONS]],
@@ -367,31 +408,44 @@ async def build_ead_validation(db: AsyncSession, run, tenant_id: str):
     config = await collateral_parameters(db, tenant_id)
     outcome = await asyncio.to_thread(
         evaluate_ead,
-        exposure, collateral, config, curve,
-        pd_latest=_pd_latest(pd_frame), run_reporting_date=run.reporting_date,
+        exposure,
+        collateral,
+        config,
+        curve,
+        pd_latest=_pd_latest(pd_frame),
+        run_reporting_date=run.reporting_date,
         engine_version=ENGINE_VERSION,
     )
     return outcome, ead_uploads
 
 
 async def validate_ead_files(
-    db: AsyncSession, tenant_id: str, run_id: str, user_id: str,
-    *, ip: str | None = None, user_agent: str | None = None,
+    db: AsyncSession,
+    tenant_id: str,
+    run_id: str,
+    user_id: str,
+    *,
+    ip: str | None = None,
+    user_agent: str | None = None,
 ) -> EadValidationResultOut:
     from ledgerline.apps.runs.service import _get_run
 
     run = await _get_run(db, tenant_id, run_id)
     await _started(db, run_id=run_id, user_id=user_id, scope="ead", ip=ip, user_agent=user_agent)
     outcome, ead_uploads = await build_ead_validation(db, run, tenant_id)
-    preview = (
-        await asyncio.to_thread(ead_preview, outcome.run, outcome.reporting_date_source)
-        if outcome.run
-        else None
+    preview = await asyncio.to_thread(ead_preview, outcome.run, outcome.reporting_date_source) if outcome.run else None
+    await _record(
+        db,
+        ead_uploads,
+        outcome.status,
+        run_id=run_id,
+        user_id=user_id,
+        scope="ead",
+        criteria=outcome.criteria,
+        ip=ip,
+        user_agent=user_agent,
     )
-    await _record(db, ead_uploads, outcome.status, run_id=run_id, user_id=user_id, scope="ead",
-                  criteria=outcome.criteria, ip=ip, user_agent=user_agent)
-    log.info("ead_validate_complete", run_id=run_id, status=outcome.status,
-             loans=preview.loanCount if preview else 0)
+    log.info("ead_validate_complete", run_id=run_id, status=outcome.status, loans=preview.loanCount if preview else 0)
     return EadValidationResultOut(
         status=outcome.status,  # type: ignore[arg-type]
         criteria=[_criterion_out(c) for c in outcome.criteria],
@@ -416,10 +470,14 @@ async def build_ecl_preview_export(db: AsyncSession, tenant_id: str, run_id: str
         "run_by": "validation preview",
         "run_id": run.id,
         "engine_version": ENGINE_VERSION,
-        "inputs": [{"dataset": "Exposure Dataset (EAD)",
-                    "file": ", ".join(u.original_filename for u in ead_uploads),
-                    "modified": max(u.created_at for u in ead_uploads).strftime("%Y-%m-%d %H:%M UTC"),
-                    "rows": outcome.run.prepared.exposure_rows_in}],
+        "inputs": [
+            {
+                "dataset": "Exposure Dataset (EAD)",
+                "file": ", ".join(u.original_filename for u in ead_uploads),
+                "modified": max(u.created_at for u in ead_uploads).strftime("%Y-%m-%d %H:%M UTC"),
+                "rows": outcome.run.prepared.exposure_rows_in,
+            }
+        ],
     }
     content = await asyncio.to_thread(build_loan_detail_workbook, outcome.run, meta)
     return content, f"Preview - {LOAN_DETAIL_FILENAME}"
