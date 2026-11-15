@@ -44,9 +44,7 @@ def closed_form(amount, rate, freq, timing, years):
         n = years * 12 // FREQ[freq]
         i = (Decimal(1) + Decimal(rate)) ** (Decimal(FREQ[freq]) / 12) - 1
         pv = Decimal(amount) * (1 - (1 + i) ** -n) / i
-        if (
-            timing == "advance"
-        ):  # first payment is at commencement → in the ROU asset, not the liability
+        if timing == "advance":  # first payment is at commencement → in the ROU asset, not the liability
             pv = pv * (1 + i) - Decimal(amount)
         return pv.quantize(Decimal("0.01"))
 
