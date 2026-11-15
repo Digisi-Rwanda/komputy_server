@@ -145,28 +145,54 @@ def _dates(df: pd.DataFrame, col: str) -> list[date]:
 # stores floats into NUMERIC columns at the column's scale.
 def _ead_records(run_id: str, tenant_id: str, df: pd.DataFrame) -> list[tuple[Any, ...]]:
     n = len(df)
-    return list(zip(
-        [new_ulid() for _ in range(n)], [run_id] * n, [tenant_id] * n,
-        _text(df, "Loan ID"), _text(df, "Customer ID"), _text(df, "SEGMENT"), _text(df, "Stage"),
-        _dates(df, "Snapshot Date"),
-        df["Period Since Origination"].astype(int).tolist(), df["Period to Be Discounted"].astype(int).tolist(),
-        _num(df, "Monthly Instalment"), _num(df, "Balance After Repayment"), _num(df, "Balance After Missed Payment"),
-        _opt(df, "Marginal PD"), _opt(df, "Cure Rate"), _text(df, "Treatment"), _text(df, "PD Rule"),
-        _num(df, "LGW"), _num(df, "LGD"), _num(df, "Credit Loss"), _num(df, "Discounted ECL"),
-        strict=True,
-    ))
+    return list(
+        zip(
+            [new_ulid() for _ in range(n)],
+            [run_id] * n,
+            [tenant_id] * n,
+            _text(df, "Loan ID"),
+            _text(df, "Customer ID"),
+            _text(df, "SEGMENT"),
+            _text(df, "Stage"),
+            _dates(df, "Snapshot Date"),
+            df["Period Since Origination"].astype(int).tolist(),
+            df["Period to Be Discounted"].astype(int).tolist(),
+            _num(df, "Monthly Instalment"),
+            _num(df, "Balance After Repayment"),
+            _num(df, "Balance After Missed Payment"),
+            _opt(df, "Marginal PD"),
+            _opt(df, "Cure Rate"),
+            _text(df, "Treatment"),
+            _text(df, "PD Rule"),
+            _num(df, "LGW"),
+            _num(df, "LGD"),
+            _num(df, "Credit Loss"),
+            _num(df, "Discounted ECL"),
+            strict=True,
+        )
+    )
 
 
 def _loan_summary_records(run_id: str, tenant_id: str, df: pd.DataFrame) -> list[tuple[Any, ...]]:
     n = len(df)
-    return list(zip(
-        [new_ulid() for _ in range(n)], [run_id] * n, [tenant_id] * n,
-        _text(df, "Loan ID"), _text(df, "Customer ID"), _text(df, "SEGMENT"), _text(df, "Stage"),
-        _dates(df, "Reporting Date"),
-        _num(df, "Outstanding Amount"), _num(df, "Discounted Collateral"), _num(df, "ECL Before Cap"),
-        (df["ECL Capped"] == "Yes").tolist(), _num(df, "Total ECL"),
-        strict=True,
-    ))
+    return list(
+        zip(
+            [new_ulid() for _ in range(n)],
+            [run_id] * n,
+            [tenant_id] * n,
+            _text(df, "Loan ID"),
+            _text(df, "Customer ID"),
+            _text(df, "SEGMENT"),
+            _text(df, "Stage"),
+            _dates(df, "Reporting Date"),
+            _num(df, "Outstanding Amount"),
+            _num(df, "Discounted Collateral"),
+            _num(df, "ECL Before Cap"),
+            (df["ECL Capped"] == "Yes").tolist(),
+            _num(df, "Total ECL"),
+            strict=True,
+        )
+    )
 
 
 async def bulk_insert_pd_results(
@@ -199,18 +225,26 @@ async def bulk_insert_ead_results(
     return await _executemany(conn, _INSERT_EAD, _ead_records(run_id, tenant_id, df))
 
 
-async def bulk_insert_loan_summaries(
-    conn: AsyncConnection, run_id: str, tenant_id: str, df: pd.DataFrame
-) -> int:
+async def bulk_insert_loan_summaries(conn: AsyncConnection, run_id: str, tenant_id: str, df: pd.DataFrame) -> int:
     return await _executemany(conn, _INSERT_LOAN_SUMMARY, _loan_summary_records(run_id, tenant_id, df))
 
 
-async def bulk_insert_exceptions(
-    conn: AsyncConnection, run_id: str, tenant_id: str, exceptions: list[Any]
-) -> int:
+async def bulk_insert_exceptions(conn: AsyncConnection, run_id: str, tenant_id: str, exceptions: list[Any]) -> int:
     records = [
-        (new_ulid(), run_id, tenant_id, seq, e.category, e.dataset, e.loan_id or "", e.customer_id or "",
-         e.field, e.value or "", e.issue, e.action)
+        (
+            new_ulid(),
+            run_id,
+            tenant_id,
+            seq,
+            e.category,
+            e.dataset,
+            e.loan_id or "",
+            e.customer_id or "",
+            e.field,
+            e.value or "",
+            e.issue,
+            e.action,
+        )
         for seq, e in enumerate(exceptions)
     ]
     return await _executemany(conn, _INSERT_EXCEPTION, records)
