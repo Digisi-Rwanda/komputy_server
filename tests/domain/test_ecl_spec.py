@@ -29,11 +29,7 @@ def _curve() -> pd.DataFrame:
     for seg, base, cure in (("Retail", 0.01, 0.10), ("Hi", 0.50, 0.0)):
         for transition, bump in (("Stage 1", 0.0), ("Stage 2", 0.02), ("Stage 3", 0.0)):
             for m in range(1, CURVE_MONTHS + 1):
-                marginal = (
-                    min(1.0, base + bump + m / 10_000)
-                    if transition != "Stage 3"
-                    else (1.0 if m == 1 else 0.0)
-                )
+                marginal = min(1.0, base + bump + m / 10_000) if transition != "Stage 3" else (1.0 if m == 1 else 0.0)
                 rows.append(
                     {
                         "SEGMENT": seg,
@@ -62,32 +58,20 @@ def _exposure() -> pd.DataFrame:
 
     return pd.DataFrame(
         [
-            loan(
-                "L1", "C1", "Retail", "Stage 1", date(2023, 2, 15), date(2027, 6, 10), 100_000, 0.12
-            ),
-            loan(
-                "L2", "C1", "Retail", "Stage 2", date(2024, 1, 31), date(2025, 8, 31), 60_000, 0.18
-            ),
+            loan("L1", "C1", "Retail", "Stage 1", date(2023, 2, 15), date(2027, 6, 10), 100_000, 0.12),
+            loan("L2", "C1", "Retail", "Stage 2", date(2024, 1, 31), date(2025, 8, 31), 60_000, 0.18),
             loan("L3", "C2", "Retail", "Stage 3", date(2022, 5, 1), date(2026, 5, 1), 30_000, 0.15),
             loan(
                 "L4", "C3", "Retail", "Stage 1", date(2023, 1, 1), date(2025, 1, 5), 9_000, 0.10
             ),  # matured (same month)
-            loan(
-                "L5", "C3", "Retail", "Stage 2", date(2024, 6, 30), date(2026, 6, 30), 12_000, 0.0
-            ),  # zero rate
+            loan("L5", "C3", "Retail", "Stage 2", date(2024, 6, 30), date(2026, 6, 30), 12_000, 0.0),  # zero rate
             loan(
                 "L6", "C4", "Retail", "Stage 2", date(2021, 9, 1), date(2027, 12, 31), 50_000, 0.09
             ),  # runs past the curve
-            loan(
-                "L7", "C5", "Hi", "Stage 2", date(2024, 1, 1), date(2026, 1, 31), 10_000, 0.20
-            ),  # capped
+            loan("L7", "C5", "Hi", "Stage 2", date(2024, 1, 1), date(2026, 1, 31), 10_000, 0.20),  # capped
             loan("L8", "C6", "Retail", "Stage 1", date(2024, 1, 1), date(2027, 1, 1), 5_000, 0.10),
-            loan(
-                "L8", "C6", "Retail", "Stage 1", date(2024, 1, 1), date(2027, 1, 1), 5_000, 0.10
-            ),  # duplicate
-            loan(
-                "L9", "C7", "Retail", "Stage 1", date(2024, 1, 1), date(2027, 1, 1), 7_000, 12.0
-            ),  # EIR as percent
+            loan("L8", "C6", "Retail", "Stage 1", date(2024, 1, 1), date(2027, 1, 1), 5_000, 0.10),  # duplicate
+            loan("L9", "C7", "Retail", "Stage 1", date(2024, 1, 1), date(2027, 1, 1), 7_000, 12.0),  # EIR as percent
             loan(
                 "L10",
                 "C8",
@@ -99,9 +83,7 @@ def _exposure() -> pd.DataFrame:
                 0.1,
                 rep=date(2024, 12, 31),
             ),
-            loan(
-                "L11", "C9", "Retail", "Stage 4", date(2024, 1, 1), date(2027, 1, 1), 4_000, 0.1
-            ),  # bad stage
+            loan("L11", "C9", "Retail", "Stage 4", date(2024, 1, 1), date(2027, 1, 1), 4_000, 0.1),  # bad stage
             loan(
                 "L12", "C9", "Retail", "Stage 1", date(2025, 2, 1), date(2027, 1, 1), 4_000, 0.1
             ),  # FP after reporting
@@ -249,9 +231,7 @@ def test_exclusions_and_actions(result) -> None:
     prepared = result.prepared
     assert sorted(prepared.exposure["Loan ID"]) == ["L1", "L2", "L3", "L4", "L5", "L6", "L7"]
     assert sorted(set(prepared.excluded["Loan ID"])) == ["L10", "L11", "L12", "L8", "L9"]
-    actions = {
-        (e.dataset, e.loan_id or e.customer_id, e.field): e.action for e in result.exceptions
-    }
+    actions = {(e.dataset, e.loan_id or e.customer_id, e.field): e.action for e in result.exceptions}
     assert actions[("Exposure", "L8", "Loan ID")] == "Loan excluded"
     assert actions[("Exposure", "L9", "EIR")] == "Loan excluded"
     assert actions[("Exposure", "L10", "Reporting Date")] == "Loan excluded"
@@ -329,9 +309,7 @@ def test_treatments_and_pd_rules(result) -> None:
     assert first.loc["L4", "Treatment"].startswith("Matured")
     assert first.loc["L4", "Marginal PD"] > 0  # matured keeps its joined PD
     assert first.loc["L5", "Treatment"].startswith("Zero rate")
-    assert (
-        rows.loc[rows["Loan ID"] == "L6", "PD Rule"].iloc[1:].str.contains("last available")
-    ).any()
+    assert (rows.loc[rows["Loan ID"] == "L6", "PD Rule"].iloc[1:].str.contains("last available")).any()
     # Missed payments: EAD at t>=3 is Balance After Repayment[t-3] grown 3 months.
     l1 = rows[rows["Loan ID"] == "L1"].reset_index(drop=True)
     assert l1.loc[5, "Balance After Missed Payment"] == pytest.approx(
@@ -391,10 +369,7 @@ def test_collateral_allocation_fails_when_a_customer_loan_has_no_row() -> None:
     run = run_ecl(prepare_inputs(exposure, collateral, CONFIG, REP), _curve())
     check = next(c for c in run.reconciliation if c.name == "Collateral allocation")
     assert not check.passed and "C1" in check.detail
-    assert any(
-        e.category == "Reconciliation" and e.field == "Collateral allocation"
-        for e in run.exceptions
-    )
+    assert any(e.category == "Reconciliation" and e.field == "Collateral allocation" for e in run.exceptions)
 
 
 def test_reporting_date_defaults_to_most_common() -> None:
@@ -408,9 +383,7 @@ def _meta() -> dict:
         "run_by": "analyst@example.com",
         "run_id": "RUN1",
         "engine_version": "v1.3.0",
-        "inputs": [
-            {"dataset": "Exposure", "file": "ead.xlsx", "modified": "2025-02-01", "rows": 13}
-        ],
+        "inputs": [{"dataset": "Exposure", "file": "ead.xlsx", "modified": "2025-02-01", "rows": 13}],
     }
 
 
@@ -460,10 +433,7 @@ def test_row_detail_splits_loan_by_loan(result) -> None:
 
     wb = openpyxl.load_workbook(BytesIO(build_loan_detail_workbook(result, _meta(), max_rows=40)))
     tabs = [n for n in wb.sheetnames if n.startswith("Row Detail")]
-    assert (
-        tabs[:2] == ["Row Detail", "Row Detail 2"]
-        and wb.sheetnames.index("Loan Summary") == len(tabs) + 1
-    )
+    assert tabs[:2] == ["Row Detail", "Row Detail 2"] and wb.sheetnames.index("Loan Summary") == len(tabs) + 1
     seen: dict[str, str] = {}
     total = 0
     for name in tabs:
