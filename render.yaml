@@ -10,17 +10,11 @@ envVarGroups:
         generateValue: true
       - key: IP_HASH_SALT
         generateValue: true
-  # Cloudflare R2 (scoped account token → S3 keys). Engine services + backup cron.
+  # Cloudflare R2. The scoped keys (STORAGE_ENDPOINT_URL, STORAGE_PUBLIC_ENDPOINT_URL, STORAGE_ACCESS_KEY,
+  # STORAGE_SECRET_KEY) are set per service on the engine API, both workers and the backup cron: Render
+  # Blueprints don't support `sync: false` inside env groups. Rotation: docs/RUNBOOK.md.
   - name: komputy-storage
     envVars:
-      - key: STORAGE_ENDPOINT_URL
-        sync: false
-      - key: STORAGE_PUBLIC_ENDPOINT_URL
-        sync: false
-      - key: STORAGE_ACCESS_KEY
-        sync: false
-      - key: STORAGE_SECRET_KEY
-        sync: false
       - key: STORAGE_REGION
         value: auto
       - key: STORAGE_BUCKET_NAME
