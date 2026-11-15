@@ -195,7 +195,7 @@ services:
     branch: main
     region: frankfurt
     plan: starter
-    schedule: "0 1 * * *"
+    schedule: "*/5 * * * *"  # TEMPORARY: verifying the backup on production
     dockerfilePath: ./ops/backup/Dockerfile
     dockerContext: ./ops/backup
     envVars:
