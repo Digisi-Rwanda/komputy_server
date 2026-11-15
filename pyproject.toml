@@ -69,13 +69,26 @@ line-length = 120
 target-version = "py312"
 src = ["src", "tests"]
 
+[tool.ruff.format]
+# Approved calculation code stays byte-for-byte as carried over.
+exclude = ["src/ledgerline/ecl/domain/**", "src/ledgerline/leases/domain/**"]
+
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "S", "ASYNC", "RUF"]
-ignore = ["S101", "RUF001", "RUF002", "RUF003", "E501"]  # line length is left to the formatter
+# E501: line length is left to the formatter. B008: FastAPI's `Depends()`/`Query()` defaults are the framework idiom.
+# UP046/UP047: Generic[T] style kept in the ported pagination helpers.
+ignore = ["S101", "RUF001", "RUF002", "RUF003", "E501", "B008", "UP046", "UP047"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S", "B", "ASYNC240"]
-"src/ledgerline/ecl/domain/**" = ["E501", "RUF005", "B905", "UP"]
+# Approved calculation code: carried over unchanged, so style rules don't apply (S106: `pass_rationale=` is not a password).
+"src/ledgerline/ecl/domain/**" = ["E501", "RUF005", "B905", "UP", "I001", "S106", "RUF007", "RUF059"]
+# Ported service modules import their schemas after helper definitions (circular-import order).
+"src/ledgerline/apps/runs/jobs.py" = ["E402"]
+"src/ledgerline/kernel/enums.py" = ["E402"]
+# Audit event names and UI labels such as "PASSWORD_CHANGED" / token="Upload" are not secrets.
+"src/ledgerline/events/audit_models.py" = ["S105"]
+"src/ledgerline/apps/runs/service.py" = ["E402", "S105"]
 "src/ledgerline/leases/domain/**" = ["E501", "B905", "UP"]
 
 [tool.pyright]
