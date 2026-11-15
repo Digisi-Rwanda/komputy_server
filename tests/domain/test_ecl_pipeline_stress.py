@@ -14,9 +14,7 @@ from ledgerline.ecl.domain.pd_engine import compute_pd
 
 
 def _pd_book() -> pd.DataFrame:
-    months = pd.to_datetime(
-        ["2024-07-31", "2024-08-31", "2024-09-30", "2024-10-31", "2024-11-30", "2024-12-31"]
-    )
+    months = pd.to_datetime(["2024-07-31", "2024-08-31", "2024-09-30", "2024-10-31", "2024-11-30", "2024-12-31"])
     rows: list[dict[str, object]] = []
     # Performing loan stays Stage 1.
     for month in months:
@@ -89,9 +87,7 @@ def test_ecl_pipeline_pd_lgd_ead_formula() -> None:
     assert "Retail" in cure_rates
     assert pd_out["Marginal_PD"].between(0.0, 1.0).all()
 
-    prepared = prepare_inputs(
-        _ead_book(), _lgd_book(), [{"name": "Property", "haircut": 0.15, "time_to_realize": 1.5}]
-    )
+    prepared = prepare_inputs(_ead_book(), _lgd_book(), [{"name": "Property", "haircut": 0.15, "time_to_realize": 1.5}])
     run = run_ecl(prepared, pd_out)
     rows = run.rows
     assert rows["Loan ID"].nunique() == 3
