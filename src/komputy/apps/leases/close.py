@@ -169,7 +169,7 @@ async def step_issues(db: AsyncSession, tenant_id: str, c: LeaseCloseRun, sid: s
         if not in_force(await setup_versions(db, tenant_id, "policies"), end):
             errors.append("No approved accounting policy is in force.")
         if not in_force(await setup_versions(db, tenant_id, "curves"), end):
-            errors.append("No approved discount-rate curve is in force.")
+            errors.append("No approved discount rate curve is in force.")
     elif sid == "events":
         rows = (
             await db.execute(
@@ -183,7 +183,7 @@ async def step_issues(db: AsyncSession, tenant_id: str, c: LeaseCloseRun, sid: s
         n = sum(1 for v in rows if v.effective_date and v.effective_date.isoformat() <= end)
         if n:
             warnings.append(
-                f"{n} change{'s' if n > 1 else ''} effective this period {'are' if n > 1 else 'is'} still pending and will post as catch-ups next period."
+                f"{n} change{'s' if n > 1 else ''} effective this period {'are' if n > 1 else 'is'} still pending and will post as catch ups next period."
             )
     elif sid == "generate":
         b = await _batch(db, tenant_id, c.batch_id)
@@ -725,7 +725,7 @@ async def lock(db: AsyncSession, m: TenantMembership, key: str) -> None:
         m.tenant_id,
         "*",
         f"{key} is locked",
-        "Changes dated in this period now post as catch-ups.",
+        "Changes dated in this period now post as catch ups.",
         "/leases/close",
     )
 

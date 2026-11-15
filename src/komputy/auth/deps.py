@@ -52,7 +52,7 @@ async def get_current_user(
     claims = decode_web_token(creds.credentials)
     request.state.web_claims = claims
     if claims.get("sup") and request.method not in ("GET", "HEAD"):
-        raise ECLException("SUPPORT_READ_ONLY", "Support sessions are read-only.", 403)
+        raise ECLException("SUPPORT_READ_ONLY", "Support sessions are view only.", 403)
     user = (await db.execute(select(User).where(User.id == claims["sub"]))).scalar_one_or_none()
     if not user or not user.is_active:
         raise ECLException("ACCOUNT_DISABLED", "Account is disabled.", 403)
@@ -87,7 +87,7 @@ async def require_tenant_member(tenant_id: str, user: CurrentUser, db: DbSession
     if int(claims.get("av", 0)) < tenant.authz_version:
         raise ECLException("TOKEN_STALE", "Permissions changed. Retry the request.", 401)
     if tenant.status in ("suspended", "closed") and request.method not in ("GET", "HEAD"):
-        raise ECLException("TENANT_SUSPENDED", "This workspace is read-only.", 403)
+        raise ECLException("TENANT_SUSPENDED", "This workspace is view only.", 403)
     service = _service_of(request)
     svc = (claims.get("svc") or {}).get(service, {})
     if (
@@ -97,7 +97,7 @@ async def require_tenant_member(tenant_id: str, user: CurrentUser, db: DbSession
     ):
         raise ECLException("SERVICE_NOT_ENABLED", "This service isn't enabled for your workspace.", 403)
     if svc.get("state") in ("expired", "trial-expired", "suspended") and request.method not in ("GET", "HEAD"):
-        raise ECLException("SERVICE_READ_ONLY", "This service is read-only for your workspace.", 403)
+        raise ECLException("SERVICE_READ_ONLY", "This service is view only for your workspace.", 403)
     # Defence in depth: row-level security policies read this for the rest of the transaction.
     await db.execute(text("SELECT set_config('app.tenant_id', :t, true)"), {"t": tenant_id})
     sup = claims.get("sup") or None

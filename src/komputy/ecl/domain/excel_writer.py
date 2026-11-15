@@ -271,7 +271,7 @@ def _build_pd_calcs_workbook(run_meta: dict[str, Any], pd_data: dict[str, Any]) 
     row = 5
     for segment in sorted(normalized.keys(), key=str):
         row = _write_matrix_block(
-            ws, row, segment, normalized[segment], caption="Raised to powers 1-299"
+            ws, row, segment, normalized[segment], caption="Raised to powers 1 to 299"
         )
     ws.column_dimensions["A"].width = 18
     for col in "BCDE":

@@ -31,7 +31,7 @@ def short_ulid(ulid: str) -> str:
 def format_file_size(num_bytes: int) -> str:
     """Format a byte count as a human-readable size string."""
     if num_bytes < 0:
-        msg = "byte count must be non-negative"
+        msg = "byte count must be zero or positive"
         raise ValueError(msg)
     if num_bytes < 1024:
         return f"{num_bytes} B"

@@ -66,7 +66,7 @@ COLUMNS = [
     ("payment_amount", "Payment amount", True),
     ("frequency", "Frequency", True),
     ("timing", "Timing", True),
-    ("rent_free_months", "Rent-free months", False),
+    ("rent_free_months", "Rent free months", False),
     ("escalation_pct", "Escalation %", False),
     ("escalation_every_months", "Escalation every (months)", False),
     ("discount_rate_pct", "Discount rate %", False),
@@ -317,7 +317,7 @@ async def _validate_rows(
         if is_iso_date(cd) and cd[:7] in locked:
             warn(
                 "commencement_date",
-                "Commences in a locked period: entries will post as catch-ups.",
+                "Commences in a locked period: entries will post as catch ups.",
             )
         amt = _dec(v("payment_amount"))
         if v("payment_amount") and (amt is None or amt <= 0):
@@ -350,7 +350,7 @@ async def _validate_rows(
             elif rd <= 0 or rd > 40:
                 err("discount_rate_pct", "Rate must be between 0% and 40%.")
         else:
-            warn("discount_rate_pct", "No rate given: the discount-rate curve will be used.")
+            warn("discount_rate_pct", "No rate given: the discount rate curve will be used.")
         ex = v("exemption").lower()
         if ex and ex not in ("none", "short_term", "low_value"):
             err("exemption", "Use none, short_term or low_value.")
@@ -444,7 +444,7 @@ async def _commit_row(db: AsyncSession, b: LeaseImportBatch, r: LeaseImportRow) 
         "rightToControl": True,
         "exemption": ex,
         "exemptionRationale": "" if ex == "none" else "Per import file: confirm in review",
-        "termRationale": "Non-cancellable term per contract (import).",
+        "termRationale": "Non cancellable term per contract (import).",
     }
     if r.action == "update" and r.lease_id:
         lease = await db.get(Lease, r.lease_id)

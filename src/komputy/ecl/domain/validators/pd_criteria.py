@@ -174,7 +174,7 @@ class _IssueSink:
                 title="Additional errors were found but not shown",
                 location="Summary",
                 fix=(
-                    f"Fix the errors above and re-validate. Up to {MAX_ISSUES} issues "
+                    f"Fix the errors above and revalidate. Up to {MAX_ISSUES} issues "
                     "are shown per validation."
                 ),
             ),
@@ -470,7 +470,7 @@ def _duplicate_criterion(combined: pd.DataFrame, sink: _IssueSink) -> CriterionR
         month = parsed.loc[index]
         sink.add(
             level="block",
-            title="Duplicate Loan ID and Reporting Month (EC-10)",
+            title="Duplicate Loan ID and Reporting Month (EC 10)",
             location=_location(row, "Loan ID"),
             fix=(
                 f"Remove duplicate rows for Loan ID={row['Loan ID']!r}, "
@@ -483,7 +483,7 @@ def _duplicate_criterion(combined: pd.DataFrame, sink: _IssueSink) -> CriterionR
         "structural",
         "block",
         f"{len(affected)} rows repeat a (Loan ID, reporting month) pair: {_join(examples)}. "
-        "Same-month rows with different days count as duplicates because the "
+        "Same month rows with different days count as duplicates because the "
         "calendar month is the transition join key.",
     )
 
@@ -503,7 +503,7 @@ def _structural_criteria(
             ("PD-03", "Segment present"),
             ("PD-04", "Reporting month valid"),
             ("PD-05", "Staging value valid"),
-            ("PD-06", "Loan amount non-negative"),
+            ("PD-06", "Loan amount zero or positive"),
             ("PD-07", "Segment recognized"),
             ("EC-10", "No duplicate rows"),
         ):
@@ -519,8 +519,8 @@ def _structural_criteria(
             column="Loan ID",
             mask=_blank_mask(combined["Loan ID"]),
             issue_title="Loan ID is empty",
-            fix="Provide a non-empty Loan ID for every row.",
-            pass_rationale="Every row has a non-blank Loan ID.",
+            fix="Provide a not empty Loan ID for every row.",
+            pass_rationale="Every row has a not blank Loan ID.",
             fail_rationale="{count} {rows} a blank Loan ID.",
         )
     )
@@ -533,8 +533,8 @@ def _structural_criteria(
             column="SEGMENT",
             mask=_blank_mask(combined["SEGMENT"]),
             issue_title="SEGMENT is empty",
-            fix="Provide a non-empty SEGMENT for every row.",
-            pass_rationale="Every row has a non-blank SEGMENT value.",
+            fix="Provide a not empty SEGMENT for every row.",
+            pass_rationale="Every row has a not blank SEGMENT value.",
             fail_rationale="{count} {rows} a blank SEGMENT.",
         )
     )
@@ -571,13 +571,13 @@ def _structural_criteria(
             combined,
             sink,
             code="PD-06",
-            name="Loan amount non-negative",
+            name="Loan amount zero or positive",
             column="Loan Amount",
             mask=_bad_amount_mask(combined["Loan Amount"]),
-            issue_title="Loan Amount must be non-negative",
+            issue_title="Loan Amount must be zero or positive",
             fix="Enter a Loan Amount greater than or equal to 0.",
             pass_rationale="Every Loan Amount is numeric and zero or greater.",
-            fail_rationale="{count} {rows} a missing, non-numeric or negative Loan Amount.",
+            fail_rationale="{count} {rows} a missing, not numeric or negative Loan Amount.",
         )
     )
     results.append(_segment_recognized_criterion(combined, allowed_segments, sink))
@@ -618,7 +618,7 @@ def _month_coverage_criterion(
         "business",
         "review",
         f"Missing reporting months in {_join(gapped)}. A skipped month is read as an "
-        "off-book exit followed by a re-entry, which understates persistence.",
+        "off book exit followed by a reentry, which understates persistence.",
     )
 
 
@@ -662,7 +662,7 @@ def _loan_id_format_criterion(combined: pd.DataFrame) -> CriterionResult:
         f"{len(dominant_ids)} Loan IDs match the dominant pattern ({dominant_ids[0]}) but "
         f"{len(odd)} {'does' if len(odd) == 1 else 'do'} not: {_join(odd)}. Mixed formats "
         "usually mean the same borrower appears under two identifiers, which breaks the "
-        "month-to-month join.",
+        "month to month join.",
     )
 
 
@@ -708,7 +708,7 @@ def _stage_mix_criterion(
     if not implausible:
         return _criterion(
             "EC-14",
-            "Stage-mix plausibility",
+            "Stage mix plausibility",
             "business",
             "pass",
             "The Stage 1/2/3 exposure split falls within the expected range for every "
@@ -716,12 +716,12 @@ def _stage_mix_criterion(
         )
     return _criterion(
         "EC-14",
-        "Stage-mix plausibility",
+        "Stage mix plausibility",
         "business",
         "review",
         f"Stage 3 exposure share is outside the configured "
         f"{_pct(thresholds.stage3_share_min)}-{_pct(thresholds.stage3_share_max)} band for "
-        f"{_join(implausible)}. Shares are exposure-weighted, not loan counts.",
+        f"{_join(implausible)}. Shares are exposure weighted, not loan counts.",
     )
 
 
@@ -756,11 +756,11 @@ def _marginal_pd_criterion(pd_output: pd.DataFrame) -> CriterionResult:
             "business",
             "pass",
             "Every computed default probability is between 0% and 100%, and the "
-            "cumulative Stage 3 probability never decreases over the 299-month horizon.",
+            "cumulative Stage 3 probability never decreases over the 299 month horizon.",
         )
     parts = []
     if out_of_bounds:
-        parts.append(f"{out_of_bounds} marginal PD value(s) outside 0-100%")
+        parts.append(f"{out_of_bounds} marginal PD value(s) outside 0 to 100%")
     if regressions:
         parts.append(f"{regressions} month(s) where cumulative default probability decreases")
     return _criterion(
@@ -847,7 +847,7 @@ def _offbooks_criterion(
             "business",
             "review",
             "Not evaluated: no segment has two or more transition months to compare "
-            "off-book exit rates across.",
+            "off book exit rates across.",
         )
     if not spikes:
         return _criterion(
@@ -855,7 +855,7 @@ def _offbooks_criterion(
             "Offbooks rate sanity",
             "business",
             "pass",
-            "Off-book exits stay within "
+            "Off book exits stay within "
             f"{_pct(thresholds.offbooks_abs_band)} of each segment's trailing average.",
         )
     return _criterion(
@@ -863,7 +863,7 @@ def _offbooks_criterion(
         "Offbooks rate sanity",
         "business",
         "review",
-        f"Off-book exits spike above the trailing average in {_join(spikes)}. "
+        f"Off book exits spike above the trailing average in {_join(spikes)}. "
         "Worth confirming these are genuine closures rather than a missing month of data.",
     )
 
@@ -910,7 +910,7 @@ def _engine_stamp_criterion(
     ]
     if skipped_sheet_count:
         parts.append(
-            f"{skipped_sheet_count} sheet(s) were skipped as non-data (no PD columns)."
+            f"{skipped_sheet_count} sheet(s) were skipped as non data (no PD columns)."
         )
     if file_count > 1 and not combine_pd_files:
         parts.append(
@@ -918,7 +918,7 @@ def _engine_stamp_criterion(
             "run, so computation will use only the first file: the computed result will "
             "not match this preview."
         )
-    parts.append("Nothing has been saved; re-running on the same files reproduces this exactly.")
+    parts.append("Nothing has been saved; rerunning on the same files reproduces this exactly.")
     return _criterion(
         "EC-18", "Reproducibility / engine version", "info", "info", " ".join(parts)
     )
@@ -929,7 +929,7 @@ def _unevaluated_business_criteria() -> list[CriterionResult]:
         _criterion("EC-11", "Chronological month coverage", "business", "review", _NOT_EVALUATED),
         _criterion("EC-12", "Loan ID format consistency", "business", "review", _NOT_EVALUATED),
         _criterion("EC-13", "Minimum transition history", "business", "review", _NOT_EVALUATED),
-        _criterion("EC-14", "Stage-mix plausibility", "business", "review", _NOT_EVALUATED),
+        _criterion("EC-14", "Stage mix plausibility", "business", "review", _NOT_EVALUATED),
         _criterion("EC-15", "Marginal PD bounds", "business", "review", _NOT_EVALUATED),
         _criterion("EC-16", "Cure rate sanity", "business", "review", _NOT_EVALUATED),
         _criterion("EC-17", "Offbooks rate sanity", "business", "review", _NOT_EVALUATED),

@@ -219,7 +219,7 @@ def _parameters(
                     "",
                     f"Haircut ({name})",
                     _fmt(haircut),
-                    "Haircut is outside 0-1",
+                    "Haircut is outside 0 to 1",
                     "Treated as 0",
                 )
             )
@@ -388,7 +388,7 @@ def prepare_inputs(
                 row[CUSTOMER_ID],
                 EIR,
                 _fmt(row["Collateral EIR"]),
-                "Collateral EIR is missing or outside 0-1",
+                "Collateral EIR is missing or outside 0 to 1",
                 f"Exposure EIR used ({_fmt(want)})",
             )
         )

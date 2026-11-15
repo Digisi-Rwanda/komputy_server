@@ -75,10 +75,10 @@ async def save_entity(db: AsyncSession, m: TenantMembership, body: dict[str, Any
         raise invalid("Name the reporting book.", "book")
     currency = (body.get("currency") or "").upper()
     if len(currency) != 3:
-        raise invalid("Pick a 3-letter currency code.", "currency")
+        raise invalid("Pick a 3 letter currency code.", "currency")
     fy = int(body.get("fyStartMonth") or 1)
     if not 1 <= fy <= 12:
-        raise invalid("Financial year must start in month 1-12.")
+        raise invalid("Financial year must start in month 1 to 12.")
     e = await entity_of(db, m.tenant_id)
     has_leases = (await db.execute(select(Lease.id).where(Lease.tenant_id == m.tenant_id).limit(1))).first() is not None
     if e is None:
@@ -194,7 +194,7 @@ async def submit_setup(
     db.add(v)
     await audit(db, m.tenant_id, m.user_id, f"setup.{kind}.submit", f"v{v.version}", reason)
     if not first:
-        label = {"gl": "GL mapping", "curves": "Discount-rate curve", "policies": "Policy"}[kind]
+        label = {"gl": "GL mapping", "curves": "Discount rate curve", "policies": "Policy"}[kind]
         await notify(
             db,
             m.tenant_id,
@@ -474,7 +474,7 @@ async def validate_version(db: AsyncSession, lease: Lease, v: LeaseVersion, vs: 
     if is_iso_date(cd) and is_iso_date(ed) and ed <= cd:
         e["endDate"] = "End date must be after commencement."
     if ent and lease.currency != ent.currency:
-        e["currency"] = f"Foreign-currency leases aren't supported yet. Use {ent.currency}."
+        e["currency"] = f"Foreign currency leases aren't supported yet. Use {ent.currency}."
     r = t.get("paymentRule")
     if (not r or not r.get("amount")) and not t.get("manualLines"):
         e["amount"] = "Add the payment amount or at least one payment line."

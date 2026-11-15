@@ -18,7 +18,6 @@ from komputy.kernel.errors import ECLException
 
 _cache: dict[str, Any] = {"set": None, "at": 0.0}
 _TTL = 600.0
-_LEGACY_ISSUER, _LEGACY_AUDIENCE = "ledgerline-web", "ecl-engine"
 
 
 def _jwks(force: bool = False) -> PyJWKSet:
@@ -49,10 +48,8 @@ def decode_web_token(token: str) -> dict[str, Any]:
             token,
             match[0],
             algorithms=["RS256"],
-            # shortcut: the pre-rebrand names stay accepted for one release so a web/engine deploy race can't
-            # reject sign-ins; remove `_LEGACY_*` once both services run the Komputy names.
-            audience=[s.web_jwt_audience, _LEGACY_AUDIENCE],
-            issuer=(s.web_jwt_issuer, _LEGACY_ISSUER),
+            audience=s.web_jwt_audience,
+            issuer=s.web_jwt_issuer,
             leeway=10,
         )
     except ECLException:

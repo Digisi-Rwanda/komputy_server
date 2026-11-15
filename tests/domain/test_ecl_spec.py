@@ -345,7 +345,7 @@ def test_cap_summaries_and_reconciliation(result) -> None:
         "Outstanding Amount",
         "Row Detail coverage",
         "Collateral allocation",
-        "ECL build-up",
+        "ECL buildup",
         "Summary totals",
         "ECL limits",
     }
@@ -353,7 +353,7 @@ def test_cap_summaries_and_reconciliation(result) -> None:
         "Loan count",
         "Outstanding Amount",
         "Row Detail coverage",
-        "ECL build-up",
+        "ECL buildup",
         "Summary totals",
         "ECL limits",
     ):

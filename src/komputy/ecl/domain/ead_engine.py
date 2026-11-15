@@ -55,7 +55,7 @@ T_MATURED = "Matured · single row"
 T_ZERO_RATE = "Zero rate · single row"
 
 # PD Rule labels (Step 8).
-R_NO_PD_ROW0 = "Reporting-date row: no PD"
+R_NO_PD_ROW0 = "Reporting date row: no PD"
 R_STAGE3 = "Stage 3: Marginal PD = 100%"
 R_CURVE = "PD curve"
 R_LAST_MONTH = "Beyond curve: last available Month"
@@ -182,7 +182,7 @@ def attach_pd(
     if curve.duplicated(["SEGMENT", "Month", "Transition"]).any():
         raise ValueError("PD curve has duplicate (SEGMENT, Month, Transition) keys")
     if not curve[["Marginal_PD", "Cure_Rate"]].stack().between(0.0, 1.0).all():
-        raise ValueError("PD curve has Marginal PD or Cure Rate outside 0-1")
+        raise ValueError("PD curve has Marginal PD or Cure Rate outside 0 to 1")
 
     out = rows.copy()
     last_month = curve.groupby(["SEGMENT", "Transition"])["Month"].max()

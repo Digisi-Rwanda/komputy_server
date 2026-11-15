@@ -71,7 +71,7 @@ async def portfolio(
     tot = defaultdict(lambda: D0)
     by_class: dict[str, Decimal] = defaultdict(lambda: D0)
     rou_class: dict[str, list[Decimal]] = defaultdict(lambda: [D0, D0])  # [ROU carrying, depreciation YTD]
-    maturity = {"< 1 yr": D0, "1-2 yrs": D0, "2-5 yrs": D0, "> 5 yrs": D0}
+    maturity = {"< 1 yr": D0, "1 to 2 yrs": D0, "2 to 5 yrs": D0, "> 5 yrs": D0}
     roll = defaultdict(lambda: D0)
     due30, due30n = D0, 0
     register = []
@@ -101,7 +101,9 @@ async def portfolio(
                         roll["opening"] += _d(r.get("liabOpening"))
                 if m > key:
                     y = (int(m[:4]) - int(key[:4])) * 12 + int(m[5:7]) - int(key[5:7])
-                    bucket = "< 1 yr" if y <= 12 else "1-2 yrs" if y <= 24 else "2-5 yrs" if y <= 60 else "> 5 yrs"
+                    bucket = (
+                        "< 1 yr" if y <= 12 else "1 to 2 yrs" if y <= 24 else "2 to 5 yrs" if y <= 60 else "> 5 yrs"
+                    )
                     maturity[bucket] += _d(r.get("payments"))
             nxt = rows.get(_add_months(key, 1))
             if nxt and _d(nxt.get("payments")):

@@ -298,7 +298,7 @@ def test_ec15_blocks_on_out_of_range_or_non_monotonic_probabilities() -> None:
     out_of_bounds.loc[1, "Marginal_PD"] = 1.4
     blocked = _marginal_pd_criterion(out_of_bounds)
     assert blocked.outcome == "block"
-    assert "outside 0-100%" in blocked.rationale
+    assert "outside 0 to 100%" in blocked.rationale
 
     regressing = valid.copy()
     regressing.loc[2, "Stage_3_prob"] = 0.02

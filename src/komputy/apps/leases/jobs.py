@@ -113,7 +113,7 @@ async def verify_books(db: AsyncSession) -> int:
                     books.tenant_id,
                     "*",
                     f"{lz.code}: stored schedule no longer matches its inputs",
-                    "Recalculate and re-approve, or contact support if this is unexpected.",
+                    "Recalculate and reapprove, or contact support if this is unexpected.",
                     f"/leases/{lz.id}",
                 )
     await db.commit()

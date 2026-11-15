@@ -98,7 +98,7 @@ async def notify_run_completed(db: AsyncSession, *, user_id: str, tenant_id: str
         user_ids="*reviewers",
         event="signoff",
         kind="runs",
-        title=f"{run_name} is ready for sign-off",
+        title=f"{run_name} is ready for sign off",
         body="A completed run is awaiting your review.",
         href=f"/ecl/runs/{run_id}/summary",
         action="Review",

@@ -209,14 +209,14 @@ from komputy.web import Tenant
 
 _AUDIT_DISPLAY: dict[str, tuple[str, str, str]] = {
     AuditEvent.RUN_CREATED.value: ("accent", "Plus", "Run created"),
-    AuditEvent.RUN_RERUN_CREATED.value: ("accent", "RefreshCcw", "Re-run created"),
+    AuditEvent.RUN_RERUN_CREATED.value: ("accent", "RefreshCcw", "Rerun created"),
     AuditEvent.FILE_UPLOADED.value: ("default", "Upload", "Files uploaded"),
     AuditEvent.VALIDATION_TRIGGERED.value: ("default", "FileSearch", "Validation started"),
     AuditEvent.VALIDATION_COMPLETED.value: ("ok", "Check", "Validation passed"),
     AuditEvent.RUN_QUEUED.value: ("accent", "Zap", "Computation started"),
     AuditEvent.RUN_COMPLETED.value: ("ok", "Check", "Run completed"),
     AuditEvent.RUN_FAILED.value: ("err", "X", "Run failed"),
-    AuditEvent.RUN_DELETED.value: ("default", "Trash2", "Run soft-deleted"),
+    AuditEvent.RUN_DELETED.value: ("default", "Trash2", "Run deleted"),
 }
 
 
@@ -874,8 +874,8 @@ async def _register_upload(
         existing_warnings = run.run_warnings or []
         run.run_warnings = [
             *existing_warnings,
-            f"EC-12: Upload '{kind}' contains {row_count:,} rows. "
-            "Compute time may exceed the 30-minute budget. "
+            f"EC 12: Upload '{kind}' contains {row_count:,} rows. "
+            "Compute time may exceed the 30 minute budget. "
             "Consider splitting the dataset into batches before running.",
         ]
 
@@ -1244,7 +1244,7 @@ async def rerun_run(
     if original.status != RunStatus.COMPLETE.value:
         raise ECLException(
             "RUN_NOT_COMPLETED",
-            "Only completed runs can be re-run.",
+            "Only completed runs can be rerun.",
             409,
         )
 
@@ -1296,7 +1296,7 @@ async def rerun_run(
         details={
             "run_id": new_run.id,
             "source_run_id": run_id,
-            "description": f"Re-run of {short_ulid(run_id)}",
+            "description": f"Rerun of {short_ulid(run_id)}",
         },
     )
     return await get_run(db, tenant_id, new_run.id)

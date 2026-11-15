@@ -173,7 +173,7 @@ async def resubmit(
         user_ids="*reviewers",
         event="signoff",
         kind="runs",
-        title=f"{run.name} is ready for sign-off",
+        title=f"{run.name} is ready for sign off",
         body=f"Resubmitted by {user.name}",
         href=f"/ecl/runs/{run.id}/summary",
         action="Review",

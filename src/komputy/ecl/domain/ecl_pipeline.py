@@ -165,7 +165,7 @@ def reconcile(run: EclRun) -> list[ReconciliationCheck]:
             "Row Detail coverage",
             0,
             int(bad.sum()),
-            "Loans breaking: ≥1 row each, Stage 1 ≤ 13 rows, single-row loans exactly 1",
+            "Loans breaking: ≥1 row each, Stage 1 ≤ 13 rows, single row loans exactly 1",
         )
     )
 
@@ -192,7 +192,7 @@ def reconcile(run: EclRun) -> list[ReconciliationCheck]:
 
     checks.append(
         _check(
-            "ECL build-up",
+            "ECL buildup",
             rows[DISCOUNTED_ECL].sum(),
             summary[ECL_BEFORE_CAP].sum(),
             "Σ Row Detail Discounted ECL = Σ ECL Before Cap",

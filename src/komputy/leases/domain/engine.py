@@ -31,11 +31,11 @@ CTX = Context(prec=34, rounding=ROUND_HALF_EVEN)
 ZERO = Decimal(0)
 ONE = Decimal(1)
 FREQ_MONTHS = {"monthly": 1, "quarterly": 3, "semiannual": 6, "annual": 12}
-MATURITY_BUCKETS = ["≤ 1 year", "1-2 years", "2-5 years", "> 5 years"]
+MATURITY_BUCKETS = ["≤ 1 year", "1 to 2 years", "2 to 5 years", "> 5 years"]
 
 ACCOUNT_LABELS = {
-    "rou_cost": "Right-of-use asset: cost",
-    "rou_accdep": "Right-of-use asset: accumulated depreciation",
+    "rou_cost": "Right of use asset: cost",
+    "rou_accdep": "Right of use asset: accumulated depreciation",
     "lease_liability": "Lease liability",
     "interest_expense": "Interest expense: leases",
     "depreciation_expense": "Depreciation expense: ROU",
@@ -618,7 +618,7 @@ def exempt_expense(t: dict[str, Any]) -> list[dict[str, Any]]:
                 "month": mk,
                 "date": add_days(f"{nmk}-01", -1),
                 "kind": "expense",
-                "memo": "Straight-line lease expense",
+                "memo": "Straight line lease expense",
             }
             _pair(out, base, "lease_expense", "cash_payable", r2(cum) - r2(prev))
             mk = nmk

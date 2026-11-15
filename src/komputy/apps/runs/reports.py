@@ -72,7 +72,7 @@ async def _sheets(db: Any, tenant_id: str, run: Run, kind: str, compare: str | N
             raise ECLException("COMPARE_REQUIRED", "Pick the run to roll forward from.", 400)
         c = (await compare_view(tenant_id, compare, run.id, db, m))["data"]
         return [
-            ("Roll-forward", ["Movement", "Amount"], [[x["label"], x["value"]] for x in c["movement"]]),
+            ("Roll forward", ["Movement", "Amount"], [[x["label"], x["value"]] for x in c["movement"]]),
             (
                 "By segment",
                 ["Segment", "Opening ECL", "Closing ECL", "Change %"],

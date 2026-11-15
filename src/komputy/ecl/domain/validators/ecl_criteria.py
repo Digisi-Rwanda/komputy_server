@@ -224,7 +224,7 @@ def evaluate_lgd(
             "LG-11",
             "Collateral parameters",
             _lines(ex, DS_PARAMETERS, "Treated as 0"),
-            "Every collateral type has a haircut in 0-1 and a time to realize ≥ 0.",
+            "Every collateral type has a haircut in 0 to 1 and a time to realize ≥ 0.",
             "Types without valid parameters count as 0 until fixed in Workspace → Collateral types",
         ),
         _review_or_pass(
@@ -238,8 +238,8 @@ def evaluate_lgd(
             "LG-13",
             "Collateral values valid",
             _lines(ex, DS_COLLATERAL, "Treated as 0"),
-            "No negative or non-numeric collateral values.",
-            "Negative or non-numeric values are treated as 0",
+            "No negative or not numeric collateral values.",
+            "Negative or not numeric values are treated as 0",
         ),
         _review_or_pass(
             "LG-14",
@@ -254,7 +254,7 @@ def evaluate_lgd(
             "Collateral EIR valid",
             _lines(ex, DS_COLLATERAL, "Exposure EIR used"),
             "Every EIR is a decimal between 0 and 1.",
-            "Missing or out-of-range EIR: the Exposure EIR is used",
+            "Missing or out of range EIR: the Exposure EIR is used",
         ),
     ]
     if not provisional:
@@ -379,7 +379,7 @@ def evaluate_ead(
             "Every SEGMENT has a PD curve",
             "structural",
             "block" if no_curve else "pass",
-            f"No PD history for: {', '.join(no_curve)}. Add these segments to the PD files and re-validate PD."
+            f"No PD history for: {', '.join(no_curve)}. Add these segments to the PD files and revalidate PD."
             if no_curve
             else f"{_plural(len(loan_segments), 'segment')} matched to the PD curve.",
         )
@@ -469,13 +469,13 @@ def evaluate_ead(
     business.append(
         _criterion(
             "EA-15",
-            "Matured and zero-rate loans",
+            "Matured and zero rate loans",
             "info",
             "info",
             f"{_plural(len(single), 'loan')} treated as a single row on the Outstanding Amount "
             f"(keeping their own stage for PD): {_sample(single[LOAN_ID].tolist())}."
             if len(single)
-            else "No matured or zero-rate loans.",
+            else "No matured or zero rate loans.",
         )
     )
     beyond = rows.loc[rows["PD Rule"] == R_LAST_MONTH, LOAN_ID].unique().tolist()
@@ -488,7 +488,7 @@ def evaluate_ead(
             f"{_plural(len(beyond), 'loan')} run past the end of the PD curve and use the last available "
             f"Month: {_sample(beyond)}."
             if beyond
-            else "Every PD-bearing row falls inside the PD curve.",
+            else "Every PD bearing row falls inside the PD curve.",
         )
     )
 
