@@ -49,9 +49,7 @@ async def batch_create_collateral_types_endpoint(
     return CollateralTypeListResponse(data=data)
 
 
-@router.patch(
-    "/{tenant_id}/collateral-types/{collateral_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.patch("/{tenant_id}/collateral-types/{collateral_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_collateral_type_endpoint(
     tenant_id: str,
     collateral_id: str,
@@ -63,9 +61,7 @@ async def update_collateral_type_endpoint(
     await service.update_collateral_type(db, tenant_id, collateral_id, body)
 
 
-@router.delete(
-    "/{tenant_id}/collateral-types/{collateral_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/{tenant_id}/collateral-types/{collateral_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_collateral_type_endpoint(
     tenant_id: str,
     collateral_id: str,
