@@ -93,8 +93,15 @@ async def members(db: AsyncSession, tenant_id: str) -> list[dict[str, Any]]:
     out = []
     for r in rows:
         role = "administrator" if r.workspace_role in ("owner", "admin") else LEASES_MAP.get(r.lr or "", "viewer")
-        out.append({"id": r.id, "name": r.name, "initials": "".join(w[0] for w in r.name.split()[:2]).upper() or "U",
-                    "role": role, "title": titles.get(role, role)})
+        out.append(
+            {
+                "id": r.id,
+                "name": r.name,
+                "initials": "".join(w[0] for w in r.name.split()[:2]).upper() or "U",
+                "role": role,
+                "title": titles.get(role, role),
+            }
+        )
     return out
 
 
@@ -124,9 +131,7 @@ async def audit(
     )
 
 
-async def notify(
-    db: AsyncSession, tenant_id: str, to: str | list[str], title: str, body: str, href: str
-) -> None:
+async def notify(db: AsyncSession, tenant_id: str, to: str | list[str], title: str, body: str, href: str) -> None:
     """to: a user id, a list of ids, '*' (all members) or '*reviewer' (reviewers + admins)."""
     if isinstance(to, str) and to.startswith("*"):
         ms = await members(db, tenant_id)
@@ -134,22 +139,27 @@ async def notify(
     else:
         ids = [to] if isinstance(to, str) else to
     if ids:
-        await publish_notice(db, tenant_id=tenant_id, user_ids=ids, event="approvals", kind="leases", title=title,
-                             body=body, href=href, action="Open")
+        await publish_notice(
+            db,
+            tenant_id=tenant_id,
+            user_ids=ids,
+            event="approvals",
+            kind="leases",
+            title=title,
+            body=body,
+            href=href,
+            action="Open",
+        )
 
 
 # ─── Setup lookups ─────────────────────────────────────────────────────────
 
 
 async def entity_of(db: AsyncSession, tenant_id: str) -> LeaseEntity | None:
-    return (
-        await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == tenant_id))
-    ).scalar_one_or_none()
+    return (await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == tenant_id))).scalar_one_or_none()
 
 
-async def setup_versions(
-    db: AsyncSession, tenant_id: str, kind: str | None = None
-) -> list[LeaseSetupVersion]:
+async def setup_versions(db: AsyncSession, tenant_id: str, kind: str | None = None) -> list[LeaseSetupVersion]:
     q = select(LeaseSetupVersion).where(LeaseSetupVersion.tenant_id == tenant_id)
     if kind:
         q = q.where(LeaseSetupVersion.kind == kind)
@@ -167,9 +177,7 @@ def in_force(versions: list[LeaseSetupVersion], on: str | None = None) -> LeaseS
 async def setup_status(db: AsyncSession, tenant_id: str) -> dict[str, bool]:
     vs = await setup_versions(db, tenant_id)
     has = lambda k: any(v.kind == k and v.status == "approved" for v in vs)  # noqa: E731
-    periods = (
-        await db.execute(select(LeasePeriod.id).where(LeasePeriod.tenant_id == tenant_id).limit(1))
-    ).first()
+    periods = (await db.execute(select(LeasePeriod.id).where(LeasePeriod.tenant_id == tenant_id).limit(1))).first()
     return {
         "entity": (await entity_of(db, tenant_id)) is not None,
         "periods": periods is not None,
@@ -211,9 +219,9 @@ def curve_rate(curve: LeaseSetupVersion | None, currency: str, term_years: float
     a, b = pts[i - 1], pts[i]
     w = Decimal(str(term_years - a["termYears"])) / Decimal(str(b["termYears"] - a["termYears"]))
     return str(
-        (
-            Decimal(str(a["rate"])) + (Decimal(str(b["rate"])) - Decimal(str(a["rate"]))) * w
-        ).quantize(Decimal("0.000001"))
+        (Decimal(str(a["rate"])) + (Decimal(str(b["rate"])) - Decimal(str(a["rate"]))) * w).quantize(
+            Decimal("0.000001")
+        )
     )
 
 
@@ -236,9 +244,7 @@ async def locked_keys(db: AsyncSession, tenant_id: str) -> set[str]:
     return set(
         (
             await db.execute(
-                select(LeasePeriod.key).where(
-                    LeasePeriod.tenant_id == tenant_id, LeasePeriod.status == "locked"
-                )
+                select(LeasePeriod.key).where(LeasePeriod.tenant_id == tenant_id, LeasePeriod.status == "locked")
             )
         ).scalars()
     )
@@ -261,9 +267,7 @@ def segment_inputs(versions: list[LeaseVersion]) -> list[dict[str, Any]]:
                 "rate": (v.rate or {}).get("value") or "0",
                 "event": "initial" if i == 0 else v.event,
                 "scopeDecrease": str(v.scope_decrease) if v.scope_decrease is not None else None,
-                "terminationPenalty": str(v.termination_penalty)
-                if v.termination_penalty is not None
-                else None,
+                "terminationPenalty": str(v.termination_penalty) if v.termination_penalty is not None else None,
             }
         )
     return out
@@ -273,9 +277,7 @@ def checksum(obj: Any) -> str:
     return hashlib.sha256(json.dumps(obj, sort_keys=True, default=str).encode()).hexdigest()
 
 
-async def write_books(
-    db: AsyncSession, lease: Lease, chain: list[LeaseVersion], dc: str
-) -> LeaseBooks:
+async def write_books(db: AsyncSession, lease: Lease, chain: list[LeaseVersion], dc: str) -> LeaseBooks:
     """(Re)compute and store the approved chain's schedule + journals. Called on every approval."""
     inputs = segment_inputs(chain)
     cks = checksum({"inputs": inputs, "dayCount": dc, "engine": ENGINE_VERSION})
@@ -347,9 +349,7 @@ def ser_doc(d: LeaseDocument) -> dict[str, Any]:
     }
 
 
-def ser_lease(
-    lease: Lease, versions: list[LeaseVersion], docs: list[LeaseDocument]
-) -> dict[str, Any]:
+def ser_lease(lease: Lease, versions: list[LeaseVersion], docs: list[LeaseDocument]) -> dict[str, Any]:
     return {
         "id": lease.id,
         "code": lease.code,
