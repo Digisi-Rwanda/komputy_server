@@ -1,0 +1,9485 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "Ledgerline Engine",
+  "version": "1.0.0"
+ },
+ "paths": {
+  "/api/v1/tenants/{tenant_id}/runs": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Create Run Endpoint",
+    "operationId": "create_run_endpoint_api_v1_tenants__tenant_id__runs_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CreateRunRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "List Runs Endpoint",
+    "operationId": "list_runs_endpoint_api_v1_tenants__tenant_id__runs_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "default": 1,
+       "title": "Page"
+      }
+     },
+     {
+      "name": "per_page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 200,
+       "minimum": 1,
+       "default": 50,
+       "title": "Per Page"
+      }
+     },
+     {
+      "name": "status",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     },
+     {
+      "name": "search",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Search"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunListResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}": {
+   "patch": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Update Run Endpoint",
+    "operationId": "update_run_endpoint_api_v1_tenants__tenant_id__runs__run_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UpdateRunRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Get Run Endpoint",
+    "operationId": "get_run_endpoint_api_v1_tenants__tenant_id__runs__run_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "view",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "default": "full",
+       "title": "View"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Delete Run Endpoint",
+    "operationId": "delete_run_endpoint_api_v1_tenants__tenant_id__runs__run_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/uploads": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Upload File Endpoint",
+    "operationId": "upload_file_endpoint_api_v1_tenants__tenant_id__runs__run_id__uploads_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_upload_file_endpoint_api_v1_tenants__tenant_id__runs__run_id__uploads_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UploadResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/uploads/direct": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Start Direct Upload Endpoint",
+    "description": "Browser uploads straight to object storage in parallel parts; nothing streams through the API.",
+    "operationId": "start_direct_upload_endpoint_api_v1_tenants__tenant_id__runs__run_id__uploads_direct_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DirectUploadStart"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Start Direct Upload Endpoint Api V1 Tenants  Tenant Id  Runs  Run Id  Uploads Direct Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/uploads/direct/complete": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Complete Direct Upload Endpoint",
+    "operationId": "complete_direct_upload_endpoint_api_v1_tenants__tenant_id__runs__run_id__uploads_direct_complete_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DirectUploadComplete"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UploadResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/uploads/{upload_id}": {
+   "delete": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Delete Upload Endpoint",
+    "operationId": "delete_upload_endpoint_api_v1_tenants__tenant_id__runs__run_id__uploads__upload_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "upload_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Upload Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/validate": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Validate Files Endpoint",
+    "operationId": "validate_files_endpoint_api_v1_tenants__tenant_id__runs__run_id__validate_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "scope",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Scope"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ValidateRunRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/validation-jobs/{job_id}": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Validation Job Endpoint",
+    "operationId": "validation_job_endpoint_api_v1_tenants__tenant_id__runs__run_id__validation_jobs__job_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "job_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Job Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/validation/{kind}/accept": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Accept Review Endpoint",
+    "operationId": "accept_review_endpoint_api_v1_tenants__tenant_id__runs__run_id__validation__kind__accept_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AcceptReviewResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/ecl/preview-export": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Ecl Preview Export Endpoint",
+    "operationId": "ecl_preview_export_endpoint_api_v1_tenants__tenant_id__runs__run_id__ecl_preview_export_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/execute": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Execute Run Endpoint",
+    "operationId": "execute_run_endpoint_api_v1_tenants__tenant_id__runs__run_id__execute_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExecuteRunResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/rerun": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Rerun Run Endpoint",
+    "operationId": "rerun_run_endpoint_api_v1_tenants__tenant_id__runs__run_id__rerun_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/RerunRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RunResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/inputs/bundle": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Download Inputs Bundle Endpoint",
+    "operationId": "download_inputs_bundle_endpoint_api_v1_tenants__tenant_id__runs__run_id__inputs_bundle_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/inputs/{kind}/file": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Download Input File Endpoint",
+    "operationId": "download_input_file_endpoint_api_v1_tenants__tenant_id__runs__run_id__inputs__kind__file_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/downloads/bundle": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Download Workbooks Bundle Endpoint",
+    "operationId": "download_workbooks_bundle_endpoint_api_v1_tenants__tenant_id__runs__run_id__downloads_bundle_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/pd/export": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Pd Export Endpoint",
+    "operationId": "pd_export_endpoint_api_v1_tenants__tenant_id__runs__run_id__pd_export_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/downloads/{kind}/file": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Download Artifact File Endpoint",
+    "operationId": "download_artifact_file_endpoint_api_v1_tenants__tenant_id__runs__run_id__downloads__kind__file_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/downloads/{kind}": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Download Artifact Endpoint",
+    "operationId": "download_artifact_endpoint_api_v1_tenants__tenant_id__runs__run_id__downloads__kind__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PresignedDownloadResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/templates/{kind}": {
+   "get": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Get Template Endpoint",
+    "operationId": "get_template_endpoint_api_v1_tenants__tenant_id__templates__kind__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/review": {
+   "get": {
+    "tags": [
+     "review"
+    ],
+    "summary": "Get Review",
+    "operationId": "get_review_api_v1_tenants__tenant_id__runs__run_id__review_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Get Review Api V1 Tenants  Tenant Id  Runs  Run Id  Review Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/review/comment": {
+   "post": {
+    "tags": [
+     "review"
+    ],
+    "summary": "Comment",
+    "operationId": "comment_api_v1_tenants__tenant_id__runs__run_id__review_comment_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReturnDecision"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Comment Api V1 Tenants  Tenant Id  Runs  Run Id  Review Comment Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/review/return": {
+   "post": {
+    "tags": [
+     "review"
+    ],
+    "summary": "Return Run",
+    "operationId": "return_run_api_v1_tenants__tenant_id__runs__run_id__review_return_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ReturnDecision"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Return Run Api V1 Tenants  Tenant Id  Runs  Run Id  Review Return Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/review/resubmit": {
+   "post": {
+    "tags": [
+     "review"
+    ],
+    "summary": "Resubmit",
+    "operationId": "resubmit_api_v1_tenants__tenant_id__runs__run_id__review_resubmit_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Decision"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Resubmit Api V1 Tenants  Tenant Id  Runs  Run Id  Review Resubmit Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/review/sign-off": {
+   "post": {
+    "tags": [
+     "review"
+    ],
+    "summary": "Sign Off",
+    "operationId": "sign_off_api_v1_tenants__tenant_id__runs__run_id__review_sign_off_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Decision"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Sign Off Api V1 Tenants  Tenant Id  Runs  Run Id  Review Sign Off Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/runs": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Runs View",
+    "operationId": "runs_view_api_v1_tenants__tenant_id__ecl_views_runs_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Runs View Api V1 Tenants  Tenant Id  Ecl Views Runs Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/runs/{run_id}": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Run View",
+    "operationId": "run_view_api_v1_tenants__tenant_id__ecl_views_runs__run_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Run View Api V1 Tenants  Tenant Id  Ecl Views Runs  Run Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/runs/{run_id}/loans": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Run Loans",
+    "description": "Loan-level results, keyset-paginated by loan id (stable across millions of rows; no OFFSET scans).",
+    "operationId": "run_loans_api_v1_tenants__tenant_id__ecl_views_runs__run_id__loans_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "segment",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Segment"
+      }
+     },
+     {
+      "name": "stage",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Stage"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "name": "after",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "After"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 100,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Run Loans Api V1 Tenants  Tenant Id  Ecl Views Runs  Run Id  Loans Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/runs/{run_id}/exceptions": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Run Exceptions",
+    "operationId": "run_exceptions_api_v1_tenants__tenant_id__ecl_views_runs__run_id__exceptions_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 1000,
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Run Exceptions Api V1 Tenants  Tenant Id  Ecl Views Runs  Run Id  Exceptions Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/runs/{run_id}/audit": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Run Audit",
+    "operationId": "run_audit_api_v1_tenants__tenant_id__ecl_views_runs__run_id__audit_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Run Audit Api V1 Tenants  Tenant Id  Ecl Views Runs  Run Id  Audit Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/runs/{run_id}/explore": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Explore",
+    "description": "Portfolio / segment drill-down: top loans by ECL, ECL by loan size, stage split and cure/LGD stats.",
+    "operationId": "explore_api_v1_tenants__tenant_id__ecl_views_runs__run_id__explore_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "segment",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Segment"
+      }
+     },
+     {
+      "name": "top",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "default": 10,
+       "title": "Top"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Explore Api V1 Tenants  Tenant Id  Ecl Views Runs  Run Id  Explore Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/runs/{run_id}/loans/{loan_id}": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Loan Detail",
+    "description": "One loan: summary, collateral, and the month-by-month schedule whose discounted losses sum to its ECL.",
+    "operationId": "loan_detail_api_v1_tenants__tenant_id__ecl_views_runs__run_id__loans__loan_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "loan_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Loan Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Loan Detail Api V1 Tenants  Tenant Id  Ecl Views Runs  Run Id  Loans  Loan Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/views/compare": {
+   "get": {
+    "tags": [
+     "views"
+    ],
+    "summary": "Compare",
+    "description": "Run A \u2192 run B, loan by loan. The movement steps tie exactly: opening + new \u2212 derecognised + transfers +\nremeasurement = closing (every loan is in exactly one bucket).",
+    "operationId": "compare_api_v1_tenants__tenant_id__ecl_views_compare_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "a",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "A"
+      }
+     },
+     {
+      "name": "b",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "B"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Compare Api V1 Tenants  Tenant Id  Ecl Views Compare Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/thresholds": {
+   "get": {
+    "tags": [
+     "setup"
+    ],
+    "summary": "Get Thresholds",
+    "operationId": "get_thresholds_api_v1_tenants__tenant_id__ecl_thresholds_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Get Thresholds Api V1 Tenants  Tenant Id  Ecl Thresholds Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "put": {
+    "tags": [
+     "setup"
+    ],
+    "summary": "Put Thresholds",
+    "operationId": "put_thresholds_api_v1_tenants__tenant_id__ecl_thresholds_put",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ThresholdsIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Put Thresholds Api V1 Tenants  Tenant Id  Ecl Thresholds Put"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/sample-run": {
+   "post": {
+    "tags": [
+     "runs"
+    ],
+    "summary": "Sample Run",
+    "operationId": "sample_run_api_v1_tenants__tenant_id__ecl_sample_run_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Sample Run Api V1 Tenants  Tenant Id  Ecl Sample Run Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/ecl/runs/{run_id}/reports/{kind}": {
+   "get": {
+    "tags": [
+     "reports"
+    ],
+    "summary": "Report",
+    "operationId": "report_api_v1_tenants__tenant_id__ecl_runs__run_id__reports__kind__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     },
+     {
+      "name": "fmt",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string",
+       "pattern": "^(xlsx|csv)$",
+       "default": "xlsx",
+       "title": "Fmt"
+      }
+     },
+     {
+      "name": "compare",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Compare"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/dashboard": {
+   "get": {
+    "tags": [
+     "results"
+    ],
+    "summary": "Get Dashboard Endpoint",
+    "operationId": "get_dashboard_endpoint_api_v1_tenants__tenant_id__dashboard_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DashboardResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/results": {
+   "get": {
+    "tags": [
+     "results"
+    ],
+    "summary": "Get Portfolio Endpoint",
+    "operationId": "get_portfolio_endpoint_api_v1_tenants__tenant_id__results_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "stage",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "description": "Repeat for several: 'Stage 1', 'Stage 2', 'Stage 3'",
+       "title": "Stage"
+      },
+      "description": "Repeat for several: 'Stage 1', 'Stage 2', 'Stage 3'"
+     },
+     {
+      "name": "min_ecl",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number",
+         "minimum": 0
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Min Ecl"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 100
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "description": "Loan or customer ID contains",
+       "title": "Q"
+      },
+      "description": "Loan or customer ID contains"
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/PortfolioResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/results/segments/{segment_name}": {
+   "get": {
+    "tags": [
+     "results"
+    ],
+    "summary": "Get Segment Endpoint",
+    "operationId": "get_segment_endpoint_api_v1_tenants__tenant_id__results_segments__segment_name__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "segment_name",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Segment Name"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "stage",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "array",
+         "items": {
+          "type": "string"
+         }
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "description": "Repeat for several: 'Stage 1', 'Stage 2', 'Stage 3'",
+       "title": "Stage"
+      },
+      "description": "Repeat for several: 'Stage 1', 'Stage 2', 'Stage 3'"
+     },
+     {
+      "name": "min_ecl",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number",
+         "minimum": 0
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Min Ecl"
+      }
+     },
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "maxLength": 100
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "description": "Loan or customer ID contains",
+       "title": "Q"
+      },
+      "description": "Loan or customer ID contains"
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "default": 1,
+       "title": "Page"
+      }
+     },
+     {
+      "name": "per_page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 200,
+       "minimum": 1,
+       "default": 50,
+       "title": "Per Page"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ledgerline__apps__results__schemas__SegmentResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/results/loans/{loan_id}": {
+   "get": {
+    "tags": [
+     "results"
+    ],
+    "summary": "Get Loan Endpoint",
+    "operationId": "get_loan_endpoint_api_v1_tenants__tenant_id__results_loans__loan_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "loan_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Loan Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/LoanResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/ecl-report": {
+   "get": {
+    "tags": [
+     "results"
+    ],
+    "summary": "Get Ecl Report Endpoint",
+    "operationId": "get_ecl_report_endpoint_api_v1_tenants__tenant_id__runs__run_id__ecl_report_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/EclReportResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/runs/{run_id}/exceptions": {
+   "get": {
+    "tags": [
+     "results"
+    ],
+    "summary": "List Run Exceptions Endpoint",
+    "operationId": "list_run_exceptions_endpoint_api_v1_tenants__tenant_id__runs__run_id__exceptions_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "run_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Run Id"
+      }
+     },
+     {
+      "name": "category",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Category"
+      }
+     },
+     {
+      "name": "page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "default": 1,
+       "title": "Page"
+      }
+     },
+     {
+      "name": "per_page",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 200,
+       "minimum": 1,
+       "default": 50,
+       "title": "Per Page"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExceptionsPageResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/segments": {
+   "get": {
+    "tags": [
+     "segments"
+    ],
+    "summary": "List Segments Endpoint",
+    "operationId": "list_segments_endpoint_api_v1_tenants__tenant_id__segments_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SegmentListResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "segments"
+    ],
+    "summary": "Create Segment Endpoint",
+    "operationId": "create_segment_endpoint_api_v1_tenants__tenant_id__segments_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CreateSegmentRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ledgerline__apps__segments__schemas__SegmentResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/segments/batch": {
+   "post": {
+    "tags": [
+     "segments"
+    ],
+    "summary": "Batch Create Segments Endpoint",
+    "operationId": "batch_create_segments_endpoint_api_v1_tenants__tenant_id__segments_batch_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BatchCreateSegmentsRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SegmentListResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/segments/{segment_id}": {
+   "patch": {
+    "tags": [
+     "segments"
+    ],
+    "summary": "Update Segment Endpoint",
+    "operationId": "update_segment_endpoint_api_v1_tenants__tenant_id__segments__segment_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "segment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Segment Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UpdateSegmentRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "segments"
+    ],
+    "summary": "Delete Segment Endpoint",
+    "operationId": "delete_segment_endpoint_api_v1_tenants__tenant_id__segments__segment_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "segment_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Segment Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/collateral-types": {
+   "get": {
+    "tags": [
+     "collateral"
+    ],
+    "summary": "List Collateral Types Endpoint",
+    "operationId": "list_collateral_types_endpoint_api_v1_tenants__tenant_id__collateral_types_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CollateralTypeListResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "collateral"
+    ],
+    "summary": "Create Collateral Type Endpoint",
+    "operationId": "create_collateral_type_endpoint_api_v1_tenants__tenant_id__collateral_types_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CreateCollateralTypeRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CollateralTypeResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/collateral-types/batch": {
+   "post": {
+    "tags": [
+     "collateral"
+    ],
+    "summary": "Batch Create Collateral Types Endpoint",
+    "operationId": "batch_create_collateral_types_endpoint_api_v1_tenants__tenant_id__collateral_types_batch_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BatchCreateCollateralTypesRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CollateralTypeListResponse"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/collateral-types/{collateral_id}": {
+   "patch": {
+    "tags": [
+     "collateral"
+    ],
+    "summary": "Update Collateral Type Endpoint",
+    "operationId": "update_collateral_type_endpoint_api_v1_tenants__tenant_id__collateral_types__collateral_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "collateral_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Collateral Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UpdateCollateralTypeRequest"
+       }
+      }
+     }
+    },
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "delete": {
+    "tags": [
+     "collateral"
+    ],
+    "summary": "Delete Collateral Type Endpoint",
+    "operationId": "delete_collateral_type_endpoint_api_v1_tenants__tenant_id__collateral_types__collateral_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "collateral_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Collateral Id"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/views/portfolio": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Portfolio",
+    "operationId": "portfolio_api_v1_tenants__tenant_id__leases_views_portfolio_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string",
+         "pattern": "^\\d{4}-\\d{2}$"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Period"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Portfolio Api V1 Tenants  Tenant Id  Leases Views Portfolio Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/views/lease/{lease_id}": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Lease View",
+    "description": "One lease for the detail page: contract, versions, documents, the approved schedule (monthly + annual by FY)\nand its journals, all from the stored books.",
+    "operationId": "lease_view_api_v1_tenants__tenant_id__leases_views_lease__lease_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Lease View Api V1 Tenants  Tenant Id  Leases Views Lease  Lease Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/state": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "State",
+    "operationId": "state_api_v1_tenants__tenant_id__leases_state_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response State Api V1 Tenants  Tenant Id  Leases State Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/entity": {
+   "put": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Put Entity",
+    "operationId": "put_entity_api_v1_tenants__tenant_id__leases_entity_put",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Put Entity Api V1 Tenants  Tenant Id  Leases Entity Put"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/periods": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Post Period",
+    "operationId": "post_period_api_v1_tenants__tenant_id__leases_periods_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Post Period Api V1 Tenants  Tenant Id  Leases Periods Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/setup/{kind}": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Post Setup",
+    "operationId": "post_setup_api_v1_tenants__tenant_id__leases_setup__kind__post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Post Setup Api V1 Tenants  Tenant Id  Leases Setup  Kind  Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/setup/{kind}/{version}/decision": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Decide Setup",
+    "operationId": "decide_setup_api_v1_tenants__tenant_id__leases_setup__kind___version__decision_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "kind",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Kind"
+      }
+     },
+     {
+      "name": "version",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Version"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Decide Setup Api V1 Tenants  Tenant Id  Leases Setup  Kind   Version  Decision Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/counterparties": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Post Counterparty",
+    "operationId": "post_counterparty_api_v1_tenants__tenant_id__leases_counterparties_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Post Counterparty Api V1 Tenants  Tenant Id  Leases Counterparties Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Create Lease",
+    "operationId": "create_lease_api_v1_tenants__tenant_id__leases_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Create Lease Api V1 Tenants  Tenant Id  Leases Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Get Lease",
+    "operationId": "get_lease_api_v1_tenants__tenant_id__leases__lease_id__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Get Lease Api V1 Tenants  Tenant Id  Leases  Lease Id  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "patch": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Patch Lease",
+    "operationId": "patch_lease_api_v1_tenants__tenant_id__leases__lease_id__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Patch Lease Api V1 Tenants  Tenant Id  Leases  Lease Id  Patch"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/calculate": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Calculate",
+    "operationId": "calculate_api_v1_tenants__tenant_id__leases__lease_id__calculate_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Calculate Api V1 Tenants  Tenant Id  Leases  Lease Id  Calculate Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/submit": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Submit",
+    "operationId": "submit_api_v1_tenants__tenant_id__leases__lease_id__submit_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Submit Api V1 Tenants  Tenant Id  Leases  Lease Id  Submit Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/withdraw": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Withdraw",
+    "operationId": "withdraw_api_v1_tenants__tenant_id__leases__lease_id__withdraw_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Withdraw Api V1 Tenants  Tenant Id  Leases  Lease Id  Withdraw Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/decision": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Decision",
+    "operationId": "decision_api_v1_tenants__tenant_id__leases__lease_id__decision_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Decision Api V1 Tenants  Tenant Id  Leases  Lease Id  Decision Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/draft": {
+   "delete": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Discard",
+    "operationId": "discard_api_v1_tenants__tenant_id__leases__lease_id__draft_delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Discard Api V1 Tenants  Tenant Id  Leases  Lease Id  Draft Delete"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/duplicates": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Duplicates",
+    "operationId": "duplicates_api_v1_tenants__tenant_id__leases__lease_id__duplicates_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Duplicates Api V1 Tenants  Tenant Id  Leases  Lease Id  Duplicates Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/events/preview": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Event Preview",
+    "operationId": "event_preview_api_v1_tenants__tenant_id__leases__lease_id__events_preview_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Event Preview Api V1 Tenants  Tenant Id  Leases  Lease Id  Events Preview Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/events": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Event",
+    "description": "Create the event version, then submit it to the chosen reviewer (one transaction).",
+    "operationId": "event_api_v1_tenants__tenant_id__leases__lease_id__events_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Event Api V1 Tenants  Tenant Id  Leases  Lease Id  Events Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/rate": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Suggested Rate",
+    "operationId": "suggested_rate_api_v1_tenants__tenant_id__leases__lease_id__rate_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     },
+     {
+      "name": "start",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Start"
+      }
+     },
+     {
+      "name": "end",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "End"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Suggested Rate Api V1 Tenants  Tenant Id  Leases  Lease Id  Rate Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/documents": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Upload Doc",
+    "operationId": "upload_doc_api_v1_tenants__tenant_id__leases__lease_id__documents_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_upload_doc_api_v1_tenants__tenant_id__leases__lease_id__documents_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Upload Doc Api V1 Tenants  Tenant Id  Leases  Lease Id  Documents Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/documents/{doc_id}/url": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Doc Url",
+    "operationId": "doc_url_api_v1_tenants__tenant_id__leases__lease_id__documents__doc_id__url_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     },
+     {
+      "name": "doc_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Doc Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Doc Url Api V1 Tenants  Tenant Id  Leases  Lease Id  Documents  Doc Id  Url Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/{lease_id}/documents/{doc_id}": {
+   "delete": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Delete Doc",
+    "operationId": "delete_doc_api_v1_tenants__tenant_id__leases__lease_id__documents__doc_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "lease_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Lease Id"
+      }
+     },
+     {
+      "name": "doc_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Doc Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Delete Doc Api V1 Tenants  Tenant Id  Leases  Lease Id  Documents  Doc Id  Delete"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/close/{period}/start": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Close Start",
+    "operationId": "close_start_api_v1_tenants__tenant_id__leases_close__period__start_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close Start Api V1 Tenants  Tenant Id  Leases Close  Period  Start Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/close/{period}/issues": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Close Issues",
+    "operationId": "close_issues_api_v1_tenants__tenant_id__leases_close__period__issues_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close Issues Api V1 Tenants  Tenant Id  Leases Close  Period  Issues Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/close/{period}/steps/{step}/complete": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Close Step",
+    "operationId": "close_step_api_v1_tenants__tenant_id__leases_close__period__steps__step__complete_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     },
+     {
+      "name": "step",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Step"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close Step Api V1 Tenants  Tenant Id  Leases Close  Period  Steps  Step  Complete Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/close/{period}/generate": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Close Generate",
+    "operationId": "close_generate_api_v1_tenants__tenant_id__leases_close__period__generate_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close Generate Api V1 Tenants  Tenant Id  Leases Close  Period  Generate Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/close/{period}/payments": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Close Payments",
+    "operationId": "close_payments_api_v1_tenants__tenant_id__leases_close__period__payments_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_close_payments_api_v1_tenants__tenant_id__leases_close__period__payments_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close Payments Api V1 Tenants  Tenant Id  Leases Close  Period  Payments Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/close/{period}/payments/confirm-scheduled": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Close Confirm Scheduled",
+    "description": "For workspaces without an AP feed: confirm every still-open scheduled payment was paid as scheduled.",
+    "operationId": "close_confirm_scheduled_api_v1_tenants__tenant_id__leases_close__period__payments_confirm_scheduled_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close Confirm Scheduled Api V1 Tenants  Tenant Id  Leases Close  Period  Payments Confirm Scheduled Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/close/{period}/payments/{pid}": {
+   "patch": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Close Resolve",
+    "operationId": "close_resolve_api_v1_tenants__tenant_id__leases_close__period__payments__pid__patch",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     },
+     {
+      "name": "pid",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Pid"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Close Resolve Api V1 Tenants  Tenant Id  Leases Close  Period  Payments  Pid  Patch"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/periods/{period}/lock": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Lock",
+    "operationId": "lock_api_v1_tenants__tenant_id__leases_periods__period__lock_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Lock Api V1 Tenants  Tenant Id  Leases Periods  Period  Lock Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/periods/{period}/reopen": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Reopen",
+    "operationId": "reopen_api_v1_tenants__tenant_id__leases_periods__period__reopen_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "period",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Period"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Reopen Api V1 Tenants  Tenant Id  Leases Periods  Period  Reopen Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/batches/{code}/export": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Batch Export",
+    "operationId": "batch_export_api_v1_tenants__tenant_id__leases_batches__code__export_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Code"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/batches/{code}/post": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Batch Post",
+    "operationId": "batch_post_api_v1_tenants__tenant_id__leases_batches__code__post_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Code"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Batch Post Api V1 Tenants  Tenant Id  Leases Batches  Code  Post Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/imports/template.csv": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Import Template",
+    "operationId": "import_template_api_v1_tenants__tenant_id__leases_imports_template_csv_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/imports": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Import Upload",
+    "operationId": "import_upload_api_v1_tenants__tenant_id__leases_imports_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "multipart/form-data": {
+       "schema": {
+        "$ref": "#/components/schemas/Body_import_upload_api_v1_tenants__tenant_id__leases_imports_post"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Import Upload Api V1 Tenants  Tenant Id  Leases Imports Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/imports/{code}": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Import Get",
+    "operationId": "import_get_api_v1_tenants__tenant_id__leases_imports__code__get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Code"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Import Get Api V1 Tenants  Tenant Id  Leases Imports  Code  Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/imports/{code}/errors.csv": {
+   "get": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Import Errors",
+    "operationId": "import_errors_api_v1_tenants__tenant_id__leases_imports__code__errors_csv_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Code"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/imports/{code}/mapping": {
+   "put": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Import Mapping",
+    "operationId": "import_mapping_api_v1_tenants__tenant_id__leases_imports__code__mapping_put",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Code"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Import Mapping Api V1 Tenants  Tenant Id  Leases Imports  Code  Mapping Put"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/imports/{code}/{action}": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Import Action",
+    "operationId": "import_action_api_v1_tenants__tenant_id__leases_imports__code___action__post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "code",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Code"
+      }
+     },
+     {
+      "name": "action",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Action"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Import Action Api V1 Tenants  Tenant Id  Leases Imports  Code   Action  Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/views": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Save View",
+    "operationId": "save_view_api_v1_tenants__tenant_id__leases_views_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Save View Api V1 Tenants  Tenant Id  Leases Views Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/views/{view_id}": {
+   "delete": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Delete View",
+    "operationId": "delete_view_api_v1_tenants__tenant_id__leases_views__view_id__delete",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "view_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "View Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Delete View Api V1 Tenants  Tenant Id  Leases Views  View Id  Delete"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/leases/notifications/read": {
+   "post": {
+    "tags": [
+     "leases"
+    ],
+    "summary": "Notifications Read",
+    "operationId": "notifications_read_api_v1_tenants__tenant_id__leases_notifications_read_post",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "type": "object",
+        "additionalProperties": true,
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Notifications Read Api V1 Tenants  Tenant Id  Leases Notifications Read Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/platform/engine-versions": {
+   "get": {
+    "tags": [
+     "platform"
+    ],
+    "summary": "List Versions",
+    "operationId": "list_versions_api_v1_platform_engine_versions_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response List Versions Api V1 Platform Engine Versions Get"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/v1/platform/engine-versions/promote": {
+   "post": {
+    "tags": [
+     "platform"
+    ],
+    "summary": "Promote",
+    "operationId": "promote_api_v1_platform_engine_versions_promote_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/Promote"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": true,
+         "type": "object",
+         "title": "Response Promote Api V1 Platform Engine Versions Promote Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ]
+   }
+  },
+  "/api/v1/tenants/{tenant_id}/usage": {
+   "get": {
+    "tags": [
+     "platform"
+    ],
+    "summary": "Usage",
+    "description": "Quota meters for the web app: ECL runs this month, loans in the latest run, active leases.",
+    "operationId": "usage_api_v1_tenants__tenant_id__usage_get",
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Usage Api V1 Tenants  Tenant Id  Usage Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/v1/ops/tenants/{tenant_id}/purge": {
+   "post": {
+    "tags": [
+     "platform"
+    ],
+    "summary": "Purge",
+    "description": "Called by the web app after a closed workspace's 30-day window: delete every engine row + stored file.",
+    "operationId": "purge_api_v1_ops_tenants__tenant_id__purge_post",
+    "parameters": [
+     {
+      "name": "tenant_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "title": "Tenant Id"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "202": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "additionalProperties": true,
+         "title": "Response Purge Api V1 Ops Tenants  Tenant Id  Purge Post"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "AcceptReviewOut": {
+    "properties": {
+     "kind": {
+      "type": "string",
+      "enum": [
+       "PD",
+       "LGD",
+       "EAD"
+      ],
+      "title": "Kind"
+     },
+     "accepted": {
+      "type": "integer",
+      "title": "Accepted"
+     }
+    },
+    "type": "object",
+    "required": [
+     "kind",
+     "accepted"
+    ],
+    "title": "AcceptReviewOut"
+   },
+   "AcceptReviewResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/AcceptReviewOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "AcceptReviewResponse"
+   },
+   "ActiveRunOut": {
+    "properties": {
+     "runId": {
+      "type": "string",
+      "title": "Runid"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "progress": {
+      "type": "number",
+      "title": "Progress"
+     },
+     "stage": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Stage"
+     }
+    },
+    "type": "object",
+    "required": [
+     "runId",
+     "name",
+     "status",
+     "progress"
+    ],
+    "title": "ActiveRunOut"
+   },
+   "BatchCreateCollateralTypesRequest": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/CreateCollateralTypeRequest"
+      },
+      "type": "array",
+      "maxItems": 50,
+      "minItems": 1,
+      "title": "Items"
+     }
+    },
+    "type": "object",
+    "required": [
+     "items"
+    ],
+    "title": "BatchCreateCollateralTypesRequest"
+   },
+   "BatchCreateSegmentsRequest": {
+    "properties": {
+     "segments": {
+      "items": {
+       "$ref": "#/components/schemas/CreateSegmentRequest"
+      },
+      "type": "array",
+      "maxItems": 50,
+      "minItems": 1,
+      "title": "Segments"
+     }
+    },
+    "type": "object",
+    "required": [
+     "segments"
+    ],
+    "title": "BatchCreateSegmentsRequest"
+   },
+   "Body_close_payments_api_v1_tenants__tenant_id__leases_close__period__payments_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_close_payments_api_v1_tenants__tenant_id__leases_close__period__payments_post"
+   },
+   "Body_import_upload_api_v1_tenants__tenant_id__leases_imports_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_import_upload_api_v1_tenants__tenant_id__leases_imports_post"
+   },
+   "Body_upload_doc_api_v1_tenants__tenant_id__leases__lease_id__documents_post": {
+    "properties": {
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     }
+    },
+    "type": "object",
+    "required": [
+     "file"
+    ],
+    "title": "Body_upload_doc_api_v1_tenants__tenant_id__leases__lease_id__documents_post"
+   },
+   "Body_upload_file_endpoint_api_v1_tenants__tenant_id__runs__run_id__uploads_post": {
+    "properties": {
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "file": {
+      "type": "string",
+      "contentMediaType": "application/octet-stream",
+      "title": "File"
+     }
+    },
+    "type": "object",
+    "required": [
+     "kind",
+     "file"
+    ],
+    "title": "Body_upload_file_endpoint_api_v1_tenants__tenant_id__runs__run_id__uploads_post"
+   },
+   "CollateralTypeListResponse": {
+    "properties": {
+     "data": {
+      "items": {
+       "$ref": "#/components/schemas/CollateralTypeOut"
+      },
+      "type": "array",
+      "title": "Data"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "CollateralTypeListResponse"
+   },
+   "CollateralTypeOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "haircut": {
+      "type": "string",
+      "title": "Haircut"
+     },
+     "time_to_realize": {
+      "type": "integer",
+      "title": "Time To Realize"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "name",
+     "haircut",
+     "time_to_realize",
+     "created_at"
+    ],
+    "title": "CollateralTypeOut"
+   },
+   "CollateralTypeResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/CollateralTypeOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "CollateralTypeResponse"
+   },
+   "CreateCollateralTypeRequest": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 2,
+      "title": "Name"
+     },
+     "haircut": {
+      "anyOf": [
+       {
+        "type": "number",
+        "maximum": 100.0,
+        "minimum": 0.0
+       },
+       {
+        "type": "string"
+       }
+      ],
+      "title": "Haircut"
+     },
+     "time_to_realize": {
+      "type": "integer",
+      "minimum": 0.0,
+      "title": "Time To Realize"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "haircut",
+     "time_to_realize"
+    ],
+    "title": "CreateCollateralTypeRequest"
+   },
+   "CreateRunRequest": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Name"
+     },
+     "reporting_period": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 100
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reporting Period"
+     },
+     "reporting_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reporting Date"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "title": "CreateRunRequest"
+   },
+   "CreateSegmentRequest": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "maxLength": 100,
+      "minLength": 2,
+      "title": "Name"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 50
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name"
+    ],
+    "title": "CreateSegmentRequest"
+   },
+   "DashboardOut": {
+    "properties": {
+     "kpis": {
+      "items": {
+       "$ref": "#/components/schemas/KpiDashboardOut"
+      },
+      "type": "array",
+      "title": "Kpis"
+     },
+     "segments": {
+      "items": {
+       "$ref": "#/components/schemas/SegmentBarDashboardOut"
+      },
+      "type": "array",
+      "title": "Segments"
+     },
+     "stages": {
+      "items": {
+       "$ref": "#/components/schemas/StageSliceOut"
+      },
+      "type": "array",
+      "title": "Stages"
+     },
+     "trend": {
+      "items": {
+       "$ref": "#/components/schemas/TrendPointOut"
+      },
+      "type": "array",
+      "title": "Trend"
+     },
+     "runs": {
+      "items": {
+       "$ref": "#/components/schemas/RunSummaryOut"
+      },
+      "type": "array",
+      "title": "Runs"
+     },
+     "activeRun": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/ActiveRunOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     }
+    },
+    "type": "object",
+    "required": [
+     "kpis",
+     "segments",
+     "stages",
+     "trend",
+     "runs"
+    ],
+    "title": "DashboardOut"
+   },
+   "DashboardResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/DashboardOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "DashboardResponse"
+   },
+   "Decision": {
+    "properties": {
+     "comment": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 2000
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Comment"
+     }
+    },
+    "type": "object",
+    "title": "Decision"
+   },
+   "DirectUploadComplete": {
+    "properties": {
+     "kind": {
+      "type": "string",
+      "pattern": "^(PD|LGD|EAD|pd|lgd|ead)$",
+      "title": "Kind"
+     },
+     "filename": {
+      "type": "string",
+      "maxLength": 255,
+      "minLength": 1,
+      "title": "Filename"
+     },
+     "key": {
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Key"
+     },
+     "uploadId": {
+      "type": "string",
+      "maxLength": 1024,
+      "minLength": 1,
+      "title": "Uploadid"
+     },
+     "parts": {
+      "items": {
+       "$ref": "#/components/schemas/DirectUploadPart"
+      },
+      "type": "array",
+      "maxItems": 10000,
+      "minItems": 1,
+      "title": "Parts"
+     },
+     "contentType": {
+      "type": "string",
+      "title": "Contenttype",
+      "default": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+     }
+    },
+    "type": "object",
+    "required": [
+     "kind",
+     "filename",
+     "key",
+     "uploadId",
+     "parts"
+    ],
+    "title": "DirectUploadComplete"
+   },
+   "DirectUploadPart": {
+    "properties": {
+     "partNumber": {
+      "type": "integer",
+      "maximum": 10000.0,
+      "minimum": 1.0,
+      "title": "Partnumber"
+     },
+     "etag": {
+      "type": "string",
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Etag"
+     }
+    },
+    "type": "object",
+    "required": [
+     "partNumber",
+     "etag"
+    ],
+    "title": "DirectUploadPart"
+   },
+   "DirectUploadStart": {
+    "properties": {
+     "kind": {
+      "type": "string",
+      "pattern": "^(PD|LGD|EAD|pd|lgd|ead)$",
+      "title": "Kind"
+     },
+     "filename": {
+      "type": "string",
+      "maxLength": 255,
+      "minLength": 1,
+      "title": "Filename"
+     },
+     "size": {
+      "type": "integer",
+      "exclusiveMinimum": 0.0,
+      "title": "Size"
+     },
+     "contentType": {
+      "type": "string",
+      "title": "Contenttype",
+      "default": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+     }
+    },
+    "type": "object",
+    "required": [
+     "kind",
+     "filename",
+     "size"
+    ],
+    "title": "DirectUploadStart"
+   },
+   "EclReportOut": {
+    "properties": {
+     "runId": {
+      "type": "string",
+      "title": "Runid"
+     },
+     "reportingDate": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reportingdate"
+     },
+     "specVersion": {
+      "type": "string",
+      "title": "Specversion"
+     },
+     "engineVersion": {
+      "type": "string",
+      "title": "Engineversion"
+     },
+     "totals": {
+      "$ref": "#/components/schemas/EclTotalsOut"
+     },
+     "stageSummary": {
+      "items": {
+       "$ref": "#/components/schemas/SummaryRowOut"
+      },
+      "type": "array",
+      "title": "Stagesummary"
+     },
+     "segmentSummary": {
+      "items": {
+       "$ref": "#/components/schemas/SummaryRowOut"
+      },
+      "type": "array",
+      "title": "Segmentsummary"
+     },
+     "reconciliation": {
+      "items": {
+       "$ref": "#/components/schemas/ReconciliationOut"
+      },
+      "type": "array",
+      "title": "Reconciliation"
+     },
+     "exceptionCounts": {
+      "additionalProperties": {
+       "type": "integer"
+      },
+      "type": "object",
+      "title": "Exceptioncounts"
+     }
+    },
+    "type": "object",
+    "required": [
+     "runId",
+     "reportingDate",
+     "specVersion",
+     "engineVersion",
+     "totals",
+     "stageSummary",
+     "segmentSummary",
+     "reconciliation",
+     "exceptionCounts"
+    ],
+    "title": "EclReportOut"
+   },
+   "EclReportResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/EclReportOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "EclReportResponse"
+   },
+   "EclTotalsOut": {
+    "properties": {
+     "outstanding": {
+      "type": "number",
+      "title": "Outstanding"
+     },
+     "ecl": {
+      "type": "number",
+      "title": "Ecl"
+     },
+     "eclBeforeCap": {
+      "type": "number",
+      "title": "Eclbeforecap"
+     },
+     "coverage": {
+      "type": "number",
+      "title": "Coverage"
+     },
+     "loans": {
+      "type": "integer",
+      "title": "Loans"
+     },
+     "excludedRows": {
+      "type": "integer",
+      "title": "Excludedrows"
+     },
+     "cappedLoans": {
+      "type": "integer",
+      "title": "Cappedloans"
+     }
+    },
+    "type": "object",
+    "required": [
+     "outstanding",
+     "ecl",
+     "eclBeforeCap",
+     "coverage",
+     "loans",
+     "excludedRows",
+     "cappedLoans"
+    ],
+    "title": "EclTotalsOut"
+   },
+   "EngineInfoOut": {
+    "properties": {
+     "version": {
+      "type": "string",
+      "title": "Version"
+     },
+     "releasedDate": {
+      "type": "string",
+      "title": "Releaseddate"
+     },
+     "pdMethod": {
+      "type": "string",
+      "title": "Pdmethod"
+     },
+     "lgdMethod": {
+      "type": "string",
+      "title": "Lgdmethod"
+     },
+     "eadMethod": {
+      "type": "string",
+      "title": "Eadmethod"
+     },
+     "pdFilesCombined": {
+      "type": "boolean",
+      "title": "Pdfilescombined"
+     },
+     "deterministic": {
+      "type": "boolean",
+      "title": "Deterministic"
+     }
+    },
+    "type": "object",
+    "required": [
+     "version",
+     "releasedDate",
+     "pdMethod",
+     "lgdMethod",
+     "eadMethod",
+     "pdFilesCombined",
+     "deterministic"
+    ],
+    "title": "EngineInfoOut"
+   },
+   "EngineProgressOut": {
+    "properties": {
+     "pd": {
+      "$ref": "#/components/schemas/EngineStageProgressOut"
+     },
+     "lgd": {
+      "$ref": "#/components/schemas/EngineStageProgressOut"
+     },
+     "ead": {
+      "$ref": "#/components/schemas/EngineStageProgressOut"
+     },
+     "ecl": {
+      "$ref": "#/components/schemas/EngineStageProgressOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "pd",
+     "lgd",
+     "ead",
+     "ecl"
+    ],
+    "title": "EngineProgressOut"
+   },
+   "EngineStageProgressOut": {
+    "properties": {
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "started_at": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Started At"
+     },
+     "finished_at": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Finished At"
+     },
+     "elapsed_ms": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Elapsed Ms"
+     }
+    },
+    "type": "object",
+    "required": [
+     "status"
+    ],
+    "title": "EngineStageProgressOut"
+   },
+   "ExceptionOut": {
+    "properties": {
+     "category": {
+      "type": "string",
+      "title": "Category"
+     },
+     "dataset": {
+      "type": "string",
+      "title": "Dataset"
+     },
+     "loanId": {
+      "type": "string",
+      "title": "Loanid"
+     },
+     "customerId": {
+      "type": "string",
+      "title": "Customerid"
+     },
+     "field": {
+      "type": "string",
+      "title": "Field"
+     },
+     "value": {
+      "type": "string",
+      "title": "Value"
+     },
+     "issue": {
+      "type": "string",
+      "title": "Issue"
+     },
+     "action": {
+      "type": "string",
+      "title": "Action"
+     }
+    },
+    "type": "object",
+    "required": [
+     "category",
+     "dataset",
+     "loanId",
+     "customerId",
+     "field",
+     "value",
+     "issue",
+     "action"
+    ],
+    "title": "ExceptionOut"
+   },
+   "ExceptionsPageOut": {
+    "properties": {
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/ExceptionOut"
+      },
+      "type": "array",
+      "title": "Items"
+     },
+     "total": {
+      "type": "integer",
+      "title": "Total"
+     },
+     "page": {
+      "type": "integer",
+      "title": "Page"
+     },
+     "perPage": {
+      "type": "integer",
+      "title": "Perpage"
+     }
+    },
+    "type": "object",
+    "required": [
+     "items",
+     "total",
+     "page",
+     "perPage"
+    ],
+    "title": "ExceptionsPageOut"
+   },
+   "ExceptionsPageResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/ExceptionsPageOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "ExceptionsPageResponse"
+   },
+   "ExecuteRunOut": {
+    "properties": {
+     "run_id": {
+      "type": "string",
+      "title": "Run Id"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "dispatch_task": {
+      "type": "boolean",
+      "title": "Dispatch Task",
+      "default": true
+     }
+    },
+    "type": "object",
+    "required": [
+     "run_id",
+     "status"
+    ],
+    "title": "ExecuteRunOut"
+   },
+   "ExecuteRunResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/ExecuteRunOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "ExecuteRunResponse"
+   },
+   "FailureDetailsOut": {
+    "properties": {
+     "stage": {
+      "type": "string",
+      "title": "Stage"
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "ref": {
+      "type": "string",
+      "title": "Ref"
+     }
+    },
+    "type": "object",
+    "required": [
+     "stage",
+     "message",
+     "ref"
+    ],
+    "title": "FailureDetailsOut"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "KpiDashboardOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "helpText": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Helptext"
+     },
+     "currencyPrefix": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Currencyprefix"
+     },
+     "value": {
+      "type": "string",
+      "title": "Value"
+     },
+     "delta": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Delta"
+     },
+     "deltaDir": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "up",
+         "down",
+         "flat"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Deltadir"
+     },
+     "subNote": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Subnote"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "label",
+     "value"
+    ],
+    "title": "KpiDashboardOut"
+   },
+   "KpiOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "helpText": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Helptext"
+     },
+     "currencyPrefix": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Currencyprefix"
+     },
+     "value": {
+      "type": "string",
+      "title": "Value"
+     },
+     "delta": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Delta"
+     },
+     "deltaDir": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "up",
+         "down",
+         "flat"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Deltadir"
+     },
+     "subNote": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Subnote"
+     },
+     "staleAsOf": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Staleasof"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "label",
+     "value"
+    ],
+    "title": "KpiOut"
+   },
+   "LoanResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/LoanViewOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "LoanResponse"
+   },
+   "LoanRowOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "customer": {
+      "type": "string",
+      "title": "Customer"
+     },
+     "stage": {
+      "type": "integer",
+      "enum": [
+       1,
+       2,
+       3
+      ],
+      "title": "Stage"
+     },
+     "pd": {
+      "type": "number",
+      "title": "Pd"
+     },
+     "lgd": {
+      "type": "number",
+      "title": "Lgd"
+     },
+     "ead": {
+      "type": "number",
+      "title": "Ead"
+     },
+     "ecl": {
+      "type": "number",
+      "title": "Ecl"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "customer",
+     "stage",
+     "pd",
+     "lgd",
+     "ead",
+     "ecl"
+    ],
+    "title": "LoanRowOut"
+   },
+   "LoanViewOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "customer": {
+      "type": "string",
+      "title": "Customer"
+     },
+     "stage": {
+      "type": "integer",
+      "enum": [
+       1,
+       2,
+       3
+      ],
+      "title": "Stage"
+     },
+     "pd": {
+      "type": "number",
+      "title": "Pd"
+     },
+     "lgd": {
+      "type": "number",
+      "title": "Lgd"
+     },
+     "ead": {
+      "type": "number",
+      "title": "Ead"
+     },
+     "ecl": {
+      "type": "number",
+      "title": "Ecl"
+     },
+     "segment": {
+      "type": "string",
+      "title": "Segment"
+     },
+     "outstanding": {
+      "type": "number",
+      "title": "Outstanding"
+     },
+     "collateralValue": {
+      "type": "number",
+      "title": "Collateralvalue"
+     },
+     "maturity": {
+      "type": "string",
+      "title": "Maturity"
+     },
+     "rundown": {
+      "items": {
+       "$ref": "#/components/schemas/MonthlyRundownOut"
+      },
+      "type": "array",
+      "title": "Rundown"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "customer",
+     "stage",
+     "pd",
+     "lgd",
+     "ead",
+     "ecl",
+     "segment",
+     "outstanding",
+     "collateralValue",
+     "maturity",
+     "rundown"
+    ],
+    "title": "LoanViewOut"
+   },
+   "MonthlyRundownOut": {
+    "properties": {
+     "month": {
+      "type": "integer",
+      "title": "Month"
+     },
+     "marginalPd": {
+      "type": "number",
+      "title": "Marginalpd"
+     },
+     "cumulativePd": {
+      "type": "number",
+      "title": "Cumulativepd"
+     },
+     "ead": {
+      "type": "number",
+      "title": "Ead"
+     },
+     "ecl": {
+      "type": "number",
+      "title": "Ecl"
+     }
+    },
+    "type": "object",
+    "required": [
+     "month",
+     "marginalPd",
+     "cumulativePd",
+     "ead",
+     "ecl"
+    ],
+    "title": "MonthlyRundownOut"
+   },
+   "PdLoanPreviewOut": {
+    "properties": {
+     "loan_id": {
+      "type": "string",
+      "title": "Loan Id"
+     },
+     "segment": {
+      "type": "string",
+      "title": "Segment"
+     },
+     "reporting_month": {
+      "type": "string",
+      "title": "Reporting Month"
+     },
+     "reporting_month_key": {
+      "type": "string",
+      "title": "Reporting Month Key"
+     },
+     "staging": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "string"
+       }
+      ],
+      "title": "Staging"
+     },
+     "next_staging": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "string"
+       }
+      ],
+      "title": "Next Staging"
+     },
+     "is_final_month": {
+      "type": "boolean",
+      "title": "Is Final Month"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loan_id",
+     "segment",
+     "reporting_month",
+     "reporting_month_key",
+     "staging",
+     "next_staging",
+     "is_final_month"
+    ],
+    "title": "PdLoanPreviewOut"
+   },
+   "PdSegmentPreviewOut": {
+    "properties": {
+     "segment": {
+      "type": "string",
+      "title": "Segment"
+     },
+     "matrix": {
+      "items": {
+       "items": {
+        "type": "number"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Matrix"
+     },
+     "amounts": {
+      "items": {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Amounts"
+     },
+     "dest_labels": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Dest Labels"
+     },
+     "stats": {
+      "$ref": "#/components/schemas/PdSegmentStatsOut"
+     },
+     "proportions": {
+      "items": {
+       "items": {
+        "type": "number"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Proportions"
+     },
+     "observed_3": {
+      "items": {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Observed 3"
+     },
+     "normalized": {
+      "items": {
+       "items": {
+        "type": "number"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Normalized"
+     },
+     "term_structure": {
+      "items": {
+       "items": {
+        "items": {
+         "type": "number"
+        },
+        "type": "array"
+       },
+       "type": "array"
+      },
+      "type": "array",
+      "title": "Term Structure"
+     }
+    },
+    "type": "object",
+    "required": [
+     "segment",
+     "matrix",
+     "amounts",
+     "dest_labels",
+     "stats",
+     "proportions",
+     "observed_3",
+     "normalized",
+     "term_structure"
+    ],
+    "title": "PdSegmentPreviewOut"
+   },
+   "PdSegmentStatsOut": {
+    "properties": {
+     "cure_rate": {
+      "type": "number",
+      "title": "Cure Rate"
+     },
+     "loans_observed": {
+      "type": "integer",
+      "title": "Loans Observed"
+     },
+     "months_of_history": {
+      "type": "integer",
+      "title": "Months Of History"
+     }
+    },
+    "type": "object",
+    "required": [
+     "cure_rate",
+     "loans_observed",
+     "months_of_history"
+    ],
+    "title": "PdSegmentStatsOut"
+   },
+   "PortfolioResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/PortfolioViewOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "PortfolioResponse"
+   },
+   "PortfolioTotalsOut": {
+    "properties": {
+     "ecl": {
+      "type": "number",
+      "title": "Ecl"
+     },
+     "outstanding": {
+      "type": "number",
+      "title": "Outstanding"
+     },
+     "loans": {
+      "type": "integer",
+      "title": "Loans"
+     },
+     "coverage": {
+      "type": "string",
+      "title": "Coverage"
+     }
+    },
+    "type": "object",
+    "required": [
+     "ecl",
+     "outstanding",
+     "loans",
+     "coverage"
+    ],
+    "title": "PortfolioTotalsOut"
+   },
+   "PortfolioViewOut": {
+    "properties": {
+     "runContext": {
+      "$ref": "#/components/schemas/RunContextOut"
+     },
+     "segments": {
+      "items": {
+       "$ref": "#/components/schemas/SegmentDataOut"
+      },
+      "type": "array",
+      "title": "Segments"
+     },
+     "totals": {
+      "$ref": "#/components/schemas/PortfolioTotalsOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "runContext",
+     "segments",
+     "totals"
+    ],
+    "title": "PortfolioViewOut"
+   },
+   "PresignedDownloadOut": {
+    "properties": {
+     "url": {
+      "type": "string",
+      "title": "Url"
+     },
+     "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Expires At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "url",
+     "expires_at"
+    ],
+    "title": "PresignedDownloadOut"
+   },
+   "PresignedDownloadResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/PresignedDownloadOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "PresignedDownloadResponse"
+   },
+   "Promote": {
+    "properties": {
+     "service": {
+      "type": "string",
+      "pattern": "^(ecl|leases)$",
+      "title": "Service"
+     },
+     "version": {
+      "type": "string",
+      "maxLength": 32,
+      "minLength": 1,
+      "title": "Version"
+     }
+    },
+    "type": "object",
+    "required": [
+     "service",
+     "version"
+    ],
+    "title": "Promote"
+   },
+   "ReconciliationOut": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "expected": {
+      "type": "number",
+      "title": "Expected"
+     },
+     "actual": {
+      "type": "number",
+      "title": "Actual"
+     },
+     "difference": {
+      "type": "number",
+      "title": "Difference"
+     },
+     "passed": {
+      "type": "boolean",
+      "title": "Passed"
+     },
+     "detail": {
+      "type": "string",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "expected",
+     "actual",
+     "difference",
+     "passed",
+     "detail"
+    ],
+    "title": "ReconciliationOut"
+   },
+   "RerunRequest": {
+    "properties": {
+     "name": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 200
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     }
+    },
+    "type": "object",
+    "title": "RerunRequest"
+   },
+   "ReturnDecision": {
+    "properties": {
+     "comment": {
+      "type": "string",
+      "maxLength": 2000,
+      "minLength": 3,
+      "title": "Comment"
+     }
+    },
+    "type": "object",
+    "required": [
+     "comment"
+    ],
+    "title": "ReturnDecision"
+   },
+   "RunAuditEventOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "kind": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "err",
+       "accent",
+       "default"
+      ],
+      "title": "Kind"
+     },
+     "iconName": {
+      "type": "string",
+      "title": "Iconname"
+     },
+     "title": {
+      "type": "string",
+      "title": "Title"
+     },
+     "description": {
+      "type": "string",
+      "title": "Description"
+     },
+     "who": {
+      "type": "string",
+      "title": "Who"
+     },
+     "time": {
+      "type": "string",
+      "title": "Time"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "kind",
+     "iconName",
+     "title",
+     "description",
+     "who",
+     "time"
+    ],
+    "title": "RunAuditEventOut"
+   },
+   "RunContextOut": {
+    "properties": {
+     "runId": {
+      "type": "string",
+      "title": "Runid"
+     },
+     "period": {
+      "type": "string",
+      "title": "Period"
+     },
+     "computedAt": {
+      "type": "string",
+      "title": "Computedat"
+     },
+     "engineVersion": {
+      "type": "string",
+      "title": "Engineversion"
+     },
+     "currency": {
+      "type": "string",
+      "title": "Currency"
+     }
+    },
+    "type": "object",
+    "required": [
+     "runId",
+     "period",
+     "computedAt",
+     "engineVersion",
+     "currency"
+    ],
+    "title": "RunContextOut"
+   },
+   "RunDetailOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "fullId": {
+      "type": "string",
+      "title": "Fullid"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "period": {
+      "type": "string",
+      "title": "Period"
+     },
+     "createdAt": {
+      "type": "string",
+      "title": "Createdat"
+     },
+     "byInitials": {
+      "type": "string",
+      "title": "Byinitials"
+     },
+     "byName": {
+      "type": "string",
+      "title": "Byname"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "eclAmount": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Eclamount"
+     },
+     "coverage": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Coverage"
+     },
+     "currency": {
+      "type": "string",
+      "title": "Currency"
+     },
+     "reportingDate": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reportingdate"
+     },
+     "workbooksStatus": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Workbooksstatus"
+     },
+     "elapsed": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Elapsed"
+     },
+     "kpis": {
+      "items": {
+       "$ref": "#/components/schemas/KpiOut"
+      },
+      "type": "array",
+      "title": "Kpis"
+     },
+     "segments": {
+      "items": {
+       "$ref": "#/components/schemas/SegmentBarOut"
+      },
+      "type": "array",
+      "title": "Segments"
+     },
+     "inputFiles": {
+      "items": {
+       "$ref": "#/components/schemas/RunInputFileOut"
+      },
+      "type": "array",
+      "title": "Inputfiles"
+     },
+     "auditEvents": {
+      "items": {
+       "$ref": "#/components/schemas/RunAuditEventOut"
+      },
+      "type": "array",
+      "title": "Auditevents"
+     },
+     "engineInfo": {
+      "$ref": "#/components/schemas/EngineInfoOut"
+     },
+     "engineProgress": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/EngineProgressOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "failureDetails": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/FailureDetailsOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "deletedBy": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Deletedby"
+     },
+     "deletedAt": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Deletedat"
+     },
+     "acceptedWarnings": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Acceptedwarnings"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "fullId",
+     "name",
+     "period",
+     "createdAt",
+     "byInitials",
+     "byName",
+     "status",
+     "eclAmount",
+     "coverage",
+     "currency",
+     "kpis",
+     "segments",
+     "inputFiles",
+     "auditEvents",
+     "engineInfo"
+    ],
+    "title": "RunDetailOut"
+   },
+   "RunInputFileOut": {
+    "properties": {
+     "uploadId": {
+      "type": "string",
+      "title": "Uploadid"
+     },
+     "type": {
+      "type": "string",
+      "enum": [
+       "PD",
+       "LGD",
+       "EAD"
+      ],
+      "title": "Type"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "size": {
+      "type": "string",
+      "title": "Size"
+     },
+     "sheets": {
+      "type": "integer",
+      "title": "Sheets"
+     },
+     "validationStatus": {
+      "type": "string",
+      "enum": [
+       "ok",
+       "warn",
+       "error"
+      ],
+      "title": "Validationstatus"
+     },
+     "warningCount": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Warningcount"
+     },
+     "warningsAccepted": {
+      "type": "boolean",
+      "title": "Warningsaccepted",
+      "default": false
+     },
+     "hash": {
+      "type": "string",
+      "title": "Hash"
+     }
+    },
+    "type": "object",
+    "required": [
+     "uploadId",
+     "type",
+     "name",
+     "size",
+     "sheets",
+     "validationStatus",
+     "hash"
+    ],
+    "title": "RunInputFileOut"
+   },
+   "RunListItemOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "fullId": {
+      "type": "string",
+      "title": "Fullid"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "period": {
+      "type": "string",
+      "title": "Period"
+     },
+     "createdAt": {
+      "type": "string",
+      "title": "Createdat"
+     },
+     "byInitials": {
+      "type": "string",
+      "title": "Byinitials"
+     },
+     "byName": {
+      "type": "string",
+      "title": "Byname"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "eclAmount": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Eclamount"
+     },
+     "coverage": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Coverage"
+     },
+     "currency": {
+      "type": "string",
+      "title": "Currency"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "fullId",
+     "name",
+     "period",
+     "createdAt",
+     "byInitials",
+     "byName",
+     "status",
+     "eclAmount",
+     "coverage",
+     "currency"
+    ],
+    "title": "RunListItemOut"
+   },
+   "RunListResponse": {
+    "properties": {
+     "data": {
+      "items": {
+       "$ref": "#/components/schemas/RunListItemOut"
+      },
+      "type": "array",
+      "title": "Data"
+     },
+     "meta": {
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Meta"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data",
+     "meta"
+    ],
+    "title": "RunListResponse"
+   },
+   "RunResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/RunDetailOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "RunResponse"
+   },
+   "RunSummaryOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "fullId": {
+      "type": "string",
+      "title": "Fullid"
+     },
+     "period": {
+      "type": "string",
+      "title": "Period"
+     },
+     "byInitials": {
+      "type": "string",
+      "title": "Byinitials"
+     },
+     "byName": {
+      "type": "string",
+      "title": "Byname"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "eclAmount": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Eclamount"
+     },
+     "currency": {
+      "type": "string",
+      "title": "Currency"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "fullId",
+     "period",
+     "byInitials",
+     "byName",
+     "status",
+     "eclAmount",
+     "currency"
+    ],
+    "title": "RunSummaryOut"
+   },
+   "SegmentBarDashboardOut": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "value": {
+      "type": "number",
+      "title": "Value"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "value"
+    ],
+    "title": "SegmentBarDashboardOut"
+   },
+   "SegmentBarOut": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "value": {
+      "type": "number",
+      "title": "Value"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "value"
+    ],
+    "title": "SegmentBarOut"
+   },
+   "SegmentDataOut": {
+    "properties": {
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "mix": {
+      "prefixItems": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "number"
+       },
+       {
+        "type": "number"
+       }
+      ],
+      "type": "array",
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Mix"
+     },
+     "ecl": {
+      "type": "number",
+      "title": "Ecl"
+     },
+     "outstanding": {
+      "type": "number",
+      "title": "Outstanding"
+     },
+     "coverage": {
+      "type": "string",
+      "title": "Coverage"
+     },
+     "loans": {
+      "type": "integer",
+      "title": "Loans"
+     },
+     "delta": {
+      "type": "number",
+      "title": "Delta"
+     }
+    },
+    "type": "object",
+    "required": [
+     "name",
+     "mix",
+     "ecl",
+     "outstanding",
+     "coverage",
+     "loans",
+     "delta"
+    ],
+    "title": "SegmentDataOut"
+   },
+   "SegmentListResponse": {
+    "properties": {
+     "data": {
+      "items": {
+       "$ref": "#/components/schemas/SegmentOut"
+      },
+      "type": "array",
+      "title": "Data"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "SegmentListResponse"
+   },
+   "SegmentOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "name": {
+      "type": "string",
+      "title": "Name"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "is_active": {
+      "type": "boolean",
+      "title": "Is Active"
+     },
+     "runs_count": {
+      "type": "integer",
+      "title": "Runs Count"
+     },
+     "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Created At"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "name",
+     "code",
+     "is_active",
+     "runs_count",
+     "created_at"
+    ],
+    "title": "SegmentOut"
+   },
+   "SegmentRateStatsOut": {
+    "properties": {
+     "cureRate": {
+      "type": "number",
+      "title": "Curerate"
+     },
+     "avgLgd": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Avglgd"
+     },
+     "avgPd12m": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Avgpd12M"
+     }
+    },
+    "type": "object",
+    "required": [
+     "cureRate"
+    ],
+    "title": "SegmentRateStatsOut"
+   },
+   "SegmentViewOut": {
+    "properties": {
+     "segment": {
+      "$ref": "#/components/schemas/SegmentDataOut"
+     },
+     "pdMatrix": {
+      "prefixItems": [
+       {
+        "prefixItems": [
+         {
+          "type": "number"
+         },
+         {
+          "type": "number"
+         },
+         {
+          "type": "number"
+         }
+        ],
+        "type": "array",
+        "maxItems": 3,
+        "minItems": 3
+       },
+       {
+        "prefixItems": [
+         {
+          "type": "number"
+         },
+         {
+          "type": "number"
+         },
+         {
+          "type": "number"
+         }
+        ],
+        "type": "array",
+        "maxItems": 3,
+        "minItems": 3
+       },
+       {
+        "prefixItems": [
+         {
+          "type": "number"
+         },
+         {
+          "type": "number"
+         },
+         {
+          "type": "number"
+         }
+        ],
+        "type": "array",
+        "maxItems": 3,
+        "minItems": 3
+       }
+      ],
+      "type": "array",
+      "maxItems": 3,
+      "minItems": 3,
+      "title": "Pdmatrix"
+     },
+     "pdObservation": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/PdSegmentPreviewOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "pdLoans": {
+      "items": {
+       "$ref": "#/components/schemas/PdLoanPreviewOut"
+      },
+      "type": "array",
+      "title": "Pdloans"
+     },
+     "rateStats": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SegmentRateStatsOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "loans": {
+      "items": {
+       "$ref": "#/components/schemas/LoanRowOut"
+      },
+      "type": "array",
+      "title": "Loans"
+     },
+     "meta": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "type": "integer"
+        },
+        {
+         "type": "boolean"
+        }
+       ]
+      },
+      "type": "object",
+      "title": "Meta"
+     }
+    },
+    "type": "object",
+    "required": [
+     "segment",
+     "pdMatrix",
+     "loans",
+     "meta"
+    ],
+    "title": "SegmentViewOut"
+   },
+   "StageSliceOut": {
+    "properties": {
+     "stage": {
+      "type": "string",
+      "enum": [
+       "Stage 1",
+       "Stage 2",
+       "Stage 3"
+      ],
+      "title": "Stage"
+     },
+     "percent": {
+      "type": "number",
+      "title": "Percent"
+     },
+     "colorVar": {
+      "type": "integer",
+      "maximum": 8.0,
+      "minimum": 1.0,
+      "title": "Colorvar"
+     }
+    },
+    "type": "object",
+    "required": [
+     "stage",
+     "percent",
+     "colorVar"
+    ],
+    "title": "StageSliceOut"
+   },
+   "SummaryRowOut": {
+    "properties": {
+     "key": {
+      "type": "string",
+      "title": "Key"
+     },
+     "outstanding": {
+      "type": "number",
+      "title": "Outstanding"
+     },
+     "ecl": {
+      "type": "number",
+      "title": "Ecl"
+     },
+     "coverage": {
+      "type": "number",
+      "title": "Coverage"
+     }
+    },
+    "type": "object",
+    "required": [
+     "key",
+     "outstanding",
+     "ecl",
+     "coverage"
+    ],
+    "title": "SummaryRowOut"
+   },
+   "ThresholdsIn": {
+    "properties": {
+     "max_month_gap": {
+      "type": "integer",
+      "maximum": 24.0,
+      "minimum": 0.0,
+      "title": "Max Month Gap"
+     },
+     "min_transitions": {
+      "type": "integer",
+      "maximum": 1000000.0,
+      "minimum": 0.0,
+      "title": "Min Transitions"
+     },
+     "stage3_share_min": {
+      "type": "number",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Stage3 Share Min"
+     },
+     "stage3_share_max": {
+      "type": "number",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Stage3 Share Max"
+     },
+     "cure_rate_min": {
+      "type": "number",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Cure Rate Min"
+     },
+     "cure_rate_max": {
+      "type": "number",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Cure Rate Max"
+     },
+     "offbooks_abs_band": {
+      "type": "number",
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Offbooks Abs Band"
+     }
+    },
+    "type": "object",
+    "required": [
+     "max_month_gap",
+     "min_transitions",
+     "stage3_share_min",
+     "stage3_share_max",
+     "cure_rate_min",
+     "cure_rate_max",
+     "offbooks_abs_band"
+    ],
+    "title": "ThresholdsIn"
+   },
+   "TrendPointOut": {
+    "properties": {
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "value": {
+      "type": "number",
+      "title": "Value"
+     }
+    },
+    "type": "object",
+    "required": [
+     "label",
+     "value"
+    ],
+    "title": "TrendPointOut"
+   },
+   "UpdateCollateralTypeRequest": {
+    "properties": {
+     "name": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 2
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "haircut": {
+      "anyOf": [
+       {
+        "type": "number",
+        "maximum": 100.0,
+        "minimum": 0.0
+       },
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Haircut"
+     },
+     "time_to_realize": {
+      "anyOf": [
+       {
+        "type": "integer",
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Time To Realize"
+     }
+    },
+    "type": "object",
+    "title": "UpdateCollateralTypeRequest"
+   },
+   "UpdateRunRequest": {
+    "properties": {
+     "combine_pd_files": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Combine Pd Files"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 200,
+        "minLength": 1
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "reporting_period": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 100
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reporting Period"
+     },
+     "reporting_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reporting Date"
+     },
+     "currency": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Currency"
+     }
+    },
+    "type": "object",
+    "title": "UpdateRunRequest"
+   },
+   "UpdateSegmentRequest": {
+    "properties": {
+     "name": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 100,
+        "minLength": 2
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     },
+     "code": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 50
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Code"
+     },
+     "is_active": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Is Active"
+     }
+    },
+    "type": "object",
+    "title": "UpdateSegmentRequest"
+   },
+   "UploadOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "kind": {
+      "type": "string",
+      "title": "Kind"
+     },
+     "filename": {
+      "type": "string",
+      "title": "Filename"
+     },
+     "size_bytes": {
+      "type": "integer",
+      "title": "Size Bytes"
+     },
+     "sha256": {
+      "type": "string",
+      "title": "Sha256"
+     },
+     "sheet_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sheet Count"
+     },
+     "row_count": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Row Count"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "kind",
+     "filename",
+     "size_bytes",
+     "sha256"
+    ],
+    "title": "UploadOut"
+   },
+   "UploadResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/UploadOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "UploadResponse"
+   },
+   "ValidateRunRequest": {
+    "properties": {
+     "accepted_warning_ids": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Accepted Warning Ids"
+     }
+    },
+    "type": "object",
+    "title": "ValidateRunRequest"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   },
+   "ledgerline__apps__results__schemas__SegmentResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/SegmentViewOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "SegmentResponse"
+   },
+   "ledgerline__apps__segments__schemas__SegmentResponse": {
+    "properties": {
+     "data": {
+      "$ref": "#/components/schemas/SegmentOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "data"
+    ],
+    "title": "SegmentResponse"
+   }
+  },
+  "securitySchemes": {
+   "HTTPBearer": {
+    "type": "http",
+    "scheme": "bearer"
+   }
+  }
+ }
+}
