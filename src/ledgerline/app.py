@@ -55,8 +55,16 @@ async def _register_engine_versions() -> None:
     try:
         async with AsyncSessionLocal() as db:
             for service, ver in (("ecl", ECL_V), ("leases", LEASES_V)):
-                await db.execute(insert(EngineVersion).values(version=ver, service=service, notes="Registered at startup").on_conflict_do_nothing())
-                promoted = await db.scalar(select(func.count()).select_from(EngineVersion).where(EngineVersion.service == service, EngineVersion.status == "promoted"))
+                await db.execute(
+                    insert(EngineVersion)
+                    .values(version=ver, service=service, notes="Registered at startup")
+                    .on_conflict_do_nothing()
+                )
+                promoted = await db.scalar(
+                    select(func.count())
+                    .select_from(EngineVersion)
+                    .where(EngineVersion.service == service, EngineVersion.status == "promoted")
+                )
                 if not promoted:
                     row = await db.get(EngineVersion, (ver, service))
                     if row:
@@ -71,8 +79,13 @@ def create_app() -> FastAPI:
     configure_logging(s)
     _init_observability()
     app = FastAPI(
-        title="Ledgerline Engine", version=s.app_version, default_response_class=ORJSONResponse, lifespan=lifespan,
-        docs_url="/docs" if s.environment != "production" else None, redoc_url=None, openapi_url="/api/v1/openapi.json",
+        title="Ledgerline Engine",
+        version=s.app_version,
+        default_response_class=ORJSONResponse,
+        lifespan=lifespan,
+        docs_url="/docs" if s.environment != "production" else None,
+        redoc_url=None,
+        openapi_url="/api/v1/openapi.json",
     )
     register_exception_handlers(app)
 
@@ -117,9 +130,19 @@ def create_app() -> FastAPI:
         from ledgerline.storage import head
 
         checks: dict[str, str] = {}
+        workers = 0
         try:
             async with engine.connect() as c:
                 await c.execute(text("SELECT 1"))
+                # Informational: queue workers with a heartbeat in the last minute (not part of API readiness).
+                workers = (
+                    await c.scalar(
+                        text(
+                            "SELECT count(*) FROM procrastinate_workers WHERE last_heartbeat > now() - interval '1 minute'"
+                        )
+                    )
+                    or 0
+                )
             checks["db"] = "ok"
         except Exception as exc:
             checks["db"] = f"error: {type(exc).__name__}"
@@ -129,7 +152,10 @@ def create_app() -> FastAPI:
         except Exception as exc:
             checks["storage"] = f"error: {type(exc).__name__}"
         ok = all(v == "ok" for v in checks.values())
-        return ORJSONResponse({"status": "ok" if ok else "degraded", "version": s.app_version, "checks": checks}, status_code=200 if ok else 503)
+        return ORJSONResponse(
+            {"status": "ok" if ok else "degraded", "version": s.app_version, "checks": checks, "workers": workers},
+            status_code=200 if ok else 503,
+        )
 
     return app
 
