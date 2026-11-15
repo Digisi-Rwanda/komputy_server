@@ -60,7 +60,9 @@ def _aio_config() -> Any:
     from aiobotocore.config import AioConfig
 
     # Path-style + SigV4 works for both MinIO (dev) and Cloudflare R2 (prod).
-    return AioConfig(signature_version="s3v4", s3={"addressing_style": "path"}, retries={"max_attempts": 5, "mode": "adaptive"})
+    return AioConfig(
+        signature_version="s3v4", s3={"addressing_style": "path"}, retries={"max_attempts": 5, "mode": "adaptive"}
+    )
 
 
 async def init_storage() -> None:
@@ -108,6 +110,7 @@ def _normalize_key(key: str) -> str:
 
 def _storage_error(exc: Exception) -> ECLException:
     from ledgerline.kernel.errors import ECLException
+
     return ECLException(
         "STORAGE_UNAVAILABLE",
         "File storage is unavailable. Please try again or contact support.",
@@ -225,7 +228,9 @@ async def _maybe_await(v: Any) -> Any:
 async def create_multipart(key: str, content_type: str) -> str:
     s, client = get_settings(), await get_storage_client()
     try:
-        r = await client.create_multipart_upload(Bucket=s.storage_bucket_name, Key=_normalize_key(key), ContentType=content_type)
+        r = await client.create_multipart_upload(
+            Bucket=s.storage_bucket_name, Key=_normalize_key(key), ContentType=content_type
+        )
     except Exception as exc:
         raise _storage_error(exc) from exc
     return str(r["UploadId"])
@@ -234,11 +239,18 @@ async def create_multipart(key: str, content_type: str) -> str:
 async def presign_parts(key: str, upload_id: str, parts: int) -> list[str]:
     s, client = get_settings(), await _get_presign_client()
     return [
-        await _maybe_await(client.generate_presigned_url(
-            "upload_part",
-            Params={"Bucket": s.storage_bucket_name, "Key": _normalize_key(key), "UploadId": upload_id, "PartNumber": n},
-            ExpiresIn=s.presign_ttl_seconds,
-        ))
+        await _maybe_await(
+            client.generate_presigned_url(
+                "upload_part",
+                Params={
+                    "Bucket": s.storage_bucket_name,
+                    "Key": _normalize_key(key),
+                    "UploadId": upload_id,
+                    "PartNumber": n,
+                },
+                ExpiresIn=s.presign_ttl_seconds,
+            )
+        )
         for n in range(1, parts + 1)
     ]
 
@@ -247,8 +259,15 @@ async def complete_multipart(key: str, upload_id: str, parts: list[dict[str, Any
     s, client = get_settings(), await get_storage_client()
     try:
         await client.complete_multipart_upload(
-            Bucket=s.storage_bucket_name, Key=_normalize_key(key), UploadId=upload_id,
-            MultipartUpload={"Parts": [{"ETag": p["etag"], "PartNumber": int(p["partNumber"])} for p in sorted(parts, key=lambda p: int(p["partNumber"]))]},
+            Bucket=s.storage_bucket_name,
+            Key=_normalize_key(key),
+            UploadId=upload_id,
+            MultipartUpload={
+                "Parts": [
+                    {"ETag": p["etag"], "PartNumber": int(p["partNumber"])}
+                    for p in sorted(parts, key=lambda p: int(p["partNumber"]))
+                ]
+            },
         )
     except Exception as exc:
         from ledgerline.kernel.errors import ECLException
@@ -266,10 +285,13 @@ async def abort_multipart(key: str, upload_id: str) -> None:
 
 async def presign_put(key: str, content_type: str, expires_seconds: int | None = None) -> str:
     s, client = get_settings(), await _get_presign_client()
-    return await _maybe_await(client.generate_presigned_url(
-        "put_object", Params={"Bucket": s.storage_bucket_name, "Key": _normalize_key(key), "ContentType": content_type},
-        ExpiresIn=expires_seconds or s.presign_ttl_seconds,
-    ))
+    return await _maybe_await(
+        client.generate_presigned_url(
+            "put_object",
+            Params={"Bucket": s.storage_bucket_name, "Key": _normalize_key(key), "ContentType": content_type},
+            ExpiresIn=expires_seconds or s.presign_ttl_seconds,
+        )
+    )
 
 
 async def presign_get(key: str, filename: str | None = None, expires_seconds: int | None = None) -> str:
@@ -277,7 +299,9 @@ async def presign_get(key: str, filename: str | None = None, expires_seconds: in
     params: dict[str, Any] = {"Bucket": s.storage_bucket_name, "Key": _normalize_key(key)}
     if filename:
         params["ResponseContentDisposition"] = f'attachment; filename="{filename}"'
-    return await _maybe_await(client.generate_presigned_url("get_object", Params=params, ExpiresIn=expires_seconds or s.presign_ttl_seconds))
+    return await _maybe_await(
+        client.generate_presigned_url("get_object", Params=params, ExpiresIn=expires_seconds or s.presign_ttl_seconds)
+    )
 
 
 async def head(key: str) -> dict[str, Any] | None:
