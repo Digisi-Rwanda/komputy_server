@@ -63,6 +63,4 @@ class AuditLog(Base):
     user_agent_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     error_code: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
