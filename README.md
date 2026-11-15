@@ -48,7 +48,6 @@ journeys across both apps: `../komputy_web/scripts/e2e-engine.mjs`, `e2e-leases.
 
 ## Deploy (Render)
 
-One image (`Dockerfile`), three services: **api** (private service, health check `/healthz`, pre-deploy
-`alembic upgrade head`), **worker-io**, **worker-calc**. Postgres: Render Postgres. Files: Cloudflare R2
-(bucket CORS must allow `PUT` from the web origin and expose the `ETag` header). Secrets: `DATABASE_URL`,
-`STORAGE_*`, `SERVICE_TOKEN`, `WEB_JWKS_URL`, `SENTRY_DSN` (optional).
+Everything is in `render.yaml` (Blueprint: Postgres, Key Value, web, engine API, two workers, crons, nightly backup to R2)
+and explained phase by phase in `docs/DEPLOYMENT_PLAN.md`; operations (rollback, restore, scaling, stuck jobs) in
+`docs/RUNBOOK.md`. CI (`.github/workflows/ci.yml`) must pass before Render deploys `main`.
