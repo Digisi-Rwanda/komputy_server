@@ -6,7 +6,7 @@ Where things are, and what to do when something goes wrong. Architecture and the
 
 | What | Where |
 |---|---|
-| Blueprint (all infra) | `render.yaml` in this repo → Render Blueprint `komputy` (auto-sync on push to `main`) |
+| Blueprint (all infra) | `render.yaml` in this repo → Render Blueprint `komputy` (auto-sync on push to `main`) → Render project **Komputy**, environment `production`. Render added the suffix `-woqc` to every name when the Blueprint was created; it is part of each resource's identity, so leave it (renaming in the dashboard would make the Blueprint create duplicates). |
 | Web | Render web `komputy-web-*` · repo `mugisham37/komputy_web` · health `/api/healthz` |
 | Engine API | Render private service `komputy-engine-api-*` · health `/healthz`, readiness `/readyz` (db, storage, live workers) |
 | Workers | `komputy-worker-io-*` (validation, ingest, exports, imports, housekeeping), `komputy-worker-calc-*` (compute, lease books) |
