@@ -37,9 +37,7 @@ def _portfolio() -> pd.DataFrame:
         ("L4", "2024-11-30", "Stage 1", 75_000.0, "SME"),
         ("L4", "2024-12-31", "Stage 1", 75_000.0, "SME"),
     ]
-    df = pd.DataFrame(
-        rows, columns=["Loan ID", "Reporting Month", "Staging", "Loan Amount", "SEGMENT"]
-    )
+    df = pd.DataFrame(rows, columns=["Loan ID", "Reporting Month", "Staging", "Loan Amount", "SEGMENT"])
     df["Reporting Month"] = pd.to_datetime(df["Reporting Month"])
     return df
 
@@ -90,12 +88,16 @@ def test_preview_matrix_is_3x4_and_row_normalized() -> None:
     preview = _preview()
     retail = next(s for s in preview.segments if s.segment == "Retail")
 
-    assert retail.dest_labels == list(DEST_LABELS) == [
-        "Stage 1",
-        "Stage 2",
-        "Stage 3",
-        "Offbooks",
-    ]
+    assert (
+        retail.dest_labels
+        == list(DEST_LABELS)
+        == [
+            "Stage 1",
+            "Stage 2",
+            "Stage 3",
+            "Offbooks",
+        ]
+    )
     assert len(retail.matrix) == 3
     assert all(len(row) == 4 for row in retail.matrix)
 
@@ -145,10 +147,7 @@ def test_compute_pd_projection_reuses_preview_aggregates() -> None:
     preview = intermediates["preview"]
     for observation in preview.observations:
         stored = np.array(
-            [
-                intermediates["aggregate"][observation.segment][stage]
-                for stage in ("Stage 1", "Stage 2", "Stage 3")
-            ]
+            [intermediates["aggregate"][observation.segment][stage] for stage in ("Stage 1", "Stage 2", "Stage 3")]
         )
         assert np.allclose(stored, observation.aggregate_3)
         assert cure_rates[observation.segment] == observation.cure_rate
