@@ -10,9 +10,7 @@ import pytest
 from ledgerline.leases.domain.dates import add_months, months_between
 from ledgerline.leases.domain.engine import compute, current_split, maturity
 
-CASES = json.loads((Path(__file__).parent.parent.parent / "fixtures" / "leases_golden.json").read_text())[
-    "cases"
-]
+CASES = json.loads((Path(__file__).parent.parent.parent / "fixtures" / "leases_golden.json").read_text())["cases"]
 
 
 def year_sum(rows, col, year):
