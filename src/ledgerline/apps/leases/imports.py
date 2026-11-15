@@ -160,9 +160,7 @@ def _norm(x: str) -> str:
     return "".join(ch for ch in x.lower() if ch.isalnum())
 
 
-async def create(
-    db: AsyncSession, m: TenantMembership, file_name: str, raw: bytes
-) -> LeaseImportBatch:
+async def create(db: AsyncSession, m: TenantMembership, file_name: str, raw: bytes) -> LeaseImportBatch:
     require(m, "administrator", "analyst")
     await require_setup(db, m.tenant_id)
     if len(raw) > MAX_BYTES:
@@ -187,9 +185,7 @@ async def create(
     if len(rows) > MAX_ROWS + 1:
         raise invalid("Up to 10,000 leases per file.")
     e = (
-        await db.execute(
-            select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update()
-        )
+        await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update())
     ).scalar_one()
     headers = [h.strip() for h in rows[0]]
     mapping = dict(e.import_mapping or {})
@@ -231,9 +227,7 @@ async def create(
 
 
 async def get(db: AsyncSession, tenant_id: str, code: str, lock: bool = False) -> LeaseImportBatch:
-    q = select(LeaseImportBatch).where(
-        LeaseImportBatch.tenant_id == tenant_id, LeaseImportBatch.code == code
-    )
+    q = select(LeaseImportBatch).where(LeaseImportBatch.tenant_id == tenant_id, LeaseImportBatch.code == code)
     b = (await db.execute(q.with_for_update() if lock else q)).scalar_one_or_none()
     if b is None:
         raise not_found("Import not found.")
@@ -246,22 +240,20 @@ def _schedule(db: AsyncSession, batch_id: str) -> None:
     def go() -> None:
         from ledgerline.apps.leases.jobs import import_job
 
-        t = asyncio.get_event_loop().create_task(import_job.configure(queueing_lock=f"import:{batch_id}").defer_async(batch_id=batch_id))
+        t = asyncio.get_event_loop().create_task(
+            import_job.configure(queueing_lock=f"import:{batch_id}").defer_async(batch_id=batch_id)
+        )
         _jobs.add(t)
         t.add_done_callback(_jobs.discard)
 
     run_after_commit(db, go)
 
 
-async def set_mapping(
-    db: AsyncSession, m: TenantMembership, code: str, mapping: dict[str, str]
-) -> None:
+async def set_mapping(db: AsyncSession, m: TenantMembership, code: str, mapping: dict[str, str]) -> None:
     b = await get(db, m.tenant_id, code, lock=True)
     missing = [label for key, label, req in COLUMNS if req and not mapping.get(key)]
     if missing:
-        raise invalid(
-            f"Map the required column{'s' if len(missing) > 1 else ''}: {', '.join(missing)}."
-        )
+        raise invalid(f"Map the required column{'s' if len(missing) > 1 else ''}: {', '.join(missing)}.")
     if any(v and v not in b.headers for v in mapping.values()):
         raise invalid("Mapping refers to a column that isn't in the file.")
     b.mapping, b.status, b.progress = mapping, "validating", 0
@@ -363,12 +355,7 @@ async def _validate_rows(
         if ex and ex not in ("none", "short_term", "low_value"):
             err("exemption", "Use none, short_term or low_value.")
         existing = next(
-            (
-                lz
-                for lz in leases
-                if lz.code.lower() == r.ref.lower()
-                or (r.name and lz.name.lower() == r.name.lower())
-            ),
+            (lz for lz in leases if lz.code.lower() == r.ref.lower() or (r.name and lz.name.lower() == r.name.lower())),
             None,
         )
         if existing:
@@ -395,9 +382,7 @@ async def _validate_rows(
 async def _commit_row(db: AsyncSession, b: LeaseImportBatch, r: LeaseImportRow) -> None:
     v = lambda k: (r.values.get(b.mapping.get(k) or "", "") or "").strip()  # noqa: E731
     ent = (
-        await db.execute(
-            select(LeaseEntity).where(LeaseEntity.tenant_id == b.tenant_id).with_for_update()
-        )
+        await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == b.tenant_id).with_for_update())
     ).scalar_one()
     cp_name = v("lessor")
     cp = (
@@ -465,11 +450,7 @@ async def _commit_row(db: AsyncSession, b: LeaseImportBatch, r: LeaseImportRow) 
         lease = await db.get(Lease, r.lease_id)
         if lease is None or lease.tenant_id != b.tenant_id:
             raise ValueError("Draft no longer exists.")
-        vs = list(
-            (
-                await db.execute(select(LeaseVersion).where(LeaseVersion.lease_id == lease.id))
-            ).scalars()
-        )
+        vs = list((await db.execute(select(LeaseVersion).where(LeaseVersion.lease_id == lease.id))).scalars())
         if chain_of(vs):
             raise ValueError("Lease was approved meanwhile — record an event instead.")
         for old in vs:
@@ -550,9 +531,7 @@ async def run_job(batch_id: str) -> None:
             rows = list(
                 (
                     await db.execute(
-                        select(LeaseImportRow)
-                        .where(LeaseImportRow.batch_id == b.id)
-                        .order_by(LeaseImportRow.row)
+                        select(LeaseImportRow).where(LeaseImportRow.batch_id == b.id).order_by(LeaseImportRow.row)
                     )
                 ).scalars()
             )
@@ -585,9 +564,7 @@ async def run_job(batch_id: str) -> None:
                     "updated",
                 ):
                     try:
-                        async with (
-                            db.begin_nested()
-                        ):  # one lease = one savepoint; a failure rolls back only this row
+                        async with db.begin_nested():  # one lease = one savepoint; a failure rolls back only this row
                             await _commit_row(db, b, r)
                     except Exception as exc:
                         r.outcome, r.outcome_message = "failed", str(exc)[:500]
@@ -635,9 +612,7 @@ async def start_commit(db: AsyncSession, m: TenantMembership, code: str) -> None
     b = await get(db, m.tenant_id, code, lock=True)
     if b.status != "validated":
         raise invalid("Validate the file first.")
-    rows = list(
-        (await db.execute(select(LeaseImportRow).where(LeaseImportRow.batch_id == b.id))).scalars()
-    )
+    rows = list((await db.execute(select(LeaseImportRow).where(LeaseImportRow.batch_id == b.id))).scalars())
     if (
         any(r.action != "skip" and any(i["severity"] == "warning" for i in r.issues) for r in rows)
         and not b.warnings_accepted
@@ -688,11 +663,7 @@ async def submit_all(db: AsyncSession, m: TenantMembership, code: str, approver_
             )
         )
     ).scalars():
-        vs = list(
-            (
-                await db.execute(select(LeaseVersion).where(LeaseVersion.lease_id == r.lease_id))
-            ).scalars()
-        )
+        vs = list((await db.execute(select(LeaseVersion).where(LeaseVersion.lease_id == r.lease_id))).scalars())
         v = pending_of(vs)
         if not v or v.status != "draft" or not v.calc_checks_ok:
             continue
@@ -723,9 +694,7 @@ async def ser(db: AsyncSession, b: LeaseImportBatch, with_rows: bool = True) -> 
         list(
             (
                 await db.execute(
-                    select(LeaseImportRow)
-                    .where(LeaseImportRow.batch_id == b.id)
-                    .order_by(LeaseImportRow.row)
+                    select(LeaseImportRow).where(LeaseImportRow.batch_id == b.id).order_by(LeaseImportRow.row)
                 )
             ).scalars()
         )
