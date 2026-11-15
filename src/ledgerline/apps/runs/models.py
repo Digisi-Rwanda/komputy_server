@@ -55,9 +55,7 @@ class Run(Base):
     run_warnings: Mapped[list | None] = mapped_column(JSON, nullable=True)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
@@ -94,24 +92,12 @@ class PdValidationThresholds(Base):
     tenant_id: Mapped[str] = mapped_column(String(26), nullable=False, index=True)
     max_month_gap: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
     min_transitions: Mapped[int] = mapped_column(Integer, nullable=False, server_default="3")
-    stage3_share_min: Mapped[Decimal] = mapped_column(
-        Numeric(6, 4), nullable=False, server_default="0"
-    )
-    stage3_share_max: Mapped[Decimal] = mapped_column(
-        Numeric(6, 4), nullable=False, server_default="0.4"
-    )
-    cure_rate_min: Mapped[Decimal] = mapped_column(
-        Numeric(6, 4), nullable=False, server_default="0.02"
-    )
-    cure_rate_max: Mapped[Decimal] = mapped_column(
-        Numeric(6, 4), nullable=False, server_default="0.9"
-    )
-    offbooks_abs_band: Mapped[Decimal] = mapped_column(
-        Numeric(6, 4), nullable=False, server_default="0.1"
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    stage3_share_min: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, server_default="0")
+    stage3_share_max: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, server_default="0.4")
+    cure_rate_min: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, server_default="0.02")
+    cure_rate_max: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, server_default="0.9")
+    offbooks_abs_band: Mapped[Decimal] = mapped_column(Numeric(6, 4), nullable=False, server_default="0.1")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
@@ -133,9 +119,7 @@ class Upload(Base):
     row_count: Mapped[int | None] = mapped_column(nullable=True)
     validation_status: Mapped[str | None] = mapped_column(Text, nullable=True)
     warnings_accepted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
 class RunReviewEvent(Base):
