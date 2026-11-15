@@ -143,23 +143,49 @@ class DirectUploadComplete(BaseModel):
 
 @router.post("/{tenant_id}/runs/{run_id}/uploads/direct", status_code=status.HTTP_201_CREATED)
 async def start_direct_upload_endpoint(
-    tenant_id: str, run_id: str, body: DirectUploadStart, db: DbSession,
+    tenant_id: str,
+    run_id: str,
+    body: DirectUploadStart,
+    db: DbSession,
     _a: TenantMembership = Depends(require_tenant_analyst_or_admin),
 ) -> dict[str, Any]:
     """Browser uploads straight to object storage in parallel parts; nothing streams through the API."""
-    return {"data": await service.start_direct_upload(db, tenant_id, run_id, kind=body.kind.upper(), filename=body.filename,
-                                                      size=body.size, content_type=body.content_type)}
+    return {
+        "data": await service.start_direct_upload(
+            db,
+            tenant_id,
+            run_id,
+            kind=body.kind.upper(),
+            filename=body.filename,
+            size=body.size,
+            content_type=body.content_type,
+        )
+    }
 
 
 @router.post("/{tenant_id}/runs/{run_id}/uploads/direct/complete", status_code=status.HTTP_201_CREATED)
 async def complete_direct_upload_endpoint(
-    request: Request, tenant_id: str, run_id: str, body: DirectUploadComplete, db: DbSession, user: CurrentUser,
+    request: Request,
+    tenant_id: str,
+    run_id: str,
+    body: DirectUploadComplete,
+    db: DbSession,
+    user: CurrentUser,
     _a: TenantMembership = Depends(require_tenant_analyst_or_admin),
 ) -> UploadResponse:
     data = await service.complete_direct_upload(
-        db, tenant_id, run_id, user.id, kind=body.kind.upper(), filename=body.filename, key=body.key, upload_id=body.upload_id,
-        parts=[{"partNumber": p.part_number, "etag": p.etag} for p in body.parts], content_type=body.content_type,
-        ip=get_client_ip(request.headers.get("X-Forwarded-For")), user_agent=get_user_agent(request.headers.get("User-Agent")),
+        db,
+        tenant_id,
+        run_id,
+        user.id,
+        kind=body.kind.upper(),
+        filename=body.filename,
+        key=body.key,
+        upload_id=body.upload_id,
+        parts=[{"partNumber": p.part_number, "etag": p.etag} for p in body.parts],
+        content_type=body.content_type,
+        ip=get_client_ip(request.headers.get("X-Forwarded-For")),
+        user_agent=get_user_agent(request.headers.get("User-Agent")),
     )
     return UploadResponse(data=data)
 
@@ -200,8 +226,13 @@ async def validate_files_endpoint(
     _log.info("validation_job_requested", run_id=run_id, scope=scope_key, job_id=job_id, created=created)
     if created:
         await validate.defer_async(
-            job_id=job_id, tenant_id=tenant_id, run_id=run_id, user_id=user.id, scope=scope_key,
-            ip=get_client_ip(request.headers.get("X-Forwarded-For")), user_agent=get_user_agent(request.headers.get("User-Agent")),
+            job_id=job_id,
+            tenant_id=tenant_id,
+            run_id=run_id,
+            user_id=user.id,
+            scope=scope_key,
+            ip=get_client_ip(request.headers.get("X-Forwarded-For")),
+            user_agent=get_user_agent(request.headers.get("User-Agent")),
         )
     return JSONResponse(status_code=202, content={"data": {"jobId": job_id, "status": "queued"}})
 
@@ -230,9 +261,7 @@ async def accept_review_endpoint(
     user: CurrentUser,
     _a: TenantMembership = Depends(require_tenant_analyst_or_admin),
 ) -> AcceptReviewResponse:
-    return AcceptReviewResponse(
-        data=await ecl_validation.accept_review(db, tenant_id, run_id, user.id, kind)
-    )
+    return AcceptReviewResponse(data=await ecl_validation.accept_review(db, tenant_id, run_id, user.id, kind))
 
 
 @router.get("/{tenant_id}/runs/{run_id}/ecl/preview-export")
@@ -268,12 +297,24 @@ async def _enforce_run_quota(db: Any, tenant_id: str, run_id: str, request: Requ
     if run is not None and run.reporting_period == "Sample data":
         return  # sample runs never use quota
     month = datetime.now(UTC).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    used = await db.scalar(select(func.count()).select_from(Run).where(
-        Run.tenant_id == tenant_id, Run.id != run_id, Run.deleted_at.is_(None), Run.created_at >= month,
-        Run.reporting_period.is_distinct_from("Sample data"),
-        Run.status.in_(("queued", "pd_running", "lgd_running", "ead_running", "complete"))))
+    used = await db.scalar(
+        select(func.count())
+        .select_from(Run)
+        .where(
+            Run.tenant_id == tenant_id,
+            Run.id != run_id,
+            Run.deleted_at.is_(None),
+            Run.created_at >= month,
+            Run.reporting_period.is_distinct_from("Sample data"),
+            Run.status.in_(("queued", "pd_running", "lgd_running", "ead_running", "complete")),
+        )
+    )
     if (used or 0) >= int(lim):
-        raise ECLException("QUOTA_EXCEEDED", f"Your workspace has used its {lim} runs this month. Ask your admin to request more capacity.", 409)
+        raise ECLException(
+            "QUOTA_EXCEEDED",
+            f"Your workspace has used its {lim} runs this month. Ask your admin to request more capacity.",
+            409,
+        )
 
 
 @router.post(
@@ -470,9 +511,7 @@ async def download_artifact_file_endpoint(
     user: CurrentUser,
     _m: TenantMembership = Depends(require_tenant_member),
 ) -> Response:
-    content, filename = await results_service.get_artifact_bytes(
-        db, tenant_id, run_id, kind.upper()
-    )
+    content, filename = await results_service.get_artifact_bytes(db, tenant_id, run_id, kind.upper())
     return Response(
         content=content,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -489,14 +528,10 @@ async def download_artifact_endpoint(
     user: CurrentUser,
     _m: TenantMembership = Depends(require_tenant_member),
 ) -> PresignedDownloadResponse:
-    url, expires_at = await results_service.get_presigned_download(
-        db, tenant_id, run_id, kind.upper()
-    )
+    url, expires_at = await results_service.get_presigned_download(db, tenant_id, run_id, kind.upper())
     from ledgerline.apps.runs.schemas import PresignedDownloadOut
 
-    return PresignedDownloadResponse(
-        data=PresignedDownloadOut(url=url, expires_at=expires_at)
-    )
+    return PresignedDownloadResponse(data=PresignedDownloadOut(url=url, expires_at=expires_at))
 
 
 @router.get("/{tenant_id}/templates/{kind}")
