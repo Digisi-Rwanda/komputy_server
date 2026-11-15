@@ -22,7 +22,8 @@ _TTL = 600.0
 
 def _jwks(force: bool = False) -> PyJWKSet:
     if force or _cache["set"] is None or time.monotonic() - _cache["at"] > _TTL:
-        r = httpx.get(get_settings().web_jwks_url, timeout=3.0)
+        s = get_settings()
+        r = httpx.get(f"http://{s.web_hostport}/api/auth/jwks" if s.web_hostport else s.web_jwks_url, timeout=3.0)
         r.raise_for_status()
         _cache.update(set=PyJWKSet.from_dict(r.json()), at=time.monotonic())
     return _cache["set"]
@@ -44,7 +45,12 @@ def decode_web_token(token: str) -> dict[str, Any]:
         if not match:
             raise ECLException("TOKEN_INVALID", "Unknown signing key.", 401)
         claims: dict[str, Any] = jwt.decode(
-            token, match[0], algorithms=["RS256"], audience=s.web_jwt_audience, issuer=s.web_jwt_issuer, leeway=10,
+            token,
+            match[0],
+            algorithms=["RS256"],
+            audience=s.web_jwt_audience,
+            issuer=s.web_jwt_issuer,
+            leeway=10,
         )
     except ECLException:
         raise
