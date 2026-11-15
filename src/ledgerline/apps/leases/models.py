@@ -46,9 +46,7 @@ class LeaseEntity(Base):
     fy_start_month: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")
     book_name: Mapped[str] = mapped_column(Text, nullable=False)
     framework: Mapped[str] = mapped_column(String(16), nullable=False, server_default="IFRS16")
-    standard_version: Mapped[str] = mapped_column(
-        Text, nullable=False, server_default="IFRS 16 (2016, as amended)"
-    )
+    standard_version: Mapped[str] = mapped_column(Text, nullable=False, server_default="IFRS 16 (2016, as amended)")
     # per-tenant sequences (locked with SELECT … FOR UPDATE when allocating)
     lease_seq: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     batch_seq: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
@@ -94,22 +92,16 @@ class LeasePeriod(Base):
     id: Mapped[str] = mapped_column(String(26), primary_key=True)
     tenant_id: Mapped[str] = mapped_column(String(26), nullable=False, index=True)
     key: Mapped[str] = mapped_column(String(7), nullable=False)  # YYYY-MM
-    status: Mapped[str] = mapped_column(
-        String(16), nullable=False, server_default="open"
-    )  # open | closing | locked
+    status: Mapped[str] = mapped_column(String(16), nullable=False, server_default="open")  # open | closing | locked
     locked_by: Mapped[str | None] = mapped_column(String(26), nullable=True)
     locked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    reopen_log: Mapped[list] = mapped_column(
-        JSON, nullable=False, default=list
-    )  # append-only [{by, at, reason}]
+    reopen_log: Mapped[list] = mapped_column(JSON, nullable=False, default=list)  # append-only [{by, at, reason}]
     created_at: Mapped[datetime] = _ts()
 
 
 class LeaseCounterparty(Base):
     __tablename__ = "lease_counterparties"
-    __table_args__ = (
-        Index("lease_cp_tenant_name_uq", "tenant_id", func.lower(text("name")), unique=True),
-    )
+    __table_args__ = (Index("lease_cp_tenant_name_uq", "tenant_id", func.lower(text("name")), unique=True),)
     id: Mapped[str] = mapped_column(String(26), primary_key=True)
     tenant_id: Mapped[str] = mapped_column(String(26), nullable=False, index=True)
     name: Mapped[str] = mapped_column(Text, nullable=False)
@@ -140,9 +132,7 @@ class Lease(Base):
     wizard_step: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     rev: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1")  # optimistic lock
     import_batch_id: Mapped[str | None] = mapped_column(String(26), nullable=True)
-    verification_failed: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, server_default="false"
-    )
+    verification_failed: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     created_at: Mapped[datetime] = _ts()
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
@@ -199,9 +189,7 @@ class LeaseBooks(Base):
     """
 
     __tablename__ = "lease_books"
-    lease_id: Mapped[str] = mapped_column(
-        String(26), ForeignKey("leases.id", ondelete="CASCADE"), primary_key=True
-    )
+    lease_id: Mapped[str] = mapped_column(String(26), ForeignKey("leases.id", ondelete="CASCADE"), primary_key=True)
     tenant_id: Mapped[str] = mapped_column(String(26), nullable=False, index=True)
     chain_checksum: Mapped[str] = mapped_column(String(64), nullable=False)
     engine_version: Mapped[str] = mapped_column(String(32), nullable=False)
@@ -237,9 +225,7 @@ class LeaseCloseRun(Base):
     id: Mapped[str] = mapped_column(String(26), primary_key=True)
     tenant_id: Mapped[str] = mapped_column(String(26), nullable=False, index=True)
     period: Mapped[str] = mapped_column(String(7), nullable=False)
-    steps: Mapped[list] = mapped_column(
-        JSON, nullable=False
-    )  # [{id, status, doneBy, doneAt, note}]
+    steps: Mapped[list] = mapped_column(JSON, nullable=False)  # [{id, status, doneBy, doneAt, note}]
     batch_id: Mapped[str | None] = mapped_column(String(26), nullable=True)
     started_by: Mapped[str] = mapped_column(String(26), nullable=False)
     started_at: Mapped[datetime] = _ts()
@@ -261,9 +247,7 @@ class LeaseActualPayment(Base):
     reference: Mapped[str] = mapped_column(Text, nullable=False)
     lease_id: Mapped[str | None] = mapped_column(String(26), nullable=True)
     expected: Mapped[Decimal | None] = mapped_column(MONEY, nullable=True)
-    match: Mapped[str] = mapped_column(
-        String(16), nullable=False
-    )  # matched | late | different | unmatched
+    match: Mapped[str] = mapped_column(String(16), nullable=False)  # matched | late | different | unmatched
     resolution: Mapped[str | None] = mapped_column(String(16), nullable=True)
     resolution_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     resolved_by: Mapped[str | None] = mapped_column(String(26), nullable=True)
@@ -287,9 +271,7 @@ class LeaseJournalBatch(Base):
     code: Mapped[str] = mapped_column(String(32), nullable=False)
     period: Mapped[str] = mapped_column(String(7), nullable=False)
     type: Mapped[str] = mapped_column(String(16), nullable=False)  # period | reversal
-    status: Mapped[str] = mapped_column(
-        String(16), nullable=False
-    )  # draft | approved | exported | posted | reversed
+    status: Mapped[str] = mapped_column(String(16), nullable=False)  # draft | approved | exported | posted | reversed
     source_checksum: Mapped[str] = mapped_column(String(64), nullable=False, server_default="")
     idempotency_key: Mapped[str] = mapped_column(Text, nullable=False)
     created_by: Mapped[str] = mapped_column(String(26), nullable=False)
