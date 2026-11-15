@@ -64,11 +64,7 @@ async def _period(db: AsyncSession, tenant_id: str, key: str, lock: bool = False
 
 async def _close(db: AsyncSession, tenant_id: str, key: str) -> LeaseCloseRun | None:
     return (
-        await db.execute(
-            select(LeaseCloseRun).where(
-                LeaseCloseRun.tenant_id == tenant_id, LeaseCloseRun.period == key
-            )
-        )
+        await db.execute(select(LeaseCloseRun).where(LeaseCloseRun.tenant_id == tenant_id, LeaseCloseRun.period == key))
     ).scalar_one_or_none()
 
 
@@ -82,24 +78,18 @@ def _set_steps(c: LeaseCloseRun, fn) -> None:
     c.steps = steps  # reassign: JSON columns don't track in-place mutation
 
 
-async def _batch(
-    db: AsyncSession, tenant_id: str, batch_id: str | None
-) -> LeaseJournalBatch | None:
+async def _batch(db: AsyncSession, tenant_id: str, batch_id: str | None) -> LeaseJournalBatch | None:
     if not batch_id:
         return None
     return (
         await db.execute(
-            select(LeaseJournalBatch).where(
-                LeaseJournalBatch.tenant_id == tenant_id, LeaseJournalBatch.id == batch_id
-            )
+            select(LeaseJournalBatch).where(LeaseJournalBatch.tenant_id == tenant_id, LeaseJournalBatch.id == batch_id)
         )
     ).scalar_one_or_none()
 
 
 async def _books(db: AsyncSession, tenant_id: str) -> list[LeaseBooks]:
-    return list(
-        (await db.execute(select(LeaseBooks).where(LeaseBooks.tenant_id == tenant_id))).scalars()
-    )
+    return list((await db.execute(select(LeaseBooks).where(LeaseBooks.tenant_id == tenant_id))).scalars())
 
 
 async def source_checksum(db: AsyncSession, tenant_id: str) -> str:
@@ -115,11 +105,7 @@ async def source_checksum(db: AsyncSession, tenant_id: str) -> str:
 
 async def _posted(db: AsyncSession, tenant_id: str) -> dict[str, dict[str, Decimal]]:
     out: dict[str, dict[str, Decimal]] = defaultdict(dict)
-    for r in (
-        await db.execute(
-            select(LeasePostedBalance).where(LeasePostedBalance.tenant_id == tenant_id)
-        )
-    ).scalars():
+    for r in (await db.execute(select(LeasePostedBalance).where(LeasePostedBalance.tenant_id == tenant_id))).scalars():
         out[r.lease_id][r.account] = r.amount
     return out
 
@@ -160,9 +146,7 @@ async def start(db: AsyncSession, m: TenantMembership, key: str) -> LeaseCloseRu
     return c
 
 
-async def step_issues(
-    db: AsyncSession, tenant_id: str, c: LeaseCloseRun, sid: str
-) -> dict[str, list[str]]:
+async def step_issues(db: AsyncSession, tenant_id: str, c: LeaseCloseRun, sid: str) -> dict[str, list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
     end = month_end(c.period)
@@ -230,9 +214,7 @@ async def step_issues(
         if not gl:
             errors.append("No approved GL mapping is in force.")
         elif unmapped:
-            errors.append(
-                f"{len(unmapped)} GL account{'s are' if len(unmapped) > 1 else ' is'} not mapped."
-            )
+            errors.append(f"{len(unmapped)} GL account{'s are' if len(unmapped) > 1 else ' is'} not mapped.")
     elif sid == "post":
         b = await _batch(db, tenant_id, c.batch_id)
         if b is None or b.status != "posted":
@@ -349,9 +331,7 @@ async def generate(db: AsyncSession, m: TenantMembership, key: str) -> LeaseJour
     if old:
         await db.delete(old)
     e = (
-        await db.execute(
-            select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update()
-        )
+        await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update())
     ).scalar_one()
     e.batch_seq += 1
     b = LeaseJournalBatch(
@@ -382,9 +362,7 @@ async def generate(db: AsyncSession, m: TenantMembership, key: str) -> LeaseJour
         )
     c.batch_id = b.id
     if not (
-        await db.execute(
-            select(LeaseActualPayment.id).where(LeaseActualPayment.close_id == c.id).limit(1)
-        )
+        await db.execute(select(LeaseActualPayment.id).where(LeaseActualPayment.close_id == c.id).limit(1))
     ).first():
         await _expected_payments(db, m.tenant_id, c)
 
@@ -399,8 +377,7 @@ async def generate(db: AsyncSession, m: TenantMembership, key: str) -> LeaseJour
             if s["status"] != "locked":
                 s.update(
                     status="todo"
-                    if sid == "reconcile"
-                    and steps[STEPS.index("matching")]["status"] in ("done", "warning")
+                    if sid == "reconcile" and steps[STEPS.index("matching")]["status"] in ("done", "warning")
                     else "locked",
                     doneBy=None,
                     doneAt=None,
@@ -420,9 +397,7 @@ async def _expected_payments(db: AsyncSession, tenant_id: str, c: LeaseCloseRun)
     names = dict(
         (
             await db.execute(
-                select(LeaseCounterparty.id, LeaseCounterparty.name).where(
-                    LeaseCounterparty.tenant_id == tenant_id
-                )
+                select(LeaseCounterparty.id, LeaseCounterparty.name).where(LeaseCounterparty.tenant_id == tenant_id)
             )
         ).all()
     )
@@ -489,11 +464,7 @@ async def upload_payments(
         ).scalars()
     )
     seen_refs = set(
-        (
-            await db.execute(
-                select(LeaseActualPayment.reference).where(LeaseActualPayment.close_id == c.id)
-            )
-        ).scalars()
+        (await db.execute(select(LeaseActualPayment.reference).where(LeaseActualPayment.close_id == c.id))).scalars()
     )
     matched = added = 0
     for r in rows:
@@ -506,18 +477,12 @@ async def upload_payments(
             raise invalid(f"Payment {ref}: date must be YYYY-MM-DD.") from e
         amt, vendor = _num(r.get("amount", "")), (r.get("vendor") or "").strip()
         hit = next(
-            (
-                x
-                for x in expected
-                if x.vendor.lower() == vendor.lower() and abs((x.date - d).days) <= 10
-            ),
+            (x for x in expected if x.vendor.lower() == vendor.lower() and abs((x.date - d).days) <= 10),
             None,
         )
         if hit:
             hit.amount, hit.reference, hit.date = amt, ref, d
-            hit.match = (
-                "matched" if abs(amt - (hit.expected or ZERO)) < Decimal("0.01") else "different"
-            )
+            hit.match = "matched" if abs(amt - (hit.expected or ZERO)) < Decimal("0.01") else "different"
             expected.remove(hit)
             matched += 1
         else:
@@ -535,9 +500,7 @@ async def upload_payments(
             )
             added += 1
         seen_refs.add(ref)
-    await audit(
-        db, m.tenant_id, m.user_id, "close.payments", key, f"{matched} matched, {added} unmatched"
-    )
+    await audit(db, m.tenant_id, m.user_id, "close.payments", key, f"{matched} matched, {added} unmatched")
     return {"matched": matched, "unmatched": added}
 
 
@@ -549,9 +512,7 @@ async def resolve_payment(
         c
         and (
             await db.execute(
-                select(LeaseActualPayment).where(
-                    LeaseActualPayment.close_id == c.id, LeaseActualPayment.id == pid
-                )
+                select(LeaseActualPayment).where(LeaseActualPayment.close_id == c.id, LeaseActualPayment.id == pid)
             )
         ).scalar_one_or_none()
     )
@@ -568,9 +529,7 @@ async def resolve_payment(
 # ─── Reconciliation ────────────────────────────────────────────────────────
 
 
-async def reconciliations(
-    db: AsyncSession, tenant_id: str, c: LeaseCloseRun
-) -> list[dict[str, Any]]:
+async def reconciliations(db: AsyncSession, tenant_id: str, c: LeaseCloseRun) -> list[dict[str, Any]]:
     end = month_end(c.period)
     liab_books = rou_books = ZERO
     for b in await _books(db, tenant_id):
@@ -584,13 +543,7 @@ async def reconciliations(
     posted = await _posted(db, tenant_id)
     batch = await _batch(db, tenant_id, c.batch_id)
     lines = (
-        list(
-            (
-                await db.execute(
-                    select(LeaseJournalLine).where(LeaseJournalLine.batch_id == batch.id)
-                )
-            ).scalars()
-        )
+        list((await db.execute(select(LeaseJournalLine).where(LeaseJournalLine.batch_id == batch.id))).scalars())
         if batch
         else []
     )
@@ -643,13 +596,8 @@ async def export_batch(db: AsyncSession, m: TenantMembership, batch_id: str) -> 
     b.exported_at = now()
     gl = in_force(await setup_versions(db, m.tenant_id, "gl"), month_end(b.period))
     accounts = (gl.data.get("accounts") if gl else {}) or {}
-    leases = {
-        lz.id: lz
-        for lz in (await db.execute(select(Lease).where(Lease.tenant_id == m.tenant_id))).scalars()
-    }
-    ent = (
-        await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id))
-    ).scalar_one()
+    leases = {lz.id: lz for lz in (await db.execute(select(Lease).where(Lease.tenant_id == m.tenant_id))).scalars()}
+    ent = (await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id))).scalar_one()
     from ledgerline.leases.domain.engine import ACCOUNT_LABELS
 
     buf = io.StringIO()
@@ -673,9 +621,7 @@ async def export_batch(db: AsyncSession, m: TenantMembership, batch_id: str) -> 
     )
     for ln in (
         await db.execute(
-            select(LeaseJournalLine)
-            .where(LeaseJournalLine.batch_id == b.id)
-            .order_by(LeaseJournalLine.id)
+            select(LeaseJournalLine).where(LeaseJournalLine.batch_id == b.id).order_by(LeaseJournalLine.id)
         )
     ).scalars():
         lz = leases.get(ln.lease_id)
@@ -735,26 +681,18 @@ async def post_batch(db: AsyncSession, m: TenantMembership, batch_id: str, erp_r
 async def _apply_lines(db: AsyncSession, tenant_id: str, batch_id: str, sign: int) -> None:
     """Add (or with sign=-1, remove) a batch's signed amounts to the posted balances."""
     totals: dict[tuple[str, str], Decimal] = defaultdict(lambda: ZERO)
-    for ln in (
-        await db.execute(select(LeaseJournalLine).where(LeaseJournalLine.batch_id == batch_id))
-    ).scalars():
+    for ln in (await db.execute(select(LeaseJournalLine).where(LeaseJournalLine.batch_id == batch_id))).scalars():
         totals[(ln.lease_id, ln.account)] += ln.debit - ln.credit
     existing = {
         (pb.lease_id, pb.account): pb
         for pb in (
-            await db.execute(
-                select(LeasePostedBalance).where(LeasePostedBalance.tenant_id == tenant_id)
-            )
+            await db.execute(select(LeasePostedBalance).where(LeasePostedBalance.tenant_id == tenant_id))
         ).scalars()
     }
     for (lease_id, account), amt in totals.items():
         pb = existing.get((lease_id, account))
         if pb is None:
-            db.add(
-                LeasePostedBalance(
-                    tenant_id=tenant_id, lease_id=lease_id, account=account, amount=sign * amt
-                )
-            )
+            db.add(LeasePostedBalance(tenant_id=tenant_id, lease_id=lease_id, account=account, amount=sign * amt))
         else:
             pb.amount = pb.amount + sign * amt
 
@@ -773,22 +711,14 @@ async def lock(db: AsyncSession, m: TenantMembership, key: str) -> None:
     await _apply_lines(db, m.tenant_id, b.id, +1)
     _set_steps(
         c,
-        lambda steps: steps[STEPS.index("post")].update(
-            status="done", doneBy=m.user_id, doneAt=now().isoformat()
-        ),
+        lambda steps: steps[STEPS.index("post")].update(status="done", doneBy=m.user_id, doneAt=now().isoformat()),
     )
     p.status, p.locked_by, p.locked_at = "locked", m.user_id, now()
     nk = next_month_key(key)
     if not (
-        await db.execute(
-            select(LeasePeriod.id).where(
-                LeasePeriod.tenant_id == m.tenant_id, LeasePeriod.key == nk
-            )
-        )
+        await db.execute(select(LeasePeriod.id).where(LeasePeriod.tenant_id == m.tenant_id, LeasePeriod.key == nk))
     ).first():
-        db.add(
-            LeasePeriod(id=new_ulid(), tenant_id=m.tenant_id, key=nk, status="open", reopen_log=[])
-        )
+        db.add(LeasePeriod(id=new_ulid(), tenant_id=m.tenant_id, key=nk, status="open", reopen_log=[]))
     await audit(db, m.tenant_id, m.user_id, "period.lock", key)
     await notify(
         db,
@@ -825,9 +755,7 @@ async def reopen(db: AsyncSession, m: TenantMembership, key: str, reason: str) -
     if b:
         await _apply_lines(db, m.tenant_id, b.id, -1)
         e = (
-            await db.execute(
-                select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update()
-            )
+            await db.execute(select(LeaseEntity).where(LeaseEntity.tenant_id == m.tenant_id).with_for_update())
         ).scalar_one()
         e.batch_seq += 1
         rev = LeaseJournalBatch(
@@ -846,9 +774,7 @@ async def reopen(db: AsyncSession, m: TenantMembership, key: str, reason: str) -
         )
         db.add(rev)
         await db.flush()
-        for ln in (
-            await db.execute(select(LeaseJournalLine).where(LeaseJournalLine.batch_id == b.id))
-        ).scalars():
+        for ln in (await db.execute(select(LeaseJournalLine).where(LeaseJournalLine.batch_id == b.id))).scalars():
             db.add(
                 LeaseJournalLine(
                     tenant_id=m.tenant_id,
@@ -884,9 +810,7 @@ async def reopen(db: AsyncSession, m: TenantMembership, key: str, reason: str) -
 async def ser_close(db: AsyncSession, c: LeaseCloseRun) -> dict[str, Any]:
     pays = (
         await db.execute(
-            select(LeaseActualPayment)
-            .where(LeaseActualPayment.close_id == c.id)
-            .order_by(LeaseActualPayment.date)
+            select(LeaseActualPayment).where(LeaseActualPayment.close_id == c.id).order_by(LeaseActualPayment.date)
         )
     ).scalars()
     return {
@@ -914,16 +838,12 @@ async def ser_close(db: AsyncSession, c: LeaseCloseRun) -> dict[str, Any]:
     }
 
 
-async def ser_batch(
-    db: AsyncSession, b: LeaseJournalBatch, with_lines: bool = True
-) -> dict[str, Any]:
+async def ser_batch(db: AsyncSession, b: LeaseJournalBatch, with_lines: bool = True) -> dict[str, Any]:
     lines = (
         list(
             (
                 await db.execute(
-                    select(LeaseJournalLine)
-                    .where(LeaseJournalLine.batch_id == b.id)
-                    .order_by(LeaseJournalLine.id)
+                    select(LeaseJournalLine).where(LeaseJournalLine.batch_id == b.id).order_by(LeaseJournalLine.id)
                 )
             ).scalars()
         )
