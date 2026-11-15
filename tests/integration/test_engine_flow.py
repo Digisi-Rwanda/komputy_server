@@ -27,29 +27,44 @@ WB = Path(__file__).parent.parent / "fixtures" / "workbooks"
 @pytest.fixture(scope="module")
 async def ctx(client: httpx.AsyncClient) -> dict[str, Any]:
     ws = await make_workspace("ECL Bank")
-    return {"c": client, "tid": ws.tid, "prep": ws.h("prep"), "rev": ws.h("rev"), "admin": ws.h("admin"),
-            "prep_as_rev": __import__("tests.integration.conftest", fromlist=["token"]).token(ws.users["prep"], ws.tid, "member", ecl="reviewer"),
-            "base": f"/api/v1/tenants/{ws.tid}/runs"}
+    return {
+        "c": client,
+        "tid": ws.tid,
+        "prep": ws.h("prep"),
+        "rev": ws.h("rev"),
+        "admin": ws.h("admin"),
+        "prep_as_rev": __import__("tests.integration.conftest", fromlist=["token"]).token(
+            ws.users["prep"], ws.tid, "member", ecl="reviewer"
+        ),
+        "base": f"/api/v1/tenants/{ws.tid}/runs",
+    }
 
 
 async def _drain(queues: list[str]) -> None:
     await drain(queues)
 
 
-async def _upload(c: httpx.AsyncClient, base: str, rid: str, h: dict[str, str], kind: str, path: Path) -> dict[str, Any]:
+async def _upload(
+    c: httpx.AsyncClient, base: str, rid: str, h: dict[str, str], kind: str, path: Path
+) -> dict[str, Any]:
     data = path.read_bytes()
-    r = await c.post(f"{base}/{rid}/uploads/direct", headers=h, json={"kind": kind, "filename": path.name, "size": len(data)})
+    r = await c.post(
+        f"{base}/{rid}/uploads/direct", headers=h, json={"kind": kind, "filename": path.name, "size": len(data)}
+    )
     assert r.status_code == 201, r.text
     plan = r.json()["data"]
     parts = []
     async with httpx.AsyncClient() as s3:  # the browser's job: PUT each part to its presigned URL
         for i, url in enumerate(plan["urls"]):
-            chunk = data[i * plan["partSize"]:(i + 1) * plan["partSize"]]
+            chunk = data[i * plan["partSize"] : (i + 1) * plan["partSize"]]
             put = await s3.put(url, content=chunk)
             assert put.status_code == 200, put.text
             parts.append({"partNumber": i + 1, "etag": put.headers["etag"]})
-    r = await c.post(f"{base}/{rid}/uploads/direct/complete", headers=h,
-                     json={"kind": kind, "filename": path.name, "key": plan["key"], "uploadId": plan["uploadId"], "parts": parts})
+    r = await c.post(
+        f"{base}/{rid}/uploads/direct/complete",
+        headers=h,
+        json={"kind": kind, "filename": path.name, "key": plan["key"], "uploadId": plan["uploadId"], "parts": parts},
+    )
     assert r.status_code == 201, r.text
     return r.json()["data"]
 
@@ -101,20 +116,28 @@ async def test_full_ecl_run_with_review(ctx: dict[str, Any]) -> None:
     assert page2["rows"][0]["id"] > page1["rows"][-1]["id"], "keyset pagination moves forward"
     assert isinstance((await c.get(f"{views}/{rid}/exceptions", headers=prep)).json()["data"], list)
     ex = (await c.get(f"{views}/{rid}/explore", headers=prep)).json()["data"]
-    assert ex["loans"] == v["loans"] and abs(sum(b["ecl"] for b in ex["sizes"]) - v["totalEcl"]) < 0.01, "size buckets tie to the total"
+    assert ex["loans"] == v["loans"] and abs(sum(b["ecl"] for b in ex["sizes"]) - v["totalEcl"]) < 0.01, (
+        "size buckets tie to the total"
+    )
     top = ex["top"][0]
     ld = (await c.get(f"{views}/{rid}/loans/{top['id']}", headers=prep)).json()["data"]
     assert ld["schedule"] and abs(ld["ecl"] - top["ecl"]) < 1e-6
     cmp = (await c.get(f"/api/v1/tenants/{ctx['tid']}/ecl/views/compare?a={rid}&b={rid}", headers=prep)).json()["data"]
     mv = {m["label"]: m["value"] for m in cmp["movement"]}
-    assert abs(mv["Opening"] - v["totalEcl"]) < 0.01 and abs(mv["Closing"] - v["totalEcl"]) < 0.01 and mv["New loans"] == 0
-    assert sum(cmp["migration"][i][i] for i in range(3)) == v["loans"], "a run compared with itself stays on the diagonal"
+    assert (
+        abs(mv["Opening"] - v["totalEcl"]) < 0.01 and abs(mv["Closing"] - v["totalEcl"]) < 0.01 and mv["New loans"] == 0
+    )
+    assert sum(cmp["migration"][i][i] for i in range(3)) == v["loans"], (
+        "a run compared with itself stays on the diagonal"
+    )
     assert len((await c.get(f"{views}/{rid}/audit", headers=prep)).json()["data"]) >= 1
 
     for kind in ("stage", "coverage", "exceptions", "recon", "board"):
         rep = await c.get(f"/api/v1/tenants/{ctx['tid']}/ecl/runs/{rid}/reports/{kind}", headers=prep)
         assert rep.status_code == 200 and rep.content[:2] == b"PK", (kind, rep.status_code, rep.text[:200])
-    rf = await c.get(f"/api/v1/tenants/{ctx['tid']}/ecl/runs/{rid}/reports/rollforward?fmt=csv&compare={rid}", headers=prep)
+    rf = await c.get(
+        f"/api/v1/tenants/{ctx['tid']}/ecl/runs/{rid}/reports/rollforward?fmt=csv&compare={rid}", headers=prep
+    )
     assert rf.status_code == 200 and b"Opening" in rf.content
 
     # Review: maker/checker
@@ -136,7 +159,15 @@ async def test_full_ecl_run_with_review(ctx: dict[str, Any]) -> None:
     assert r.status_code == 409 and r.json()["code"] == "RUN_LOCKED"
 
     async with AsyncSessionLocal() as db:
-        events = (await db.execute(text("SELECT payload->>'event' FROM engine.outbox_events WHERE payload->>'runId' = :r"), {"r": rid})).scalars().all()
+        events = (
+            (
+                await db.execute(
+                    text("SELECT payload->>'event' FROM engine.outbox_events WHERE payload->>'runId' = :r"), {"r": rid}
+                )
+            )
+            .scalars()
+            .all()
+        )
     assert {"completed", "signoff"} <= set(events)
 
 
