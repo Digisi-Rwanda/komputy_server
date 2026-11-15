@@ -1,0 +1,33 @@
+# Lint + full test suite (domain maths and integration against Postgres 17 + MinIO), then a production image build.
+# Render deploys `main` only after this passes (autoDeployTrigger: checksPass).
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+concurrency: { group: "ci-${{ github.ref }}", cancel-in-progress: true }
+permissions: { contents: read }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env: { POSTGRES_USER: ledgerline, POSTGRES_PASSWORD: ledgerline, POSTGRES_DB: ledgerline_engine_test }
+        ports: ["5440:5432"]
+        options: --health-cmd "pg_isready -U ledgerline" --health-interval 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: MinIO (S3 stand-in for R2)
+        run: |
+          docker run -d -p 9010:9000 -e MINIO_ROOT_USER=ledgerline -e MINIO_ROOT_PASSWORD=ledgerline-secret minio/minio:RELEASE.2025-04-22T22-12-26Z server /data
+          for i in $(seq 30); do curl -sf localhost:9010/minio/health/live && break; sleep 1; done
+      - uses: astral-sh/setup-uv@v5
+        with: { enable-cache: true }
+      - run: uv sync --frozen
+      - run: uv run ruff check src tests
+      - run: uv run ruff format --check src tests
+      - run: uv run pytest -q
+      - name: Production image builds
+        run: docker build -t komputy-engine:ci . && docker build -t komputy-backup:ci ops/backup
