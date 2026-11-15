@@ -1,0 +1,84 @@
+[project]
+name = "ledgerline-engine"
+version = "1.0.0"
+description = "Ledgerline calculation & accounting engine (IFRS 9 ECL, IFRS 16 leases)"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.32",
+  "pydantic>=2.9",
+  "pydantic-settings>=2.6",
+  "sqlalchemy[asyncio]>=2.0.36",
+  "asyncpg>=0.30",
+  "psycopg[binary,pool]>=3.2",
+  "alembic>=1.14",
+  "procrastinate>=3.0",
+  "pyjwt[crypto]>=2.10",
+  "httpx>=0.28",
+  "aioboto3>=13.2",
+  "numpy>=2.1",
+  "pandas>=2.2",
+  "scipy>=1.14",
+  "numpy-financial>=1.0",
+  "polars>=1.14",
+  "pyarrow>=18.0",
+  "python-calamine>=0.3",
+  "openpyxl>=3.1",
+  "xlsxwriter>=3.2",
+  "python-ulid>=3.0",
+  "structlog>=24.4",
+  "orjson>=3.10",
+  "sentry-sdk>=2.18",
+  "opentelemetry-api>=1.28",
+  "opentelemetry-sdk>=1.28",
+  "opentelemetry-exporter-otlp-proto-http>=1.28",
+  "opentelemetry-instrumentation-fastapi>=0.49b0",
+  "python-multipart>=0.0.33",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "hypothesis>=6.118",
+  "ruff>=0.8",
+  "pyright>=1.1.389",
+  "httpx>=0.28",
+]
+
+[project.scripts]
+ledgerline = "ledgerline.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ledgerline"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+markers = ["integration: needs Postgres + S3 (make dev)", "perf: slow performance suite"]
+addopts = "-m 'not perf'"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "ASYNC", "RUF"]
+ignore = ["S101", "RUF001", "RUF002", "RUF003", "E501"]  # line length is left to the formatter
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B", "ASYNC240"]
+"src/ledgerline/ecl/domain/**" = ["E501", "RUF005", "B905", "UP"]
+"src/ledgerline/leases/domain/**" = ["E501", "B905", "UP"]
+
+[tool.pyright]
+include = ["src"]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
