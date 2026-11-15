@@ -23,9 +23,7 @@ MONTH_ENDS = ["2024-01-31", "2024-02-29", "2024-03-31", "2024-04-30", "2024-05-3
 
 
 def _sheet(rows: list[tuple], *, filename: str = "pd.xlsx", sheet: str = "Sheet1") -> PdSourceSheet:
-    return PdSourceSheet(
-        filename=filename, sheet_name=sheet, frame=pd.DataFrame(rows, columns=COLUMNS)
-    )
+    return PdSourceSheet(filename=filename, sheet_name=sheet, frame=pd.DataFrame(rows, columns=COLUMNS))
 
 
 def _healthy_rows() -> list[tuple]:
@@ -147,9 +145,7 @@ def test_pd01_blocks_when_no_sheet_holds_pd_data() -> None:
 
 
 def test_non_data_sheets_are_skipped_not_blocked() -> None:
-    cover = PdSourceSheet(
-        filename="pd.xlsx", sheet_name="Cover", frame=pd.DataFrame({"Notes": ["Q4 pack"]})
-    )
+    cover = PdSourceSheet(filename="pd.xlsx", sheet_name="Cover", frame=pd.DataFrame({"Notes": ["Q4 pack"]}))
     data = _sheet(_healthy_rows(), sheet="Data")
     outcome = _evaluate([cover, data])
 
@@ -226,16 +222,11 @@ def test_ec10_treats_same_month_different_day_as_duplicate() -> None:
     rows = [*_healthy_rows(), ("L001", "2024-01-15", "Stage 2", 100_000.0, "Retail")]
     outcome = _evaluate([_sheet(rows)])
     assert _outcome(outcome, "EC-10") == "block"
-    assert "calendar month is the transition join key" in _by_code(outcome.criteria)[
-        "EC-10"
-    ].rationale
+    assert "calendar month is the transition join key" in _by_code(outcome.criteria)["EC-10"].rationale
 
 
 def test_issue_list_is_capped_with_an_explicit_truncation_notice() -> None:
-    rows = [
-        (None, MONTH_ENDS[0], "Stage 1", 100.0, "Retail")
-        for _ in range(120)
-    ]
+    rows = [(None, MONTH_ENDS[0], "Stage 1", 100.0, "Retail") for _ in range(120)]
     outcome = _evaluate([_sheet(rows)])
 
     assert outcome.issues_truncated is True
@@ -280,11 +271,7 @@ def test_ec13_respects_a_tenant_override() -> None:
 
 
 def test_ec14_flags_an_implausible_stage3_share() -> None:
-    rows = [
-        (loan, month, "Stage 3", 100_000.0, "Retail")
-        for loan in ("L001", "L002")
-        for month in MONTH_ENDS
-    ]
+    rows = [(loan, month, "Stage 3", 100_000.0, "Retail") for loan in ("L001", "L002") for month in MONTH_ENDS]
     outcome = _evaluate([_sheet(rows)])
     assert _outcome(outcome, "EC-14") == "review"
     assert "100.0%" in _by_code(outcome.criteria)["EC-14"].rationale
@@ -334,9 +321,9 @@ def test_ec15_tolerates_floating_point_noise() -> None:
 
 
 def test_ec16_flags_a_zero_cure_rate() -> None:
-    rows = [
-        ("L001", month, "Stage 3", 100_000.0, "Retail") for month in MONTH_ENDS
-    ] + [("L002", month, "Stage 1", 100_000.0, "Retail") for month in MONTH_ENDS]
+    rows = [("L001", month, "Stage 3", 100_000.0, "Retail") for month in MONTH_ENDS] + [
+        ("L002", month, "Stage 1", 100_000.0, "Retail") for month in MONTH_ENDS
+    ]
     outcome = _evaluate([_sheet(rows)])
     assert _outcome(outcome, "EC-16") == "review"
     assert "0.0%" in _by_code(outcome.criteria)["EC-16"].rationale
@@ -346,9 +333,7 @@ def test_ec16_is_not_evaluated_without_stage3_exposure() -> None:
     rows = [("L001", month, "Stage 1", 100_000.0, "Retail") for month in MONTH_ENDS]
     outcome = _evaluate([_sheet(rows)])
     assert _outcome(outcome, "EC-16") == "review"
-    assert "no segment has any observed Stage 3 exposure" in _by_code(outcome.criteria)[
-        "EC-16"
-    ].rationale
+    assert "no segment has any observed Stage 3 exposure" in _by_code(outcome.criteria)["EC-16"].rationale
 
 
 def test_ec17_flags_an_offbooks_spike() -> None:
@@ -387,9 +372,9 @@ def test_ec17_needs_two_transition_months() -> None:
 
 def test_ec19_flags_a_stage_with_no_observed_exposure() -> None:
     """A zero row projects a 0% lifetime PD that looks measured but never was."""
-    rows = [
-        ("L001", month, "Stage 1", 100_000.0, "Retail") for month in MONTH_ENDS
-    ] + [("L002", month, "Stage 2", 50_000.0, "Retail") for month in MONTH_ENDS]
+    rows = [("L001", month, "Stage 1", 100_000.0, "Retail") for month in MONTH_ENDS] + [
+        ("L002", month, "Stage 2", 50_000.0, "Retail") for month in MONTH_ENDS
+    ]
     outcome = _evaluate([_sheet(rows)])
 
     assert _outcome(outcome, "EC-19") == "review"
@@ -426,9 +411,7 @@ def test_classify_sheets_separates_data_malformed_and_cover_pages() -> None:
         sheet_name="Partial",
         frame=pd.DataFrame({"Loan ID": ["L1"], "SEGMENT": ["Retail"]}),
     )
-    cover = PdSourceSheet(
-        filename="pd.xlsx", sheet_name="Cover", frame=pd.DataFrame({"Notes": ["x"]})
-    )
+    cover = PdSourceSheet(filename="pd.xlsx", sheet_name="Cover", frame=pd.DataFrame({"Notes": ["x"]}))
 
     kept, broken, skipped = classify_sheets([data, malformed, cover])
     assert [s.sheet_name for s in kept] == ["Data"]
@@ -440,9 +423,7 @@ def test_combine_normalizes_the_reporting_month_alias_and_keeps_provenance() -> 
     frame = pd.DataFrame(_healthy_rows(), columns=COLUMNS).rename(
         columns={"Reporting Month": 'Reporting Month ("As At")'}
     )
-    combined = combine_pd_sheets(
-        [PdSourceSheet(filename="pd.xlsx", sheet_name="Data", frame=frame)]
-    )
+    combined = combine_pd_sheets([PdSourceSheet(filename="pd.xlsx", sheet_name="Data", frame=frame)])
     assert "Reporting Month" in combined.columns
     assert combined["_pd_source_file"].unique().tolist() == ["pd.xlsx"]
     # Excel rows are 1-based with a header, so the first data row is row 2.
